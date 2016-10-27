@@ -75,12 +75,46 @@ public class WebService : System.Web.Services.WebService
         return ReturnContant; // 回傳資料
     }
 
+    // 登入方法，密碼正確回傳"True"，錯誤則回傳錯誤訊息
     [WebMethod]
     public string LoginSystem (string Account, string PassWord)
     {
-        string Msg = "";
-        
-        return Msg;
+        string ReturnContant = "";
+        try
+        {
+            objcon = new SqlConnection(strdbcon);
+            objcon.Open();
+            sql = "select Account,Password form Member where Account ='" + Account + "'";
+            sqlcmd = new SqlCommand(sql, objcon);
+            SqlDataReader dr = sqlcmd.ExecuteReader();
+            if (dr.IsClosed == false)
+            {
+                while (dr.Read())
+                {
+                    if ( dr[1].ToString().Equals(PassWord) )
+                    {
+                        ReturnContant = "True";
+                    }
+                    else
+                    {
+                        ReturnContant = "Account or password is wrong";
+                    }
+                }
+                dr.Close();
+                objcon.Close();
+            }
+            else
+            {
+                ReturnContant = "Account don't exist.";
+            }
+            
+
+        }
+        catch (Exception ex)
+        {
+            //Response.Write(ex.Message);
+        }
+        return ReturnContant;
     }
 
 }
