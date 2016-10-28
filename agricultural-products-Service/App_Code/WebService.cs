@@ -77,21 +77,22 @@ public class WebService : System.Web.Services.WebService
 
     // 登入方法，密碼正確回傳"True"，錯誤則回傳錯誤訊息
     [WebMethod]
-    public string LoginSystem (string Account, string PassWord)
+    public string LoginSystem (string Account, string Password)
     {
         string ReturnContant = "";
         try
         {
             objcon = new SqlConnection(strdbcon);
             objcon.Open();
-            sql = "select Account,Password form Member where Account ='" + Account + "'";
+            sql = "select Account,Password from Member where Account = @account";
             sqlcmd = new SqlCommand(sql, objcon);
+            sqlcmd.Parameters.Add("@account", SqlDbType.NVarChar).Value = Account;
             SqlDataReader dr = sqlcmd.ExecuteReader();
             if (dr.IsClosed == false)
             {
                 while (dr.Read())
                 {
-                    if ( dr[1].ToString().Equals(PassWord) )
+                    if ( dr[1].ToString().Equals(Password) )
                     {
                         ReturnContant = "True";
                     }
@@ -105,7 +106,7 @@ public class WebService : System.Web.Services.WebService
             }
             else
             {
-                ReturnContant = "Account don't exist.";
+                ReturnContant = "Account doesn't exist.";
             }
             
 
