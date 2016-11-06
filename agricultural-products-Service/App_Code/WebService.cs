@@ -6,6 +6,9 @@ using System.Web.Services;
 using System.IO;
 using System.Data.SqlClient;
 using System.Data;
+using System.Drawing;
+using QRCoder;
+using ZXing;
 
 
 /// <summary>
@@ -118,4 +121,58 @@ public class WebService : System.Web.Services.WebService
         return ReturnContant;
     }
 
+    [WebMethod]
+    public string getQRCode(string data)
+    {
+        string qrCodeLink = "https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=" + data + "&chld=L|4";
+        return DateTime.Now.ToString("yyyyMMddHHmmss");
+    }
+
+    [WebMethod]
+    public void textQRCode(string data)
+    {
+        string savePath = @"E:\\Git Project\\NPUST_sales-of-agricultural-products-Service\\agricultural-products-Service\\QRCode\\";
+        string saveName = DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+        QRCode qrCode = new QRCode(qrCodeData);
+        Bitmap qrCodeImage = qrCode.GetGraphic(20);
+        System.Web.UI.WebControls.Image imgBarCode = new System.Web.UI.WebControls.Image();
+        imgBarCode.Height = 150;
+        imgBarCode.Width = 150;
+        using (Bitmap bitMap = qrCode.GetGraphic(20))
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bitMap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                byte[] byteImage = ms.ToArray();
+                try
+                {
+                    MemoryStream memoryStream = new MemoryStream(byteImage);
+                    FileStream fileStream = new FileStream(savePath + saveName, FileMode.Create);
+                    memoryStream.WriteTo(fileStream);
+                    memoryStream.Close();
+                    fileStream.Close();
+                    fileStream = null;
+                    memoryStream = null;
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+            }
+        }
+
+    }
+
+    [WebMethod]
+    public void textZxing()
+    {
+        BarcodeWriter bw = new BarcodeWriter();
+        bw.Format = BarcodeFormat.QR_CODE;
+        bw.Options.Width = 260;
+        bw.Options.Height = 237;
+        Bitmap bitmap = bw.Write("PIXNET");
+    }
 }
