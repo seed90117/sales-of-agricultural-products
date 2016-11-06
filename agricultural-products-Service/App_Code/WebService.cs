@@ -122,7 +122,7 @@ public class WebService : System.Web.Services.WebService
     }
 
     [WebMethod]
-    public string getQRCode(string data)
+    public string getGoogleQRCode(string data)
     {
         string qrCodeLink = "https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=" + data + "&chld=L|4";
         return DateTime.Now.ToString("yyyyMMddHHmmss");
