@@ -12,7 +12,7 @@ using QRCoder;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Web.Script.Serialization;
-
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Summary description for WebService
@@ -212,6 +212,109 @@ public class WebService : System.Web.Services.WebService
             //Response.Write(ex.Message);
             return getBoolJson(false);
         }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetIntroduction(string input)
+    {
+        int id=0;
+        string ReturnContant = ""; // 回傳資料字串變數
+        try
+        {
+            objcon = new SqlConnection(strdbcon); // 建立連接
+            objcon.Open(); // 開啟連接
+            sql = @"select Attributes,BigItem,SmallItem,ProductName,Period,PDF from Introduction"; // SQL語法
+            if (!input.Equals("ALL"))
+            {
+                input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
+                if (input.Equals(""))
+                {
+                    return getBoolJson(false);
+                }
+                else
+                {
+                    id = int.Parse(input);
+                }
+                sql += @" where IntroductionID=@id";
+            }
+                sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
+            // 只需修改以下部分---------------------------------------------------------------------------------------
+            // 取得回傳值(查詢、修改、刪除使用此語法)，新增語法使用 sqlcmd.ExecuteNonQuery();
+            if (!input.Equals("ALL"))
+            {
+                sqlcmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+            }
+            SqlDataReader dr = sqlcmd.ExecuteReader();
+            if (dr.IsClosed == false) // 確認資料庫開啟
+            {
+                //宣告一個DataTable等等用來存放資料庫裡撈出來的資料
+                DataTable table = new DataTable();
+                //把剛剛撈到的資料塞進table裡面
+                table.Load(dr);
+                //這行是利用Json.net直接把table轉成Json
+                ReturnContant = JsonConvert.SerializeObject(table, Formatting.None);
+                dr.Close(); // 停止讀取資料
+                objcon.Close(); // 關閉連接
+                ReturnContant = ReturnContant.Replace(@"\r\n", string.Empty);//移除那些特殊字元
+            }
+            // ------------------------------------------------------------------------------------------------------
+        }
+        catch (Exception ex)
+        {
+            //Response.Write(ex.Message);
+            return getBoolJson(false);
+        }
+        //return new JavaScriptSerializer().Serialize(ReturnContant);
+        return ReturnContant;
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMemberInfo(string input)
+    {
+        int id;
+        string ReturnContant = ""; // 回傳資料字串變數
+        input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
+        if (input.Equals(""))
+        {
+            return getBoolJson(false);
+        }
+        else
+        {
+            id = int.Parse(input);
+        }
+        try
+        {
+            objcon = new SqlConnection(strdbcon); // 建立連接
+            objcon.Open(); // 開啟連接
+            sql = @"select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where MemberID=@id"; // SQL語法
+            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
+                                                  // 只需修改以下部分---------------------------------------------------------------------------------------
+                                                  // 取得回傳值(查詢、修改、刪除使用此語法)，新增語法使用 sqlcmd.ExecuteNonQuery();
+            sqlcmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+            SqlDataReader dr = sqlcmd.ExecuteReader();
+            if (dr.IsClosed == false) // 確認資料庫開啟
+            {
+                //宣告一個DataTable等等用來存放資料庫裡撈出來的資料
+                DataTable table = new DataTable();
+                //把剛剛撈到的資料塞進table裡面
+                table.Load(dr);
+                //這行是利用Json.net直接把table轉成Json
+                ReturnContant = JsonConvert.SerializeObject(table, Formatting.None);
+                dr.Close(); // 停止讀取資料
+                objcon.Close(); // 關閉連接
+                ReturnContant = ReturnContant.Replace(@"\r\n", string.Empty);//移除那些特殊字元
+            }
+            // ------------------------------------------------------------------------------------------------------
+        }
+        catch (Exception ex)
+        {
+            //Response.Write(ex.Message);
+            return getBoolJson(false);
+        }
+        //return new JavaScriptSerializer().Serialize(ReturnContant);
+        return ReturnContant;
     }
 
 
