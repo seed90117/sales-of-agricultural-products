@@ -271,18 +271,18 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetMemberInfo(string input)
+    public string GetMemberInfo(string memberID)
     {
         int id;
         string ReturnContant = ""; // 回傳資料字串變數
-        input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
-        if (input.Equals(""))
+        memberID = Regex.Replace(memberID, "[^0-9]", "");//移除非數字的字元
+        if (memberID.Equals(""))
         {
             return getBoolJson(false);
         }
         else
         {
-            id = int.Parse(input);
+            id = int.Parse(memberID);
         }
         try
         {
@@ -316,81 +316,6 @@ public class WebService : System.Web.Services.WebService
         //return new JavaScriptSerializer().Serialize(ReturnContant);
         return ReturnContant;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
