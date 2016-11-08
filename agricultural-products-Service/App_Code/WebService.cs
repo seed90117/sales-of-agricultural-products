@@ -355,6 +355,31 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
+                            string CompanyName, string Address, string Access)
+    {
+        try
+        {
+            objcon = new SqlConnection(strdbcon); // 建立連接
+            objcon.Open(); // 開啟連接
+            sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
+                 "values('" + Account + "','" + Password + "','" + FirstName + "','" + LastName + "','" + Phone + "','" + Email + "','" + CompanyName + "','" + Address + "','" + Access + "')";
+            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
+            sqlcmd.ExecuteNonQuery();
+            return getBoolJson(true);
+        }
+        catch (Exception ex)
+        {
+            return getBoolJson(false);
+        }
+        finally
+        {
+            objcon.Close();
+        }
+    }
+
     // Private Method
     private string getBoolJson(bool input)
     {
