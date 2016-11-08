@@ -2,44 +2,47 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Services;
 using System.Web.Services;
 using System.IO;
 using System.Data.SqlClient;
 using System.Data;
 using System.Drawing;
 using QRCoder;
-using ZXing;
+using Newtonsoft.Json;
+using System.Web.Script.Serialization;
 
 
 /// <summary>
 /// Summary description for WebService
 /// </summary>
-[WebService(Namespace = "http://140.127.22.4/AgriculturalProducts/")]
+[WebService(Namespace = "http://127.0.0.1/AgriculturalProducts/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
-// [System.Web.Script.Services.ScriptService]
+[System.Web.Script.Services.ScriptService]
 public class WebService : System.Web.Services.WebService
 {
 
-    string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
-    SqlConnection objcon;
-    SqlCommand sqlcmd;
-    string sql;
+    private string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
+    private SqlConnection objcon;
+    private SqlCommand sqlcmd;
+    private string sql;
 
     public WebService()
     {
-
         //Uncomment the following line if using designed components 
         //InitializeComponent(); 
     }
 
     [WebMethod]
-    public string HelloWorld()
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string HelloWorld(string d)
     {
-        return "Hello World";
+        return new JavaScriptSerializer().Serialize("Hello World");
     }
 
     // [WebMethod]要加在方法上方
+    // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     // 方法名稱直白，單字第一個字需大寫
     // 範例如下
 
@@ -78,11 +81,46 @@ public class WebService : System.Web.Services.WebService
         return ReturnContant; // 回傳資料
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string TestDataBaseContactJSON()
+    {
+        string ReturnContant = ""; // 回傳資料字串變數
+        try
+        {
+            objcon = new SqlConnection(strdbcon); // 建立連接
+            objcon.Open(); // 開啟連接
+            sql = "select * from Test"; // SQL語法
+            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
+            // 只需修改以下部分---------------------------------------------------------------------------------------
+            // 取得回傳值(查詢、修改、刪除使用此語法)，新增語法使用 sqlcmd.ExecuteNonQuery();
+            SqlDataReader dr = sqlcmd.ExecuteReader();
+            if (dr.IsClosed == false) // 確認資料庫開啟
+            {
+                //宣告一個DataTable等等用來存放資料庫裡撈出來的資料
+                DataTable table = new DataTable();
+                //把剛剛撈到的資料塞進table裡面
+                table.Load(dr);
+                //這行是利用Json.net直接把table轉成Json
+                ReturnContant = JsonConvert.SerializeObject(table, Formatting.None);
+                dr.Close(); // 停止讀取資料
+                objcon.Close(); // 關閉連接
+            }
+            // ------------------------------------------------------------------------------------------------------
+        }
+        catch (Exception ex)
+        {
+            //Response.Write(ex.Message);
+        }
+        //return new JavaScriptSerializer().Serialize(ReturnContant);
+        return ReturnContant;
+    }
+
     // 登入方法，密碼正確回傳"True"，錯誤則回傳錯誤訊息
     [WebMethod]
     public string LoginSystem (string Account, string Password)
     {
-        string ReturnContant = "";
+        string returnContant = "";
         try
         {
             objcon = new SqlConnection(strdbcon);
@@ -97,11 +135,11 @@ public class WebService : System.Web.Services.WebService
                 {
                     if ( dr[1].ToString().Equals(Password) )
                     {
-                        ReturnContant = "True";
+                        returnContant = "True";
                     }
                     else
                     {
-                        ReturnContant = "Account or password is wrong";
+                        returnContant = "Account or password is wrong";
                     }
                 }
                 dr.Close();
@@ -109,7 +147,7 @@ public class WebService : System.Web.Services.WebService
             }
             else
             {
-                ReturnContant = "Account doesn't exist.";
+                returnContant = "Account doesn't exist.";
             }
             
 
@@ -118,18 +156,11 @@ public class WebService : System.Web.Services.WebService
         {
             //Response.Write(ex.Message);
         }
-        return ReturnContant;
+        return returnContant;
     }
 
     [WebMethod]
-    public string getGoogleQRCode(string data)
-    {
-        string qrCodeLink = "https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=" + data + "&chld=L|4";
-        return DateTime.Now.ToString("yyyyMMddHHmmss");
-    }
-
-    [WebMethod]
-    public void textQRCode(string data)
+    public void getQRCode(string data)
     {
         string savePath = @"E:\\Git Project\\NPUST_sales-of-agricultural-products-Service\\agricultural-products-Service\\QRCode\\";
         string saveName = DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
@@ -158,21 +189,9 @@ public class WebService : System.Web.Services.WebService
                 }
                 catch (Exception ex)
                 {
-
+                    //Response.Write(ex.Message);
                 }
-
             }
         }
-
-    }
-
-    [WebMethod]
-    public void textZxing()
-    {
-        BarcodeWriter bw = new BarcodeWriter();
-        bw.Format = BarcodeFormat.QR_CODE;
-        bw.Options.Width = 260;
-        bw.Options.Height = 237;
-        Bitmap bitmap = bw.Write("PIXNET");
     }
 }
