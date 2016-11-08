@@ -16,7 +16,7 @@ using System.Web.Script.Serialization;
 /// <summary>
 /// Summary description for WebService
 /// </summary>
-[WebService(Namespace = "http://127.0.0.1/AgriculturalProducts/")]
+[WebService(Namespace = "http://140.127.22.4/AgriculturalProducts/")]
 [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
 // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
 [System.Web.Script.Services.ScriptService]
@@ -159,11 +159,20 @@ public class WebService : System.Web.Services.WebService
         return returnContant;
     }
 
-    [WebMethod]
-    public void getQRCode(string data)
+
+
+
+
+
+
+
+    // Private Method
+
+    private string getQRCode(string data)
     {
-        string savePath = @"E:\\Git Project\\NPUST_sales-of-agricultural-products-Service\\agricultural-products-Service\\QRCode\\";
-        string saveName = DateTime.Now.ToString("yyyyMMddHHmmss") + ".jpg";
+        string savePath = @"D:\\web\\PlatformAPI\\QRCode\\";
+        string saveName = DateTime.Now.ToString("yyyyMMdd") + System.Guid.NewGuid().ToString() + ".jpg";
+        string returnURL = savePath + saveName;
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
         QRCodeData qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
         QRCode qrCode = new QRCode(qrCodeData);
@@ -186,10 +195,12 @@ public class WebService : System.Web.Services.WebService
                     fileStream.Close();
                     fileStream = null;
                     memoryStream = null;
+                    return returnURL;
                 }
                 catch (Exception ex)
                 {
                     //Response.Write(ex.Message);
+                    return "null";
                 }
             }
         }
