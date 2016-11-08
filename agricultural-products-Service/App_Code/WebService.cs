@@ -10,6 +10,7 @@ using System.Data;
 using System.Drawing;
 using QRCoder;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Web.Script.Serialization;
 
 
@@ -56,9 +57,9 @@ public class WebService : System.Web.Services.WebService
         {
             objcon = new SqlConnection(strdbcon); // 建立連接
             objcon.Open(); // 開啟連接
-            sql = "select * from Test"; // SQL語法
+            //sql = "select * from Test"; // SQL語法
+            sql = "insert into Test(ContentText) values('test111');SELECT SCOPE_IDENTITY()";
             sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
-
             // 只需修改以下部分---------------------------------------------------------------------------------------
             // 取得回傳值(查詢、修改、刪除使用此語法)，新增語法使用 sqlcmd.ExecuteNonQuery();
             SqlDataReader dr = sqlcmd.ExecuteReader();
@@ -66,12 +67,15 @@ public class WebService : System.Web.Services.WebService
             {
                 while (dr.Read()) // 讀取資料
                 {
-                    ReturnContant += dr[0] + "," + dr[1] + ";"; // 同一筆資料不同欄位用逗號隔開，不同資料用分號隔開
+                    ReturnContant += dr[0];
+                    //ReturnContant += dr[0] + "," + dr[1] + ";"; // 同一筆資料不同欄位用逗號隔開，不同資料用分號隔開
                 }
                 dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
             // ------------------------------------------------------------------------------------------------------
+
+            objcon.Close();
 
         }
         catch (Exception ex)
@@ -90,7 +94,7 @@ public class WebService : System.Web.Services.WebService
         {
             objcon = new SqlConnection(strdbcon); // 建立連接
             objcon.Open(); // 開啟連接
-            sql = "select * from Test"; // SQL語法
+            sql = "select * from Test where ID = 1 "; // SQL語法
             sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
             // 只需修改以下部分---------------------------------------------------------------------------------------
             // 取得回傳值(查詢、修改、刪除使用此語法)，新增語法使用 sqlcmd.ExecuteNonQuery();
@@ -159,18 +163,66 @@ public class WebService : System.Web.Services.WebService
         return returnContant;
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProduct(string CompanyID, string CompanyName, string ProductName, string Type, string Introduction,
+                                string AdditionalValue, string Origin, string Image, string PackagingDate, string Verification,
+                                string ValidityPeriod, string ValidityNumber)
+    {
+        string id = "null";
+        string qr = "http://140.127.22.4/XXXXXX/";
 
+        try
+        {
+            objcon = new SqlConnection(strdbcon); // 建立連接
+            objcon.Open(); // 開啟連接
+            sql = "insert into Product(CompanyID,CompanyName,ProductName,Type,Introduction,AdditionalValue,Origin," +
+                "Image,PackagingDate,Verification,ValidityPeriod,ValidityNumber) values ('" + CompanyID + "','" + 
+                CompanyName + "','" + ProductName + "','" + Type + "','" + Introduction + "','" + AdditionalValue + "','" +
+                Origin + "','" + Image + "','" + PackagingDate + "','" + Verification + "','" + ValidityPeriod + "','" + ValidityNumber +
+                "');SELECT SCOPE_IDENTITY()"; // SQL語法
+            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
+            SqlDataReader dr = sqlcmd.ExecuteReader();
+            if (dr.IsClosed == false) // 確認資料庫開啟
+            {
+                dr.Read();
+                id = dr[0].ToString();
+                dr.Close(); // 停止讀取資料
+                objcon.Close(); // 關閉連接
+            }
+            
+            qr += getQRCode(id);
+            if (!qr.Equals("null"))
+            {
+                objcon.Open();
+                sql = "update Product set QRCode = '" + qr +"' where ProductID = '" + id + "'";
+                sqlcmd = new SqlCommand(sql, objcon);
+                sqlcmd.ExecuteNonQuery();
+                objcon.Close();
+            }
 
-
-
+            return getBoolJson(true);
+        }
+        catch (Exception ex)
+        {
+            //Response.Write(ex.Message);
+            return getBoolJson(false);
+        }
+    }
 
 
 
     // Private Method
+    private string getBoolJson(bool input)
+    {
+        JObject job = JObject.Parse(@"{""stage"": """+ input.ToString() + @"""}");
+        return JsonConvert.SerializeObject(job, Formatting.None);
+    }
 
     private string getQRCode(string data)
     {
-        string savePath = @"D:\\web\\PlatformAPI\\QRCode\\";
+        //string savePath = @"D:\\web\\PlatformAPI\\QRCode\\";
+        string savePath = @"E:\\Git Project\\NPUST_sales-of-agricultural-products-Service\\agricultural-products-Service\\QRCode\\";
         string saveName = DateTime.Now.ToString("yyyyMMdd") + System.Guid.NewGuid().ToString() + ".jpg";
         string returnURL = savePath + saveName;
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
