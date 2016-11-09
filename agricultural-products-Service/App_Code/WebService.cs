@@ -190,7 +190,7 @@ public class WebService : System.Web.Services.WebService
             return gm.getStageJson(false, "Password is wrong");
         }
     }
-
+    /*
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetIntroduction(string input)
@@ -245,7 +245,8 @@ public class WebService : System.Web.Services.WebService
         //return new JavaScriptSerializer().Serialize(ReturnContant);
         return ReturnContant;
     }
-
+    */
+    /*
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetMemberInfo(string memberID)
@@ -293,7 +294,8 @@ public class WebService : System.Web.Services.WebService
         //return new JavaScriptSerializer().Serialize(ReturnContant);
         return ReturnContant;
     }
-
+    */
+    /*
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
@@ -318,5 +320,5 @@ public class WebService : System.Web.Services.WebService
             objcon.Close();
         }
     }
-
+    */
 }
