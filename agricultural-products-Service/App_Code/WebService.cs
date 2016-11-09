@@ -34,63 +34,17 @@ public class WebService : System.Web.Services.WebService
         //InitializeComponent(); 
     }
 
+    // 用於測試方法，Commit前記得回復原狀
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public void HelloWorld()
     {
-        /*sql = "select MemberID,Account,Password from Member where Account = 'io'";
-        JObject job = JObject.Parse(sqlMethod.SignSelect(sql));
-        return job["Password"].ToString();*/
+        
     }
 
     // [WebMethod]要加在方法上方
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     // 方法名稱直白，單字第一個字需大寫
-    // 範例如下
-
-    // 測試資料庫連接
-    [WebMethod]
-    public string TestDataBaseContact ()
-    {
-        sql = "update Test set ContentText = '12311232123' where ID = 5";
-        return sqlMethod.Update(sql);
-    }
-
-    [WebMethod]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string TestDataBaseContactJSON()
-    {
-        string ReturnContant = ""; // 回傳資料字串變數
-        try
-        {
-            objcon = new SqlConnection(strdbcon); // 建立連接
-            objcon.Open(); // 開啟連接
-            sql = "select * from Test where ID = 1 "; // SQL語法
-            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
-            // 只需修改以下部分---------------------------------------------------------------------------------------
-            // 取得回傳值(查詢、修改、刪除使用此語法)，新增語法使用 sqlcmd.ExecuteNonQuery();
-            SqlDataReader dr = sqlcmd.ExecuteReader();
-            if (dr.IsClosed == false) // 確認資料庫開啟
-            {
-                //宣告一個DataTable等等用來存放資料庫裡撈出來的資料
-                DataTable table = new DataTable();
-                //把剛剛撈到的資料塞進table裡面
-                table.Load(dr);
-                //這行是利用Json.net直接把table轉成Json
-                ReturnContant = JsonConvert.SerializeObject(table, Formatting.None);
-                dr.Close(); // 停止讀取資料
-                objcon.Close(); // 關閉連接
-            }
-            // ------------------------------------------------------------------------------------------------------
-        }
-        catch (Exception ex)
-        {
-            //Response.Write(ex.Message);
-        }
-        //return new JavaScriptSerializer().Serialize(ReturnContant);
-        return ReturnContant;
-    }
-
 
     // Main Method
 
@@ -240,30 +194,17 @@ public class WebService : System.Web.Services.WebService
         return JsonConvert.SerializeObject(job, Formatting.None);
     }
 
-    /*
+
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
                             string CompanyName, string Address, string Access)
     {
-        try
-        {
-            objcon = new SqlConnection(strdbcon); // 建立連接
-            objcon.Open(); // 開啟連接
-            sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
-                 "values('" + Account + "','" + Password + "','" + FirstName + "','" + LastName + "','" + Phone + "','" + Email + "','" + CompanyName + "','" + Address + "','" + Access + "')";
-            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
-            sqlcmd.ExecuteNonQuery();
-            return getBoolJson(true);
-        }
-        catch (Exception ex)
-        {
-            return getBoolJson(false);
-        }
-        finally
-        {
-            objcon.Close();
-        }
+        sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
+                  "values('" + Account + "','" + Password + "','" + FirstName + "','" + LastName + "','" + Phone + "','" +
+                  Email + "','" + CompanyName + "','" + Address + "','" + Access + "')";
+
+        return sqlMethod.Insert(sql);
     }
-    */
+
 }
