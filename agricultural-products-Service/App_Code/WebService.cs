@@ -1,4 +1,5 @@
-﻿using System.Web.Script.Services;
+﻿using System;
+using System.Web.Script.Services;
 using System.Web.Services;
 using System.Data.SqlClient;
 using Newtonsoft.Json;
@@ -20,7 +21,10 @@ public class WebService : System.Web.Services.WebService
     private SqlCommand sqlcmd;
     private string sql;
     private SQLMethod sqlMethod = new SQLMethod();
+
     private GetMethod gm = new GetMethod();
+    private MainMethod main = new MainMethod();
+    private JObject job;
 
     public WebService()
     {
@@ -39,6 +43,176 @@ public class WebService : System.Web.Services.WebService
     // [WebMethod]要加在方法上方
     // [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     // 方法名稱直白，單字第一個字需大寫
+
+
+    // JSON Method
+    
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string SignInJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string account = job["Account"].ToString();
+            string password = job["Password"].ToString();
+            if (!account.Equals("") && !password.Equals(""))
+                return main.SignIn(account, password);
+            else
+                return gm.getStageJson(false, "Account or password can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProductJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string companyID = job["CompanyID"].ToString();
+            string companyName = job["CompanyName"].ToString();
+            string productName = job["ProductName"].ToString();
+            string type = job["Type"].ToString();
+            string introduction = job["Introduction"].ToString();
+            string additionalValue = job["AdditionalValue"].ToString();
+            string origin = job["Origin"].ToString();
+            string image = job["Image"].ToString();
+            string packagingDate = job["PackagingDate"].ToString();
+            string verification = job["Verification"].ToString();
+            string validityPeriod = job["ValidityPeriod"].ToString();
+            string validityNumber = job["ValidityNumber"].ToString();
+            if (!companyID.Equals("") && !companyName.Equals("") && !productName.Equals("") && !type.Equals("") && !introduction.Equals("") &&
+                !additionalValue.Equals("") && !origin.Equals("") && !image.Equals("") && !packagingDate.Equals("") && !verification.Equals("") &&
+                !validityPeriod.Equals("") && !validityNumber.Equals(""))
+                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, image, packagingDate, verification, validityPeriod, validityPeriod);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null");
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string ResetPasswordJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string oldPassword = job["OldPassword"].ToString();
+            string newPassword = job["NewPassword"].ToString();
+            if (!identify.Equals("") && !oldPassword.Equals("") && !newPassword.Equals(""))
+                return main.ResetPassword(identify, oldPassword, newPassword);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+    
+    // 待確認
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetIntroductionJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string oldPassword = job["OldPassword"].ToString();
+            string newPassword = job["NewPassword"].ToString();
+            if (!identify.Equals("") && !oldPassword.Equals("") && !newPassword.Equals(""))
+                return main.ResetPassword(identify, oldPassword, newPassword);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
+    // 待確認
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMemberInfoJson(string input)
+    {
+        int id;
+        input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
+
+        if (input.Equals(""))
+            return gm.getStageJson(false, "Input Number");
+        else
+            id = int.Parse(input);
+
+        sql = @"select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where MemberID=" + id; // SQL語法
+        JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access"));
+        return JsonConvert.SerializeObject(job, Formatting.None);
+    }
+
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewMemberJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string account = job["Account"].ToString();
+            string password = job["Password"].ToString();
+            string firstName = job["FirstName"].ToString();
+            string lastName = job["LastName"].ToString();
+            string phone = job["Phone"].ToString();
+            string email = job["Email"].ToString();
+            string companyName = job["CompanyName"].ToString();
+            string address = job["Address"].ToString();
+            string access = job["Access"].ToString();
+            if (!account.Equals("") && !password.Equals("") && !firstName.Equals("") && 
+                !lastName.Equals("") && !phone.Equals("") && !email.Equals("") && 
+                !companyName.Equals("") && !address.Equals("") && !access.Equals(""))
+                return main.NewMember(account, password, firstName, lastName, phone, email, companyName, address, access);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewRecordJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string productID = job["ProductID"].ToString();
+            string type = job["Type"].ToString();
+            string action = job["Action"].ToString();
+            string note = job["Note"].ToString();
+            if (!identify.Equals("") && !productID.Equals("") && !type.Equals("") && !action.Equals("") && !note.Equals(""))
+                return main.NewRecord(identify, productID, type, action, note);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
 
     // Main Method
 
@@ -131,7 +305,7 @@ public class WebService : System.Web.Services.WebService
         else
             return gm.getStageJson(false, "Password is wrong");
     }
-    
+
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetIntroduction(string input)
