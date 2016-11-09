@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Script.Services;
+﻿using System.Web.Script.Services;
 using System.Web.Services;
-using System.IO;
 using System.Data.SqlClient;
-using System.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
@@ -71,27 +65,22 @@ public class WebService : System.Web.Services.WebService
             msg = "Sign success";
         }
         else
-        {
             msg = "Account or password was wrong, please try again.";
-        }
+
         if (isSign)
         {
             // Update Member table's identify
             sql = "update Member set Identify = '" + identify + "' where (MemberID = " + memberID + ")";
             job = JObject.Parse(sqlMethod.Update(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
-            {
                 isIdentify = true;
-            }
-            
+
             // insert SignLog table
-            sql = "insert into SignLog(MemberID,Account,SignTime,Identify,IP) values('" + memberID + "','" 
-                + Account + "','" + DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss") + "','" + identify + "','" + ip + "')";
+            sql = "insert into SignLog(MemberID,Account,SignTime,Identify,IP) values('" + memberID + "','"
+                + Account + "','" + gm.getCurrentDate() + "','" + identify + "','" + ip + "')";
             job = JObject.Parse(sqlMethod.Update(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
-            {
                 isLog = true;
-            }
         }
         if (isSign && isIdentify && isLog)
         {
@@ -132,7 +121,7 @@ public class WebService : System.Web.Services.WebService
     public string ResetPassword(string Identify, string OldPassword, string NewPassword)
     {
         sql = "select MemberID,Password from Member where Identify = '" + Identify + "'";
-        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;Password", 2));
+        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;Password"));
         string id = job["MemberID"].ToString();
         if (job["Password"].ToString().Equals(OldPassword))
         {
@@ -140,11 +129,9 @@ public class WebService : System.Web.Services.WebService
             return sqlMethod.Update(sql);
         }
         else
-        {
             return gm.getStageJson(false, "Password is wrong");
-        }
     }
-
+    
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetIntroduction(string input)
@@ -154,21 +141,19 @@ public class WebService : System.Web.Services.WebService
         sql = @"select Attributes,BigItem,SmallItem,ProductName,Period,PDF from Introduction"; // SQL語法
         if (input.Equals("ALL"))
         {
-            JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Attributes;BigItem;SmallItem;ProductName;Period;PDF", 6));
+            JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Attributes;BigItem;SmallItem;ProductName;Period;PDF"));
             jsonStr = JsonConvert.SerializeObject(job, Formatting.None);
             return jsonStr.Replace(@"\r\n", string.Empty);//移除那些特殊字元
         }
         else
         {
             input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
+
             if (input.Equals(""))
-            {
                 return gm.getStageJson(false, "Input Number");
-            }
             else
-            {
                 id = int.Parse(input);
-            }
+
             sql += @" where IntroductionID=" + id;
             jsonStr = sqlMethod.Select(sql);
             return jsonStr.Replace(@"\r\n", string.Empty);//移除那些特殊字元
@@ -181,16 +166,14 @@ public class WebService : System.Web.Services.WebService
     {
         int id;
         input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
+
         if (input.Equals(""))
-        {
             return gm.getStageJson(false, "Input Number");
-        }
         else
-        {
             id = int.Parse(input);
-        }
+
         sql = @"select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where MemberID=" + id; // SQL語法
-        JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access", 8));
+        JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access"));
         return JsonConvert.SerializeObject(job, Formatting.None);
     }
 
@@ -203,8 +186,51 @@ public class WebService : System.Web.Services.WebService
         sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
                   "values('" + Account + "','" + Password + "','" + FirstName + "','" + LastName + "','" + Phone + "','" +
                   Email + "','" + CompanyName + "','" + Address + "','" + Access + "')";
-
         return sqlMethod.Insert(sql);
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewRecord(string identify, string productID, string type, string action, string note)
+    {
+        string memberID = "";
+        string creator = "";
+        string productName = "";
+        bool isMember = false;
+        bool isProductName = false;
+
+        // Get memberID and creator
+        sql = "select MemberID, FirstName, LastName from Member where Identify = '" + identify + "'";
+        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;FirstName;LastName"));
+        memberID = job["MemberID"].ToString();
+        creator = job["LastName"].ToString() + job["FirstName"].ToString();
+        if (!memberID.Equals("") && !creator.Equals(""))
+            isMember = true;
+
+        // Get ProductName
+        sql = "select ProductName from Product where ProductID = '" + productID + "'";
+        job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName"));
+        productName = job["ProductName"].ToString();
+        if (!productName.Equals(""))
+            isProductName = true;
+
+        // Insert record data
+        if (isProductName && isMember)
+        {
+            sql = "insert into Record(MemberID, Creator, ProductID, ProductName, Date, Type, Action, Note) values('" + memberID + "','" +
+                creator + "','" + productID + "','" + productName + "','" + gm.getCurrentDate() + "','" + type + "','" + action + "','" +
+                note + "')";
+            return sqlMethod.Insert(sql);
+        }
+        else
+        {
+            if (!isMember)
+                return gm.getStageJson(false, "Member information is wrong.");
+            else if (!isProductName)
+                return gm.getStageJson(false, "ProductID is wrong.");
+            else
+                return gm.getStageJson(false, "Inserting record is wrong.");
+        }
+    }
+    
 }

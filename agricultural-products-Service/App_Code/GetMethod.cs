@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -77,5 +75,10 @@ public class GetMethod
     public string getUUID()
     {
         return System.Guid.NewGuid().ToString();
+    }
+
+    public string getCurrentDate()
+    {
+        return DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss");
     }
 }
