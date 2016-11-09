@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Data.SqlClient;
 using System.Data;
 using Newtonsoft.Json;
@@ -91,8 +88,10 @@ public class SQLMethod
     }
 
     // Simple select method for one data, return{"Result" : "Value"}
-    public string SelectSingle(string sql, string returnName, int count)
+    public string SelectSingle(string sql, string returnName)
     {
+        string[] tmp = returnName.Split(';');
+        int count = tmp.Length;
         if (!sql.Equals(""))
         {
             try
