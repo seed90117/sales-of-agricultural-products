@@ -14,6 +14,7 @@ public class SQLMethod
     private static string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
     private SqlConnection objcon = new SqlConnection(strdbcon);
     private SqlCommand sqlcmd;
+    private GetMethod gm = new GetMethod();
 
     public SQLMethod()
     {
@@ -25,7 +26,6 @@ public class SQLMethod
     // Simple insert method
     public string Insert(string sql)
     {
-        GetMethod gm = new GetMethod();
         if (!sql.Equals(""))
         {
             try
@@ -54,7 +54,6 @@ public class SQLMethod
     // Simple select method for two or many data
     public string Select(string sql)
     {
-        GetMethod gm = new GetMethod();
         if (!sql.Equals(""))
         {
             try
@@ -94,7 +93,6 @@ public class SQLMethod
     // Simple select method for one data, return{"Result" : "Value"}
     public string SelectSingle(string sql, string returnName, int count)
     {
-        GetMethod gm = new GetMethod();
         if (!sql.Equals(""))
         {
             try
@@ -141,7 +139,6 @@ public class SQLMethod
     // Simple update method
     public string Update(string sql)
     {
-        GetMethod gm = new GetMethod();
         if (!sql.Equals(""))
         {
             try
@@ -170,7 +167,6 @@ public class SQLMethod
     // SignSelect
     public string SignSelect(string sql, string returnNameArray)
     {
-        GetMethod gm = new GetMethod();
         if (!sql.Equals(""))
         {
             try
@@ -208,7 +204,6 @@ public class SQLMethod
     // Insert and return new ID
     public string InsertSelect(string sql)
     {
-        GetMethod gm = new GetMethod();
         if (!sql.Equals(""))
         {
             try
@@ -243,26 +238,4 @@ public class SQLMethod
         }
     }
 
-    /*
-    // SignIn
-    private bool insertSignLog(string MemberID, string Account, string Identify, string Ip)
-    {
-        try
-        {
-            objcon = new SqlConnection(strdbcon); // 建立連接
-            objcon.Open(); // 開啟連接
-            sql = "insert into SignLog(MemberID,Account,SignTime,Identify,IP) values('" +
-                MemberID + "','" + Account + "','" + DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss") +
-                "','" + Identify + "','" + Ip + "')";
-            sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
-            sqlcmd.ExecuteNonQuery();
-            objcon.Close(); // 關閉連接
-            return true;
-        }
-        catch (Exception ex)
-        {
-            //Response.Write(ex.Message);
-            return false;
-        }
-    }*/
 }
