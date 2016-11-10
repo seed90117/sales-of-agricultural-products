@@ -253,4 +253,19 @@ public class MainMethod
         }
         return sqlMethod.Select(sql);
     }
+
+    public string GetProduct(string ProductID)
+    {
+        if (ProductID.Equals("ALL"))
+        {
+            sql = "select * from Product";
+            return sqlMethod.Select(sql);
+        }
+        else
+        {
+            sql = "select * from Product where ProductID = '" + ProductID + "'";
+            return sqlMethod.SelectSingle(sql, "CompanyID;CompanyName;ProductName;Type;Introduction;AdditionalValue;Origin;" +
+                "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Price");
+        }
+    }
 }

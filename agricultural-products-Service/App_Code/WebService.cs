@@ -277,6 +277,25 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string productID = job["ProductID"].ToString();
+            if (!productID.Equals(""))
+                return main.GetProduct(productID);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
 
     // Main Method
     [WebMethod]
@@ -352,5 +371,12 @@ public class WebService : System.Web.Services.WebService
     public string GetMember(string Access)
     {
         return main.GetMember(Access);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProduct(string ProductID)
+    {
+        return main.GetProduct(ProductID);
     }
 }
