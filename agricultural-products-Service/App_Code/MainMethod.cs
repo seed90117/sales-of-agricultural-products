@@ -200,6 +200,47 @@ public class MainMethod
         }
     }
 
+    public string NewProductOrder(string Identify, string ProductID, string Amount, string Delivery, string Shipment, string Note)
+    {
+        string Account = "";
+        string Name = "";
+        string Phone = "";
+        string Address = "";
+        string ProductName = "";
+        string Price = "";
+        bool Bm = false;
+        bool Bp = false;
+        sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + Identify + "'";
+        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "Account;Name;Phone;Address"));
+        Account = job["Account"].ToString();
+        Name = job["Name"].ToString();
+        Phone = job["Phone"].ToString();
+        Address = job["Address"].ToString();
+        if (!Account.Equals("") && !Name.Equals("") && !Phone.Equals("") && !Address.Equals(""))
+            Bm = true;
+        sql = "select ProductName , Price  from Product where ProductID =" + ProductID;
+        job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Price"));
+        ProductName = job["ProductName"].ToString();
+        Price = job["Price"].ToString();
+        if (!ProductName.Equals("") && !Price.Equals(""))
+            Bp = true;
+        if (Bm && Bp)
+        {
+            sql = "Insert into ProductOrder ( MemberAccount , MemberName , MemberPhone , MemberAddress , ProductName , Price) values ('" + Account + "','" + Name + "','" + Phone + "','" + Address + "','" + ProductName + "','" + Price + "') ";
+            return sqlMethod.Insert(sql);
+        }
+        else
+        {
+            if (!Bm)
+                return gm.getStageJson(false, "Member information is wrong.");
+            else if (!Bp)
+                return gm.getStageJson(false, "Product information is wrong.");
+            else
+                return gm.getStageJson(false, "All wrong.");
+
+        }
+    }
+
     public string GetMember(string Access)
     {
         if (Access.Equals("ALL"))

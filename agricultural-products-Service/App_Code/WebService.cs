@@ -236,6 +236,30 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewOrderJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string productID = job["ProductID"].ToString();
+            string amount = job["Amount"].ToString();
+            string delivery = job["Delivery"].ToString();
+            string shipment = job["Shipment"].ToString();
+            string note = job["Note"].ToString();
+            if (!identify.Equals("") && !productID.Equals("") && !amount.Equals("") && !delivery.Equals("") && !shipment.Equals("") && !note.Equals(""))
+                return main.NewProductOrder(identify, productID, amount, delivery, shipment, note);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetMemberJson(string inputJsonStr)
     {
         job = gm.getJsonResult(inputJsonStr);
