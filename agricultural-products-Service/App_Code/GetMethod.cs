@@ -17,6 +17,37 @@ public class GetMethod
         return JsonConvert.SerializeObject(reMsg);
     }
 
+    public string getJson(string name, string input)
+    {
+        JObject job = JObject.Parse(@"{""" + name + @""": """ + input.ToString() + @"""}");
+        return JsonConvert.SerializeObject(job, Formatting.None);
+    }
+
+    public JObject getJsonResult(string jsonStr)
+    {
+        return JsonConvert.DeserializeObject<JObject>(jsonStr);
+    }
+
+    public string getJsonArray(string nameArray, string inputArray)
+    {
+        string[] name = nameArray.Split(';');
+        string[] input = inputArray.Split(';');
+        string json = "{";
+        for (int i=0; i<name.Length; i++)
+        {
+            json += @"""" + name[i] + @""": """ + input[i] + @"""";
+            if (i == name.Length - 1)
+            {
+                json += "}";
+            }
+            else
+            {
+                json += ",";
+            }
+        }
+        return json;
+    }
+
     public string getIpAddress()
     {
         //登入ip
@@ -39,37 +70,6 @@ public class GetMethod
             strIpAddr = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
         }
         return strIpAddr; ;
-    }
-
-    public JObject getJsonResult(string jsonStr)
-    {
-        return JsonConvert.DeserializeObject<JObject>(jsonStr);
-    }
-
-    public string getJson(string name, string input)
-    {
-        JObject job = JObject.Parse(@"{""" + name + @""": """ + input.ToString() + @"""}");
-        return JsonConvert.SerializeObject(job, Formatting.None);
-    }
-
-    public string getJsonArray(string nameArray, string inputArray)
-    {
-        string[] name = nameArray.Split(';');
-        string[] input = inputArray.Split(';');
-        string json = "{";
-        for (int i=0; i<name.Length; i++)
-        {
-            json += @"""" + name[i] + @""": """ + input[i] + @"""";
-            if (i == name.Length - 1)
-            {
-                json += "}";
-            }
-            else
-            {
-                json += ",";
-            }
-        }
-        return json;
     }
 
     public string getUUID()

@@ -1,9 +1,5 @@
-﻿using System.Web.Script.Services;
-using System.Web.Services;
-using System.Data.SqlClient;
-using Newtonsoft.Json;
+﻿using System.Data.SqlClient;
 using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
 
 /// <summary>
 /// Summary description for MainMethod
@@ -104,45 +100,16 @@ public class MainMethod
             return gm.getStageJson(false, "Password is wrong");
     }
 
-    public string GetIntroduction(string input)
+    public string GetIntroduction()
     {
-        int id = 0;
-        string jsonStr = "";
-        sql = @"select Attributes,BigItem,SmallItem,ProductName,Period,PDF from Introduction"; // SQL語法
-        if (input.Equals("ALL"))
-        {
-            JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Attributes;BigItem;SmallItem;ProductName;Period;PDF"));
-            jsonStr = JsonConvert.SerializeObject(job, Formatting.None);
-            return jsonStr.Replace(@"\r\n", string.Empty);//移除那些特殊字元
-        }
-        else
-        {
-            input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
-
-            if (input.Equals(""))
-                return gm.getStageJson(false, "Input Number");
-            else
-                id = int.Parse(input);
-
-            sql += @" where IntroductionID=" + id;
-            jsonStr = sqlMethod.Select(sql);
-            return jsonStr.Replace(@"\r\n", string.Empty);//移除那些特殊字元
-        }
+        sql = "select * from Introduction";
+        return sqlMethod.Select(sql);
     }
 
-    public string GetMemberInfo(string input)
+    public string GetMemberInfo(string identify)
     {
-        int id;
-        input = Regex.Replace(input, "[^0-9]", "");//移除非數字的字元
-
-        if (input.Equals(""))
-            return gm.getStageJson(false, "Input Number");
-        else
-            id = int.Parse(input);
-
-        sql = @"select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where MemberID=" + id; // SQL語法
-        JObject job = JObject.Parse(sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access"));
-        return JsonConvert.SerializeObject(job, Formatting.None);
+        sql = "select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where Identify =" + identify;
+        return sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access");
     }
 
     public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
