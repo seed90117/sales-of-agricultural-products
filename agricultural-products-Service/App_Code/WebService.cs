@@ -101,10 +101,11 @@ public class WebService : System.Web.Services.WebService
             string verification = job["Verification"].ToString();
             string validityPeriod = job["ValidityPeriod"].ToString();
             string validityNumber = job["ValidityNumber"].ToString();
+            string price = job["Price"].ToString();
             if (!companyID.Equals("") && !companyName.Equals("") && !productName.Equals("") && !type.Equals("") && !introduction.Equals("") &&
                 !additionalValue.Equals("") && !origin.Equals("") && !image.Equals("") && !packagingDate.Equals("") && !verification.Equals("") &&
-                !validityPeriod.Equals("") && !validityNumber.Equals(""))
-                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, image, packagingDate, verification, validityPeriod, validityPeriod);
+                !validityPeriod.Equals("") && !validityNumber.Equals("") && !price.Equals(""))
+                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, image, packagingDate, verification, validityPeriod, validityPeriod, price);
             else
                 return gm.getStageJson(false, "Data can't be null.");
         }
@@ -226,10 +227,10 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewProduct(string CompanyID, string CompanyName, string ProductName, string Type, string Introduction,
                                 string AdditionalValue, string Origin, string Image, string PackagingDate, string Verification,
-                                string ValidityPeriod, string ValidityNumber)
+                                string ValidityPeriod, string ValidityNumber, string Price)
     {
         return main.NewProduct(CompanyID, CompanyName, ProductName, Type, Introduction, AdditionalValue, Origin, 
-                               Image, PackagingDate, Verification, ValidityPeriod, ValidityNumber);
+                               Image, PackagingDate, Verification, ValidityPeriod, ValidityNumber, Price);
     }
 
     [WebMethod]
