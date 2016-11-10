@@ -162,4 +162,41 @@ public class MainMethod
                 return gm.getStageJson(false, "Inserting record is wrong.");
         }
     }
+
+    public string UpdateMemberInfo(string column, string value)
+    {
+        int IdentifyNumber = -1;
+        string[] strSplit1 = column.Split(';');
+        string[] strSplit2 = value.Split(';');
+        if (strSplit1.Length > 1)
+        {
+            sql = "update Member set ";
+            for (int i = 0; i < strSplit1.Length; i++)
+            {
+                if (strSplit1[i].Equals("Identify"))
+                {
+                    IdentifyNumber = i;
+                    continue;
+                }
+                if (i != 0)
+                {
+                    sql += ", ";
+                }
+                sql += strSplit1[i] + " = '" + strSplit2[i] + "' ";
+            }
+            if (IdentifyNumber > -1)
+            {
+                sql += "where Identify = '" + strSplit2[IdentifyNumber] + "'";
+                return sqlMethod.Update(sql);
+            }
+            else
+            {
+                return gm.getStageJson(false, "Identify is not exist");
+            }
+        }
+        else
+        {
+            return gm.getStageJson(false, "column is not enough");
+        }
+    }
 }

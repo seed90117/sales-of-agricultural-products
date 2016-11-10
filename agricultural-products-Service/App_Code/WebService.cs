@@ -213,6 +213,24 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string UpdateMemberInfoJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string column = job["Column"].ToString();
+            string value = job["Value"].ToString();
+
+            return main.UpdateMemberInfo(column, value);
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
 
     // Main Method
     [WebMethod]
@@ -268,5 +286,11 @@ public class WebService : System.Web.Services.WebService
     {
         return main.NewRecord(Identify, ProductID, Type, Action, Note);
     }
-    
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string UpdateMemberInfo(string column, string value)
+    {
+        return main.UpdateMemberInfo(column, value);
+    }
 }
