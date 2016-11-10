@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlClient;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Summary description for MainMethod
@@ -77,7 +78,7 @@ public class MainMethod
         sql = "insert into Product(CompanyID,CompanyName,ProductName,Type,Introduction,AdditionalValue,Origin," +
                 "Image,PackagingDate,Verification,ValidityPeriod,ValidityNumber,Price) values ('" + CompanyID + "','" +
                 CompanyName + "','" + ProductName + "','" + Type + "','" + Introduction + "','" + AdditionalValue + "','" +
-                Origin + "','" + Image + "','" + PackagingDate + "','" + Verification + "','" + ValidityPeriod + "','" + 
+                Origin + "','" + Image + "','" + PackagingDate + "','" + Verification + "','" + ValidityPeriod + "','" +
                 ValidityNumber + "'," + Price + ");SELECT SCOPE_IDENTITY()";
         JObject job = gm.getJsonResult(sqlMethod.InsertSelect(sql));
         id = job["ProductID"].ToString();
@@ -268,4 +269,27 @@ public class MainMethod
                 "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Price");
         }
     }
+    public string GetRecord(string ProductID)
+    {
+        string data = "";
+        Regex r = new Regex(@"^\d+(\.)?\d*$");
+
+        if (ProductID.Trim().Equals(""))
+            return gm.getStageJson(false, "Json data can't be null.");
+        else if (!r.IsMatch(ProductID.Trim()))
+            return gm.getStageJson(false, "Data can't be null.");
+
+
+        sql = "select * from Record where ProductID = '" + ProductID + "'";
+        data=sqlMethod.Select(sql);
+
+        if (data.Equals("[]"))
+        {
+            return gm.getStageJson(false, "Contact");
+        }
+
+        return data;        
+    }
 }
+
+
