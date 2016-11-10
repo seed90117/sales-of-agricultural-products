@@ -68,17 +68,17 @@ public class MainMethod
 
     public string NewProduct(string CompanyID, string CompanyName, string ProductName, string Type, string Introduction,
                                 string AdditionalValue, string Origin, string Image, string PackagingDate, string Verification,
-                                string ValidityPeriod, string ValidityNumber)
+                                string ValidityPeriod, string ValidityNumber, string Price)
     {
         string id = "null";
         string qr = "null";
         QRCodeMethod qrcm = new QRCodeMethod();
 
         sql = "insert into Product(CompanyID,CompanyName,ProductName,Type,Introduction,AdditionalValue,Origin," +
-                "Image,PackagingDate,Verification,ValidityPeriod,ValidityNumber) values ('" + CompanyID + "','" +
+                "Image,PackagingDate,Verification,ValidityPeriod,ValidityNumber,Price) values ('" + CompanyID + "','" +
                 CompanyName + "','" + ProductName + "','" + Type + "','" + Introduction + "','" + AdditionalValue + "','" +
-                Origin + "','" + Image + "','" + PackagingDate + "','" + Verification + "','" + ValidityPeriod + "','" + ValidityNumber +
-                "');SELECT SCOPE_IDENTITY()";
+                Origin + "','" + Image + "','" + PackagingDate + "','" + Verification + "','" + ValidityPeriod + "','" + 
+                ValidityNumber + "'," + Price + ");SELECT SCOPE_IDENTITY()";
         JObject job = gm.getJsonResult(sqlMethod.InsertSelect(sql));
         id = job["ProductID"].ToString();
         qr = qrcm.GetQRCode(id);
