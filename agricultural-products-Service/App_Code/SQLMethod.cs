@@ -11,6 +11,7 @@ public class SQLMethod
     private static string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
     private SqlConnection objcon = new SqlConnection(strdbcon);
     private SqlCommand sqlcmd;
+    private SqlDataReader dr;
     private GetMethod gm = new GetMethod();
 
     public SQLMethod()
@@ -57,14 +58,13 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     DataTable table = new DataTable();
                     table.Load(dr);
                     //這行是利用Json.net直接把table轉成Json
                     return JsonConvert.SerializeObject(table, Formatting.None);
-                    dr.Close(); // 停止讀取資料
                 }
                 else
                 {
@@ -78,6 +78,7 @@ public class SQLMethod
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
@@ -98,7 +99,7 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     dr.Read();
@@ -112,7 +113,6 @@ public class SQLMethod
                         }
                     }
                     return gm.getJsonArray(returnName, drStr);
-                    dr.Close(); // 停止讀取資料
                 }
                 else
                 {
@@ -126,6 +126,7 @@ public class SQLMethod
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
@@ -145,7 +146,6 @@ public class SQLMethod
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
                 sqlcmd.ExecuteNonQuery();
-                
                 return gm.getStageJson(true, "Success");
             }
             catch (Exception ex)
@@ -166,18 +166,24 @@ public class SQLMethod
     // SignSelect
     public string SignSelect(string sql, string returnNameArray)
     {
+        string[] tmp = returnNameArray.Split(';');
+        int count = tmp.Length;
+        string content = "";
         if (!sql.Equals(""))
         {
             try
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     dr.Read();
+                    for (int i = 0; i < count; i++)
+                    {
+                        content += dr[i].ToString();
+                    }
                     return gm.getJsonArray(returnNameArray, dr[0].ToString() + ";" + dr[1].ToString());
-                    dr.Close(); // 停止讀取資料
                 }
                 else
                 {
@@ -191,6 +197,7 @@ public class SQLMethod
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
@@ -209,12 +216,11 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     dr.Read();
                     return gm.getJson("ProductID", dr[0].ToString());
-                    dr.Close(); // 停止讀取資料
                 }
                 else
                 {
@@ -228,6 +234,7 @@ public class SQLMethod
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }

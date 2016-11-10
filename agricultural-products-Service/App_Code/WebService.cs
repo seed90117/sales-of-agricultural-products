@@ -296,6 +296,44 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRecordJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string productID = job["ProductID"].ToString();
+            if (!productID.Equals(""))
+                return main.GetRecord(productID);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetSignLogJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            if (!identify.Equals(""))
+                return main.GetSignLog(identify);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
+
 
     // Main Method
     [WebMethod]
@@ -379,10 +417,18 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetProduct(ProductID);
     }
+
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetRecord(string ProductID)
     {
         return main.GetRecord(ProductID);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetSignLog(string Identify)
+    {
+        return main.GetSignLog(Identify);
     }
 }

@@ -28,7 +28,7 @@ public class MainMethod
         bool isIdentify = false;
         bool isLog = false;
         sql = "select MemberID,Password from Member where Account = '" + Account + "'";
-        JObject job = JObject.Parse(sqlMethod.SignSelect(sql, "MemberID;Password"));
+        JObject job = gm.getJsonResult(sqlMethod.SignSelect(sql, "MemberID;Password"));
         if (job["Password"].ToString().Equals(Password))
         {
             isSign = true;
@@ -269,6 +269,7 @@ public class MainMethod
                 "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Price");
         }
     }
+
     public string GetRecord(string ProductID)
     {
         string data = "";
@@ -289,6 +290,26 @@ public class MainMethod
         }
 
         return data;        
+    }
+
+    public string GetSignLog(string Identify)
+    {
+        string memberID = "";
+        bool isGetID = false;
+        sql = "select MemberID from SignLog where Identify = '" + Identify + "'";
+        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID"));
+        memberID = job["MemberID"].ToString();
+        if (!memberID.Equals(""))
+            isGetID = true;
+
+        if (isGetID)
+        {
+            sql = "select * from SignLog where MemberID = '" + memberID + "'";
+            return sqlMethod.Select(sql);
+        }
+        else
+            return gm.getStageJson(false, "Member information is wrong.");
+        
     }
 }
 
