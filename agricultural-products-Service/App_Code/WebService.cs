@@ -318,6 +318,13 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewOrder(string Identify, string ProductID, string Amount, string Delivery, string Shipment, string Note)
+    {
+        return main.NewProductOrder(Identify, ProductID, Amount, Delivery, Shipment, Note);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetMember(string Access)
     {
         return main.GetMember(Access);
