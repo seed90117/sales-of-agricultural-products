@@ -199,4 +199,17 @@ public class MainMethod
             return gm.getStageJson(false, "column is not enough");
         }
     }
+
+    public string GetMember(string Access)
+    {
+        if (Access.Equals("ALL"))
+        {
+            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member";
+        }
+        else
+        {
+            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + Access + "'";
+        }
+        return sqlMethod.Select(sql);
+    }
 }

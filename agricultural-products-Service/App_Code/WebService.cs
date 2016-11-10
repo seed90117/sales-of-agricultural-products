@@ -223,8 +223,29 @@ public class WebService : System.Web.Services.WebService
         {
             string column = job["Column"].ToString();
             string value = job["Value"].ToString();
+            if (!column.Equals("") && !value.Equals(""))
+                return main.UpdateMemberInfo(column, value);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
+        }
+        catch (Exception ex)
+        {
+            return gm.getStageJson(false, "Json data can't be null.");
+        }
+    }
 
-            return main.UpdateMemberInfo(column, value);
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMemberJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string access = job["Access"].ToString();
+            if (!access.Equals(""))
+                return main.GetMember(access);
+            else
+                return gm.getStageJson(false, "Data can't be null.");
         }
         catch (Exception ex)
         {
@@ -293,5 +314,12 @@ public class WebService : System.Web.Services.WebService
     public string UpdateMemberInfo(string column, string value)
     {
         return main.UpdateMemberInfo(column, value);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMember(string Access)
+    {
+        return main.GetMember(Access);
     }
 }
