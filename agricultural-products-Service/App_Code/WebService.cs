@@ -379,4 +379,10 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetProduct(ProductID);
     }
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRecord(string ProductID)
+    {
+        return main.GetRecord(ProductID);
+    }
 }
