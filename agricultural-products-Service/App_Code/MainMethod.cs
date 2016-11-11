@@ -109,7 +109,7 @@ public class MainMethod
 
     public string GetMemberInfo(string identify)
     {
-        sql = "select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where Identify =" + identify;
+        sql = "select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where Identify = '" + identify + "'";
         return sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access");
     }
 

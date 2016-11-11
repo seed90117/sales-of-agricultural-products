@@ -11,7 +11,6 @@ public class SQLMethod
     private static string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
     private SqlConnection objcon = new SqlConnection(strdbcon);
     private SqlCommand sqlcmd;
-    private SqlDataReader dr;
     private GetMethod gm = new GetMethod();
 
     public SQLMethod()
@@ -58,12 +57,13 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                dr = sqlcmd.ExecuteReader();
+                SqlDataReader dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     DataTable table = new DataTable();
                     table.Load(dr);
                     //這行是利用Json.net直接把table轉成Json
+                    dr.Close(); // 停止讀取資料
                     return JsonConvert.SerializeObject(table, Formatting.None);
                 }
                 else
@@ -78,7 +78,6 @@ public class SQLMethod
             }
             finally
             {
-                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
@@ -99,7 +98,7 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                dr = sqlcmd.ExecuteReader();
+                SqlDataReader dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     dr.Read();
@@ -112,6 +111,7 @@ public class SQLMethod
                             drStr += ";";
                         }
                     }
+                    dr.Close(); // 停止讀取資料
                     return gm.getJsonArray(returnName, drStr);
                 }
                 else
@@ -126,7 +126,6 @@ public class SQLMethod
             }
             finally
             {
-                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
@@ -175,15 +174,18 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                dr = sqlcmd.ExecuteReader();
+                SqlDataReader dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     dr.Read();
                     for (int i = 0; i < count; i++)
                     {
                         content += dr[i].ToString();
+                        if (i < count - 1)
+                            content += ";";
                     }
-                    return gm.getJsonArray(returnNameArray, dr[0].ToString() + ";" + dr[1].ToString());
+                    dr.Close(); // 停止讀取資料
+                    return gm.getJsonArray(returnNameArray, content);
                 }
                 else
                 {
@@ -197,7 +199,6 @@ public class SQLMethod
             }
             finally
             {
-                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
@@ -216,11 +217,13 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                dr = sqlcmd.ExecuteReader();
+                SqlDataReader dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     dr.Read();
-                    return gm.getJson("ProductID", dr[0].ToString());
+                    string productID = dr[0].ToString();
+                    dr.Close(); // 停止讀取資料
+                    return gm.getJson("ProductID", productID);
                 }
                 else
                 {
@@ -234,7 +237,6 @@ public class SQLMethod
             }
             finally
             {
-                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
