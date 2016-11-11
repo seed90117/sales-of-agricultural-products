@@ -14,6 +14,7 @@ public class MainMethod
     private string sql;
     private SQLMethod sqlMethod = new SQLMethod();
     private GetMethod gm = new GetMethod();
+    private Message msg = new Message();
 
     // 方法名稱直白，單字第一個字需大寫
 
@@ -22,7 +23,7 @@ public class MainMethod
         string identify = "";
         string memberID = "";
         string ip = "";
-        string msg = "";
+        string reMsg = "";
         string jsonStr = "";
         bool isSign = false;
         bool isIdentify = false;
@@ -35,10 +36,10 @@ public class MainMethod
             identify = gm.getUUID();
             memberID = job["MemberID"].ToString();
             ip = gm.getIpAddress();
-            msg = "Sign success";
+            reMsg = msg.success;
         }
         else
-            msg = "Account or password was wrong, please try again.";
+            reMsg = msg.signError_cht;
 
         if (isSign)
         {
@@ -57,12 +58,12 @@ public class MainMethod
         }
         if (isSign && isIdentify && isLog)
         {
-            jsonStr = gm.getJsonArray("stage;message;uuid", isSign.ToString() + ";" + msg + ";" + identify);
+            jsonStr = gm.getJsonArray("stage;message;uuid", isSign.ToString() + ";" + reMsg + ";" + identify);
             return jsonStr;
         }
         else
         {
-            jsonStr = gm.getJsonArray("stage;message;uuid", false.ToString() + ";" + msg + ";null");
+            jsonStr = gm.getJsonArray("stage;message;uuid", false.ToString() + ";" + reMsg + ";null");
             return jsonStr;
         }
     }
@@ -98,7 +99,7 @@ public class MainMethod
             return sqlMethod.Update(sql);
         }
         else
-            return gm.getStageJson(false, "Password is wrong");
+            return gm.getStageJson(false, msg.passwordError_cht);
     }
 
     public string GetIntroduction()
@@ -192,12 +193,12 @@ public class MainMethod
             }
             else
             {
-                return gm.getStageJson(false, "Identify is not exist");
+                return gm.getStageJson(false, msg.identifyError_cht);
             }
         }
         else
         {
-            return gm.getStageJson(false, "column is not enough");
+            return gm.getStageJson(false, msg.columnError_cht);
         }
     }
 
@@ -233,11 +234,9 @@ public class MainMethod
         else
         {
             if (!Bm)
-                return gm.getStageJson(false, "Member information is wrong.");
-            else if (!Bp)
-                return gm.getStageJson(false, "Product information is wrong.");
+                return gm.getStageJson(false, msg.memberInfoError_cht);
             else
-                return gm.getStageJson(false, "All wrong.");
+                return gm.getStageJson(false, msg.productInfoError_cht);
 
         }
     }
@@ -272,24 +271,8 @@ public class MainMethod
 
     public string GetRecord(string ProductID)
     {
-        string data = "";
-        Regex r = new Regex(@"^\d+(\.)?\d*$");
-
-        if (ProductID.Trim().Equals(""))
-            return gm.getStageJson(false, "Json data can't be null.");
-        else if (!r.IsMatch(ProductID.Trim()))
-            return gm.getStageJson(false, "Data can't be null.");
-
-
         sql = "select * from Record where ProductID = '" + ProductID + "'";
-        data=sqlMethod.Select(sql);
-
-        if (data.Equals("[]"))
-        {
-            return gm.getStageJson(false, "Contact");
-        }
-
-        return data;        
+        return sqlMethod.Select(sql); 
     }
 
     public string GetSignLog(string Identify)
@@ -308,7 +291,7 @@ public class MainMethod
             return sqlMethod.Select(sql);
         }
         else
-            return gm.getStageJson(false, "Member information is wrong.");
+            return gm.getStageJson(false, msg.memberInfoError_cht);
         
     }
 }

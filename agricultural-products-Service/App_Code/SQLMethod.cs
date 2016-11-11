@@ -12,6 +12,7 @@ public class SQLMethod
     private SqlConnection objcon = new SqlConnection(strdbcon);
     private SqlCommand sqlcmd;
     private GetMethod gm = new GetMethod();
+    private Message msg = new Message();
 
     public SQLMethod()
     {
@@ -30,12 +31,12 @@ public class SQLMethod
                 objcon.Open(); // 開啟連接
                 sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
                 sqlcmd.ExecuteNonQuery();
-                return gm.getStageJson(true, "Success");
+                return gm.getStageJson(true, msg.success);
             }
             catch (Exception ex)
             {
                 //Response.Write(ex.Message);
-                return gm.getStageJson(false, "Fail");
+                return gm.getStageJson(false, msg.contactError_cht);
             }
             finally
             {
@@ -44,7 +45,7 @@ public class SQLMethod
         }
         else
         {
-            return gm.getStageJson(false, "Null");
+            return gm.getStageJson(false, msg.sqlError_cht);
         }
     }
 
@@ -53,85 +54,96 @@ public class SQLMethod
     {
         if (!sql.Equals(""))
         {
+            SqlDataReader dr = null;
+            string data = "";
             try
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
                     DataTable table = new DataTable();
                     table.Load(dr);
                     //這行是利用Json.net直接把table轉成Json
-                    dr.Close(); // 停止讀取資料
-                    return JsonConvert.SerializeObject(table, Formatting.None);
+                    data = JsonConvert.SerializeObject(table, Formatting.None);
+                    if (!data.Equals("[]"))
+                        return data;
+                    else
+                        return gm.getStageJson(false, msg.noData_cht);
                 }
                 else
                 {
-                    return gm.getStageJson(false, "Contact");
+                    return gm.getStageJson(false, msg.contactError_cht);
                 }
             }
             catch (Exception ex)
             {
                 //Response.Write(ex.Message);
-                return gm.getStageJson(false, "Fail");
+                return gm.getStageJson(false, msg.error_cht);
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
         else
         {
-            return gm.getStageJson(false, "Null");
+            return gm.getStageJson(false, msg.sqlError_cht);
         }
     }
 
     // Simple select method for one data, return{"Result" : "Value"}
     public string SelectSingle(string sql, string returnName)
     {
-        string[] tmp = returnName.Split(';');
-        int count = tmp.Length;
         if (!sql.Equals(""))
         {
+            SqlDataReader dr = null;
+            string[] tmp = returnName.Split(';');
+            int count = tmp.Length;
+            string drStr = "";
             try
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
-                    dr.Read();
-                    string drStr = "";
-                    for (int i = 0; i < count; i++)
+                    if (dr.Read())
                     {
-                        drStr += dr[i].ToString();
-                        if (i < count-1)
+                        for (int i = 0; i < count; i++)
                         {
-                            drStr += ";";
+                            drStr += dr[i].ToString();
+                            if (i < count - 1)
+                            {
+                                drStr += ";";
+                            }
                         }
+                        return gm.getJsonArray(returnName, drStr);
                     }
-                    dr.Close(); // 停止讀取資料
-                    return gm.getJsonArray(returnName, drStr);
+                    else
+                        return gm.getStageJson(false, msg.noData_cht);
                 }
                 else
                 {
-                    return gm.getStageJson(false, "Contact");
+                    return gm.getStageJson(false, msg.contactError_cht);
                 }
             }
             catch (Exception ex)
             {
                 //Response.Write(ex.Message);
-                return gm.getStageJson(false, "Fail");
+                return gm.getStageJson(false, msg.error_cht);
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
         else
         {
-            return gm.getStageJson(false, "Null");
+            return gm.getStageJson(false, msg.sqlError_cht);
         }
     }
 
@@ -145,11 +157,11 @@ public class SQLMethod
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
                 sqlcmd.ExecuteNonQuery();
-                return gm.getStageJson(true, "Success");
+                return gm.getStageJson(true, msg.success);
             }
             catch (Exception ex)
             {
-                return gm.getStageJson(false, "Fail");
+                return gm.getStageJson(false, msg.error_cht);
             }
             finally
             {
@@ -158,53 +170,58 @@ public class SQLMethod
         }
         else
         {
-            return gm.getStageJson(false, "Null");
+            return gm.getStageJson(false, msg.sqlError_cht);
         }
     }
     
     // SignSelect
     public string SignSelect(string sql, string returnNameArray)
     {
-        string[] tmp = returnNameArray.Split(';');
-        int count = tmp.Length;
-        string content = "";
         if (!sql.Equals(""))
         {
+            SqlDataReader dr = null;
+            string[] tmp = returnNameArray.Split(';');
+            int count = tmp.Length;
+            string content = "";
             try
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
-                    dr.Read();
-                    for (int i = 0; i < count; i++)
+                    if (dr.Read())
                     {
-                        content += dr[i].ToString();
-                        if (i < count - 1)
-                            content += ";";
+                        for (int i = 0; i < count; i++)
+                        {
+                            content += dr[i].ToString();
+                            if (i < count - 1)
+                                content += ";";
+                        }
+                        return gm.getJsonArray(returnNameArray, content);
                     }
-                    dr.Close(); // 停止讀取資料
-                    return gm.getJsonArray(returnNameArray, content);
+                    else
+                        return gm.getStageJson(false, msg.noData_cht);
                 }
                 else
                 {
-                    return gm.getStageJson(false, "Contact");
+                    return gm.getStageJson(false, msg.contactError_cht);
                 }
             }
             catch (Exception ex)
             {
                 //Response.Write(ex.Message);
-                return gm.getStageJson(false, "Fail");
+                return gm.getStageJson(false, msg.error_cht);
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
         else
         {
-            return gm.getStageJson(false, "Null");
+            return gm.getStageJson(false, msg.sqlError_cht);
         }
     }
 
@@ -213,36 +230,41 @@ public class SQLMethod
     {
         if (!sql.Equals(""))
         {
+            SqlDataReader dr = null;
             try
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                SqlDataReader dr = sqlcmd.ExecuteReader();
+                dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
                 {
-                    dr.Read();
-                    string productID = dr[0].ToString();
-                    dr.Close(); // 停止讀取資料
-                    return gm.getJson("ProductID", productID);
+                    if (dr.Read())
+                    {
+                        string productID = dr[0].ToString();
+                        return gm.getJson("ProductID", productID);
+                    }
+                    else
+                        return gm.getStageJson(false, msg.noData_cht);
                 }
                 else
                 {
-                    return gm.getStageJson(false, "Contact");
+                    return gm.getStageJson(false, msg.contactError_cht);
                 }
             }
             catch (Exception ex)
             {
                 //Response.Write(ex.Message);
-                return gm.getStageJson(false, "Fail");
+                return gm.getStageJson(false, msg.error_cht);
             }
             finally
             {
+                dr.Close(); // 停止讀取資料
                 objcon.Close(); // 關閉連接
             }
         }
         else
         {
-            return gm.getStageJson(false, "Null");
+            return gm.getStageJson(false, msg.sqlError_cht);
         }
     }
 

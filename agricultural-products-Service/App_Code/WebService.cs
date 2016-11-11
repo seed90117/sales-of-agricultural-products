@@ -14,6 +14,7 @@ public class WebService : System.Web.Services.WebService
 {
     private GetMethod gm = new GetMethod();
     private MainMethod main = new MainMethod();
+    private Message msg = new Message();
     private JObject job;
 
     public WebService()
@@ -52,7 +53,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -74,11 +75,11 @@ public class WebService : System.Web.Services.WebService
             if (!account.Equals("") && !password.Equals(""))
                 return main.SignIn(account, password);
             else
-                return gm.getStageJson(false, "Account or password can't be null.");
+                return gm.getStageJson(false, msg.signNullError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -107,11 +108,11 @@ public class WebService : System.Web.Services.WebService
                 !validityPeriod.Equals("") && !validityNumber.Equals("") && !price.Equals(""))
                 return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, image, packagingDate, verification, validityPeriod, validityPeriod, price);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -128,11 +129,11 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !oldPassword.Equals("") && !newPassword.Equals(""))
                 return main.ResetPassword(identify, oldPassword, newPassword);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
     
@@ -154,11 +155,11 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals(""))
                 return main.GetMemberInfo(identify);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -183,11 +184,11 @@ public class WebService : System.Web.Services.WebService
                 !companyName.Equals("") && !address.Equals("") && !access.Equals(""))
                 return main.NewMember(account, password, firstName, lastName, phone, email, companyName, address, access);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -206,11 +207,11 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !productID.Equals("") && !type.Equals("") && !action.Equals("") && !note.Equals(""))
                 return main.NewRecord(identify, productID, type, action, note);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -226,11 +227,11 @@ public class WebService : System.Web.Services.WebService
             if (!column.Equals("") && !value.Equals(""))
                 return main.UpdateMemberInfo(column, value);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -250,11 +251,11 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !productID.Equals("") && !amount.Equals("") && !delivery.Equals("") && !shipment.Equals("") && !note.Equals(""))
                 return main.NewProductOrder(identify, productID, amount, delivery, shipment, note);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -269,11 +270,11 @@ public class WebService : System.Web.Services.WebService
             if (!access.Equals(""))
                 return main.GetMember(access);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -288,11 +289,11 @@ public class WebService : System.Web.Services.WebService
             if (!productID.Equals(""))
                 return main.GetProduct(productID);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -307,11 +308,11 @@ public class WebService : System.Web.Services.WebService
             if (!productID.Equals(""))
                 return main.GetRecord(productID);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
@@ -326,11 +327,11 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals(""))
                 return main.GetSignLog(identify);
             else
-                return gm.getStageJson(false, "Data can't be null.");
+                return gm.getStageJson(false, msg.inputDataError_cht);
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, "Json data can't be null.");
+            return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
 
