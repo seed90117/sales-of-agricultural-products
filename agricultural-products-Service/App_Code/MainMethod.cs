@@ -7,10 +7,6 @@ using System.Text.RegularExpressions;
 /// </summary>
 public class MainMethod
 {
-
-    private string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
-    private SqlConnection objcon;
-    private SqlCommand sqlcmd;
     private string sql;
     private SQLMethod sqlMethod = new SQLMethod();
     private GetMethod gm = new GetMethod();
