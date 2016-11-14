@@ -79,6 +79,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -112,6 +113,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -133,6 +135,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -159,6 +162,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -188,6 +192,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -211,6 +216,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -231,6 +237,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -255,6 +262,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -274,6 +282,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -293,6 +302,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -312,6 +322,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -331,6 +342,28 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductColumnJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string column = job["Column"].ToString();
+            string value = job["Value"].ToString();
+            if (!column.Equals("") && !value.Equals(""))
+                return main.GetProductColumn(column, value);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
             return gm.getStageJson(false, msg.jsonError_cht);
         }
     }
@@ -431,5 +464,12 @@ public class WebService : System.Web.Services.WebService
     public string GetSignLog(string Identify)
     {
         return main.GetSignLog(Identify);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductColumn(string Column, string Value)
+    {
+        return main.GetProductColumn(Column, Value);
     }
 }

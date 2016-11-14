@@ -35,7 +35,7 @@ public class SQLMethod
             }
             catch (Exception ex)
             {
-                //Response.Write(ex.Message);
+                Console.WriteLine(ex.Message);
                 return gm.getStageJson(false, msg.contactError_cht);
             }
             finally
@@ -79,7 +79,7 @@ public class SQLMethod
             }
             catch (Exception ex)
             {
-                //Response.Write(ex.Message);
+                Console.WriteLine(ex.Message);
                 return gm.getStageJson(false, msg.error_cht);
             }
             finally
@@ -132,7 +132,7 @@ public class SQLMethod
             }
             catch (Exception ex)
             {
-                //Response.Write(ex.Message);
+                Console.WriteLine(ex.Message);
                 return gm.getStageJson(false, msg.error_cht);
             }
             finally
@@ -161,6 +161,7 @@ public class SQLMethod
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return gm.getStageJson(false, msg.error_cht);
             }
             finally
@@ -210,7 +211,7 @@ public class SQLMethod
             }
             catch (Exception ex)
             {
-                //Response.Write(ex.Message);
+                Console.WriteLine(ex.Message);
                 return gm.getStageJson(false, msg.error_cht);
             }
             finally
@@ -253,7 +254,7 @@ public class SQLMethod
             }
             catch (Exception ex)
             {
-                //Response.Write(ex.Message);
+                Console.WriteLine(ex.Message);
                 return gm.getStageJson(false, msg.error_cht);
             }
             finally

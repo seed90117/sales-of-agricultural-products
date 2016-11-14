@@ -14,7 +14,7 @@ public class MainMethod
 
     // 方法名稱直白，單字第一個字需大寫
 
-    public string SignIn(string Account, string Password)
+    public string SignIn(string Account, string Password) // By Kevin Yen
     {
         string identify = "";
         string memberID = "";
@@ -66,7 +66,7 @@ public class MainMethod
 
     public string NewProduct(string CompanyID, string CompanyName, string ProductName, string Type, string Introduction,
                                 string AdditionalValue, string Origin, string Image, string PackagingDate, string Verification,
-                                string ValidityPeriod, string ValidityNumber, string Price)
+                                string ValidityPeriod, string ValidityNumber, string Price) // By Kevin Yen
     {
         string id = "null";
         string qr = "null";
@@ -84,7 +84,7 @@ public class MainMethod
         return sqlMethod.Update(sql);
     }
 
-    public string ResetPassword(string Identify, string OldPassword, string NewPassword)
+    public string ResetPassword(string Identify, string OldPassword, string NewPassword) // By Kevin Yen
     {
         sql = "select MemberID,Password from Member where Identify = '" + Identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;Password"));
@@ -111,7 +111,7 @@ public class MainMethod
     }
 
     public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
-                            string CompanyName, string Address, string Access)
+                            string CompanyName, string Address, string Access) // By Wei-Min Zhang
     {
         sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
                   "values('" + Account + "','" + Password + "','" + FirstName + "','" + LastName + "','" + Phone + "','" +
@@ -119,7 +119,7 @@ public class MainMethod
         return sqlMethod.Insert(sql);
     }
 
-    public string NewRecord(string identify, string productID, string type, string action, string note)
+    public string NewRecord(string identify, string productID, string type, string action, string note) // By Kevin Yen
     {
         string memberID = "";
         string creator = "";
@@ -198,7 +198,7 @@ public class MainMethod
         }
     }
 
-    public string NewProductOrder(string Identify, string ProductID, string Amount, string Delivery, string Shipment, string Note)
+    public string NewProductOrder(string Identify, string ProductID, string Amount, string Delivery, string Shipment, string Note) // By Wei-Min Zhang
     {
         string Account = "";
         string Name = "";
@@ -237,7 +237,7 @@ public class MainMethod
         }
     }
 
-    public string GetMember(string Access)
+    public string GetMember(string Access) // By Kevin Yen
     {
         if (Access.Equals("ALL"))
         {
@@ -271,7 +271,7 @@ public class MainMethod
         return sqlMethod.Select(sql); 
     }
 
-    public string GetSignLog(string Identify)
+    public string GetSignLog(string Identify) // By Kevin Yen
     {
         string memberID = "";
         bool isGetID = false;
@@ -288,7 +288,7 @@ public class MainMethod
         }
         else
             return gm.getStageJson(false, msg.memberInfoError_cht);
-        
+
     }
 }
 
