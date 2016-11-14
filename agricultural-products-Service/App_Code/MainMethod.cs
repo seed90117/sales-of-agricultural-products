@@ -13,6 +13,7 @@ public class MainMethod
     private Message msg = new Message();
 
     // 方法名稱直白，單字第一個字需大寫
+    // 變數第一個單字須小寫
 
     public string SignIn(string account, string password) // By Kevin Yen
     {
@@ -206,6 +207,7 @@ public class MainMethod
         string address = "";
         string productName = "";
         string price = "";
+        int totalPrice = 0;
         bool Bm = false;
         bool Bp = false;
         sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify + "'";
@@ -216,16 +218,21 @@ public class MainMethod
         address = job["Address"].ToString();
         if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
             Bm = true;
-        sql = "select ProductName , Price  from Product where ProductID =" + productID;
+        sql = "select ProductName , Price  from Product where ProductID =" + productID + "'";
         job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Price"));
         productName = job["ProductName"].ToString();
         price = job["Price"].ToString();
         if (!productName.Equals("") && !price.Equals(""))
             Bp = true;
+
+        totalPrice = int.Parse(price) + int.Parse(shipment);
+
         if (Bm && Bp)
         {
-            sql = "Insert into ProductOrder ( MemberAccount , MemberName , MemberPhone , MemberAddress , ProductName , Price) values ('" +
-                account + "','" + name + "','" + phone + "','" + address + "','" + productName + "','" + price + "') ";
+            sql = "Insert into ProductOrder (MemberAccount, MemberName, MemberPhone, MemberAddress, ProductName,Amount," +
+                " Price, Delivery, Shipment, TotalPrice, Note)" + " values ('" + account + "','" + name + "','" + phone + 
+                "','" + address + "','" + productName + "','" + amount + "','" + price + "','" + delivery + "','" + 
+                shipment + "','" + totalPrice.ToString() + "','" + note + "') ";
             return sqlMethod.Insert(sql);
         }
         else
@@ -298,7 +305,7 @@ public class MainMethod
 
     }
 
-    public string NewProductImage(string productID,string imageType, string image) // By Kevin Yen
+    public string NewProductImage(string productID, string imageType, string image) // By Kevin Yen
     {
         string imageUrl = gm.uploadImage(image);
         string type = "";
