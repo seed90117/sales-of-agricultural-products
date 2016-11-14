@@ -265,6 +265,12 @@ public class MainMethod
         }
     }
 
+    public string GetProductColumn(string Column, string Value)
+    {
+        sql = "select * from Product where "+ Column + " = '" + Value + "'";
+        return sqlMethod.Select(sql);
+    }
+
     public string GetRecord(string ProductID)
     {
         sql = "select * from Record where ProductID = '" + ProductID + "'";
