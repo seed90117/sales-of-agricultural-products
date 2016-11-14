@@ -49,7 +49,7 @@ public class SQLMethod
         }
     }
 
-    // Simple select method for two or many data
+    // Simple select method, two or many database data were returned
     public string Select(string sql)
     {
         if (!sql.Equals(""))
@@ -94,7 +94,7 @@ public class SQLMethod
         }
     }
 
-    // Simple select method for one data, return{"Result" : "Value"}
+    // Simple select method, one data was returned, return{"Result" : "Value"}
     public string SelectSingle(string sql, string returnName)
     {
         if (!sql.Equals(""))

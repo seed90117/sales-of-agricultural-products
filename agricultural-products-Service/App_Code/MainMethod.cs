@@ -98,13 +98,13 @@ public class MainMethod
             return gm.getStageJson(false, msg.passwordError_cht);
     }
 
-    public string GetIntroduction()
+    public string GetIntroduction() //Huan-Chieh Chen
     {
         sql = "select * from Introduction";
         return sqlMethod.Select(sql);
     }
 
-    public string GetMemberInfo(string identify)
+    public string GetMemberInfo(string identify) //Huan-Chieh Chen
     {
         sql = "select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where Identify = '" + identify + "'";
         return sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access");
@@ -161,7 +161,7 @@ public class MainMethod
         }
     }
 
-    public string UpdateMemberInfo(string column, string value)
+    public string UpdateMemberInfo(string column, string value) //Huan-Chieh Chen
     {
         int IdentifyNumber = -1;
         string[] strSplit1 = column.Split(';');
@@ -265,13 +265,13 @@ public class MainMethod
         }
     }
 
-    public string GetProductColumn(string Column, string Value)
+    public string GetProductColumn(string Column, string Value) //Huan-Chieh Chen
     {
         sql = "select * from Product where "+ Column + " = '" + Value + "'";
         return sqlMethod.Select(sql);
     }
 
-    public string GetRecord(string ProductID)
+    public string GetRecord(string ProductID) //Huan-Chieh Chen
     {
         sql = "select * from Record where ProductID = '" + ProductID + "'";
         return sqlMethod.Select(sql); 
