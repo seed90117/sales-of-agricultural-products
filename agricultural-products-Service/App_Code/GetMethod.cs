@@ -2,6 +2,8 @@
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Drawing;
+using System.IO;
 
 /// <summary>
 /// Summary description for GetMethod
@@ -80,5 +82,39 @@ public class GetMethod
     public string getCurrentDate()
     {
         return DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss");
+    }
+
+    public string uploadImage(string image)
+    {
+        string savePath = HttpContext.Current.Server.MapPath("~/ProductImage/");
+        string saveName = getUUID() + ".jpg";
+        string serverPath = "http://140.127.22.4/PlatformAPI/ProductImage/";
+        string returnURL = serverPath + saveName;
+        byte[] bt = Convert.FromBase64String(image);
+        System.IO.MemoryStream stream = new System.IO.MemoryStream(bt);
+        Bitmap bitmap = new Bitmap(stream);
+        MemoryStream memoryStream = null;
+        FileStream fileStream = null;
+        // string fileName = "uploadImage.jpg";
+        try
+        {
+            memoryStream = new MemoryStream(bt);
+            fileStream = new FileStream(savePath+saveName, FileMode.Create);
+            memoryStream.WriteTo(fileStream);
+            return returnURL;
+        }
+
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return "";
+        }
+        finally
+        {
+            memoryStream.Close();
+            fileStream.Close();
+            fileStream = null;
+            memoryStream = null;
+        }
     }
 }

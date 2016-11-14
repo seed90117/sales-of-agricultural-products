@@ -26,9 +26,15 @@ public class WebService : System.Web.Services.WebService
     // 用於測試方法，Commit前記得回復原狀
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string HelloWorld()
+    public string HelloWorld(string image)
     {
-        return "Hello World";
+        string tmp = gm.uploadImage(image);
+        if (!tmp.Equals(""))
+        {
+            return tmp;
+        }
+        else
+            return gm.getStageJson(false, msg.uploadFail_cht);
     }
 
     [WebMethod]
@@ -107,7 +113,7 @@ public class WebService : System.Web.Services.WebService
             if (!companyID.Equals("") && !companyName.Equals("") && !productName.Equals("") && !type.Equals("") && !introduction.Equals("") &&
                 !additionalValue.Equals("") && !origin.Equals("") && !image.Equals("") && !packagingDate.Equals("") && !verification.Equals("") &&
                 !validityPeriod.Equals("") && !validityNumber.Equals("") && !price.Equals(""))
-                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, image, packagingDate, verification, validityPeriod, validityPeriod, price);
+                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, packagingDate, verification, validityPeriod, validityPeriod, price);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -368,6 +374,28 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProductImageJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string productID = job["ProductID"].ToString();
+            string imageType = job["ImageType"].ToString();
+            string image = job["Image"].ToString();
+            if (!productID.Equals("") && !imageType.Equals("") && !image.Equals(""))
+                return main.NewProductImage(productID, imageType, image);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
 
     // Main Method
     [WebMethod]
@@ -384,7 +412,7 @@ public class WebService : System.Web.Services.WebService
                                 string ValidityPeriod, string ValidityNumber, string Price)
     {
         return main.NewProduct(CompanyID, CompanyName, ProductName, Type, Introduction, AdditionalValue, Origin, 
-                               Image, PackagingDate, Verification, ValidityPeriod, ValidityNumber, Price);
+                               PackagingDate, Verification, ValidityPeriod, ValidityNumber, Price);
     }
 
     [WebMethod]
@@ -471,5 +499,12 @@ public class WebService : System.Web.Services.WebService
     public string GetProductColumn(string Column, string Value)
     {
         return main.GetProductColumn(Column, Value);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProductImage(string ProductID, string ImageType, string Image)
+    {
+        return main.NewProductImage(ProductID, ImageType, Image);
     }
 }

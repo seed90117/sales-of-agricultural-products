@@ -238,51 +238,51 @@ public class MainMethod
         }
     }
 
-    public string GetMember(string access) // By Kevin Yen
+    public string GetMember(string Access) // By Kevin Yen
     {
-        if (access.Equals("ALL"))
+        if (Access.Equals("ALL"))
         {
             sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member";
         }
         else
         {
-            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + access + "'";
+            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + Access + "'";
         }
         return sqlMethod.Select(sql);
     }
 
-    public string GetProduct(string productID)
+    public string GetProduct(string ProductID)
     {
-        if (productID.Equals("ALL"))
+        if (ProductID.Equals("ALL"))
         {
             sql = "select * from Product";
             return sqlMethod.Select(sql);
         }
         else
         {
-            sql = "select * from Product where ProductID = '" + productID + "'";
+            sql = "select * from Product where ProductID = '" + ProductID + "'";
             return sqlMethod.SelectSingle(sql, "CompanyID;CompanyName;ProductName;Type;Introduction;AdditionalValue;Origin;" +
                 "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Price");
         }
     }
 
-    public string GetProductColumn(string column, string value) //Huan-Chieh Chen
+    public string GetProductColumn(string Column, string Value) //Huan-Chieh Chen
     {
-        sql = "select * from Product where "+ column + " = '" + value + "'";
+        sql = "select * from Product where "+ Column + " = '" + Value + "'";
         return sqlMethod.Select(sql);
     }
 
-    public string GetRecord(string productID) //Huan-Chieh Chen
+    public string GetRecord(string ProductID) //Huan-Chieh Chen
     {
-        sql = "select * from Record where ProductID = '" + productID + "'";
+        sql = "select * from Record where ProductID = '" + ProductID + "'";
         return sqlMethod.Select(sql); 
     }
 
-    public string GetSignLog(string identify) // By Kevin Yen
+    public string GetSignLog(string Identify) // By Kevin Yen
     {
         string memberID = "";
         bool isGetID = false;
-        sql = "select MemberID from SignLog where Identify = '" + identify + "'";
+        sql = "select MemberID from SignLog where Identify = '" + Identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID"));
         memberID = job["MemberID"].ToString();
         if (!memberID.Equals(""))

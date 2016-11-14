@@ -23,4 +23,5 @@ public class Message
     public string columnError_cht = "欄位錯誤";
     public string memberInfoError_cht = "會員資料錯誤";
     public string productInfoError_cht = "產品資料錯誤";
+    public string uploadFail_cht = "上傳失敗";
 }

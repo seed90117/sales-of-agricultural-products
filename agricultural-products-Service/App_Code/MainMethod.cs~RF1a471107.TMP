@@ -14,7 +14,7 @@ public class MainMethod
 
     // 方法名稱直白，單字第一個字需大寫
 
-    public string SignIn(string account, string password) // By Kevin Yen
+    public string SignIn(string Account, string Password) // By Kevin Yen
     {
         string identify = "";
         string memberID = "";
@@ -24,9 +24,9 @@ public class MainMethod
         bool isSign = false;
         bool isIdentify = false;
         bool isLog = false;
-        sql = "select MemberID,Password from Member where Account = '" + account + "'";
+        sql = "select MemberID,Password from Member where Account = '" + Account + "'";
         JObject job = gm.getJsonResult(sqlMethod.SignSelect(sql, "MemberID;Password"));
-        if (job["Password"].ToString().Equals(password))
+        if (job["Password"].ToString().Equals(Password))
         {
             isSign = true;
             identify = gm.getUUID();
@@ -47,7 +47,7 @@ public class MainMethod
 
             // insert SignLog table
             sql = "insert into SignLog(MemberID,Account,SignTime,Identify,IP) values('" + memberID + "','"
-                + account + "','" + gm.getCurrentDate() + "','" + identify + "','" + ip + "')";
+                + Account + "','" + gm.getCurrentDate() + "','" + identify + "','" + ip + "')";
             job = JObject.Parse(sqlMethod.Update(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
                 isLog = true;
@@ -64,19 +64,19 @@ public class MainMethod
         }
     }
 
-    public string NewProduct(string companyID, string companyName, string productName, string type, string introduction,
-                                string additionalValue, string origin, string packagingDate, string verification,
-                                string validityPeriod, string validityNumber, string price) // By Kevin Yen
+    public string NewProduct(string CompanyID, string CompanyName, string ProductName, string Type, string Introduction,
+                                string AdditionalValue, string Origin, string PackagingDate, string Verification,
+                                string ValidityPeriod, string ValidityNumber, string Price) // By Kevin Yen
     {
         string id = "null";
         string qr = "null";
         QRCodeMethod qrcm = new QRCodeMethod();
 
         sql = "insert into Product(CompanyID,CompanyName,ProductName,Type,Introduction,AdditionalValue,Origin," +
-                "PackagingDate,Verification,ValidityPeriod,ValidityNumber,Price) values ('" + companyID + "','" +
-                companyName + "','" + productName + "','" + type + "','" + introduction + "','" + additionalValue + "','" +
-                origin + "','" + packagingDate + "','" + verification + "','" + validityPeriod + "','" +
-                validityNumber + "'," + price + ");SELECT SCOPE_IDENTITY()";
+                "PackagingDate,Verification,ValidityPeriod,ValidityNumber,Price) values ('" + CompanyID + "','" +
+                CompanyName + "','" + ProductName + "','" + Type + "','" + Introduction + "','" + AdditionalValue + "','" +
+                Origin + "','" + PackagingDate + "','" + Verification + "','" + ValidityPeriod + "','" +
+                ValidityNumber + "'," + Price + ");SELECT SCOPE_IDENTITY()";
         JObject job = gm.getJsonResult(sqlMethod.InsertSelect(sql));
         id = job["ProductID"].ToString();
         qr = qrcm.GetQRCode(id);
@@ -84,14 +84,14 @@ public class MainMethod
         return sqlMethod.Update(sql);
     }
 
-    public string ResetPassword(string identify, string oldPassword, string newPassword) // By Kevin Yen
+    public string ResetPassword(string Identify, string OldPassword, string NewPassword) // By Kevin Yen
     {
-        sql = "select MemberID,Password from Member where Identify = '" + identify + "'";
+        sql = "select MemberID,Password from Member where Identify = '" + Identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;Password"));
         string id = job["MemberID"].ToString();
-        if (job["Password"].ToString().Equals(oldPassword))
+        if (job["Password"].ToString().Equals(OldPassword))
         {
-            sql = "update Member set Password = '" + newPassword + "' where MemberID = '" + id + "'";
+            sql = "update Member set Password = '" + NewPassword + "' where MemberID = '" + id + "'";
             return sqlMethod.Update(sql);
         }
         else
@@ -110,12 +110,12 @@ public class MainMethod
         return sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access");
     }
 
-    public string NewMember(string account, string password, string firstName, string lastName, string phone, string email,
-                            string companyName, string address, string access) // By Wei-Min Zhang
+    public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
+                            string CompanyName, string Address, string Access) // By Wei-Min Zhang
     {
         sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
-                  "values('" + account + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
-                  email + "','" + companyName + "','" + address + "','" + access + "')";
+                  "values('" + Account + "','" + Password + "','" + FirstName + "','" + LastName + "','" + Phone + "','" +
+                  Email + "','" + CompanyName + "','" + Address + "','" + Access + "')";
         return sqlMethod.Insert(sql);
     }
 
@@ -198,34 +198,33 @@ public class MainMethod
         }
     }
 
-    public string NewProductOrder(string identify, string productID, string amount, string delivery, string shipment, string note) // By Wei-Min Zhang
+    public string NewProductOrder(string Identify, string ProductID, string Amount, string Delivery, string Shipment, string Note) // By Wei-Min Zhang
     {
-        string account = "";
-        string name = "";
-        string phone = "";
-        string address = "";
-        string productName = "";
-        string price = "";
+        string Account = "";
+        string Name = "";
+        string Phone = "";
+        string Address = "";
+        string ProductName = "";
+        string Price = "";
         bool Bm = false;
         bool Bp = false;
-        sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify + "'";
+        sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + Identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "Account;Name;Phone;Address"));
-        account = job["Account"].ToString();
-        name = job["Name"].ToString();
-        phone = job["Phone"].ToString();
-        address = job["Address"].ToString();
-        if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
+        Account = job["Account"].ToString();
+        Name = job["Name"].ToString();
+        Phone = job["Phone"].ToString();
+        Address = job["Address"].ToString();
+        if (!Account.Equals("") && !Name.Equals("") && !Phone.Equals("") && !Address.Equals(""))
             Bm = true;
-        sql = "select ProductName , Price  from Product where ProductID =" + productID;
+        sql = "select ProductName , Price  from Product where ProductID =" + ProductID;
         job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Price"));
-        productName = job["ProductName"].ToString();
-        price = job["Price"].ToString();
-        if (!productName.Equals("") && !price.Equals(""))
+        ProductName = job["ProductName"].ToString();
+        Price = job["Price"].ToString();
+        if (!ProductName.Equals("") && !Price.Equals(""))
             Bp = true;
         if (Bm && Bp)
         {
-            sql = "Insert into ProductOrder ( MemberAccount , MemberName , MemberPhone , MemberAddress , ProductName , Price) values ('" +
-                account + "','" + name + "','" + phone + "','" + address + "','" + productName + "','" + price + "') ";
+            sql = "Insert into ProductOrder ( MemberAccount , MemberName , MemberPhone , MemberAddress , ProductName , Price) values ('" + Account + "','" + Name + "','" + Phone + "','" + Address + "','" + ProductName + "','" + Price + "') ";
             return sqlMethod.Insert(sql);
         }
         else
@@ -238,51 +237,51 @@ public class MainMethod
         }
     }
 
-    public string GetMember(string access) // By Kevin Yen
+    public string GetMember(string Access) // By Kevin Yen
     {
-        if (access.Equals("ALL"))
+        if (Access.Equals("ALL"))
         {
             sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member";
         }
         else
         {
-            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + access + "'";
+            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + Access + "'";
         }
         return sqlMethod.Select(sql);
     }
 
-    public string GetProduct(string productID)
+    public string GetProduct(string ProductID)
     {
-        if (productID.Equals("ALL"))
+        if (ProductID.Equals("ALL"))
         {
             sql = "select * from Product";
             return sqlMethod.Select(sql);
         }
         else
         {
-            sql = "select * from Product where ProductID = '" + productID + "'";
+            sql = "select * from Product where ProductID = '" + ProductID + "'";
             return sqlMethod.SelectSingle(sql, "CompanyID;CompanyName;ProductName;Type;Introduction;AdditionalValue;Origin;" +
                 "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Price");
         }
     }
 
-    public string GetProductColumn(string column, string value) //Huan-Chieh Chen
+    public string GetProductColumn(string Column, string Value) //Huan-Chieh Chen
     {
-        sql = "select * from Product where "+ column + " = '" + value + "'";
+        sql = "select * from Product where "+ Column + " = '" + Value + "'";
         return sqlMethod.Select(sql);
     }
 
-    public string GetRecord(string productID) //Huan-Chieh Chen
+    public string GetRecord(string ProductID) //Huan-Chieh Chen
     {
-        sql = "select * from Record where ProductID = '" + productID + "'";
+        sql = "select * from Record where ProductID = '" + ProductID + "'";
         return sqlMethod.Select(sql); 
     }
 
-    public string GetSignLog(string identify) // By Kevin Yen
+    public string GetSignLog(string Identify) // By Kevin Yen
     {
         string memberID = "";
         bool isGetID = false;
-        sql = "select MemberID from SignLog where Identify = '" + identify + "'";
+        sql = "select MemberID from SignLog where Identify = '" + Identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID"));
         memberID = job["MemberID"].ToString();
         if (!memberID.Equals(""))

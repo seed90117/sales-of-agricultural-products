@@ -13,8 +13,9 @@ public class QRCodeMethod
 {
     public string GetQRCode(string data)
     {
+        GetMethod gm = new GetMethod();
         string savePath = HttpContext.Current.Server.MapPath("~/QRCode/");
-        string saveName = DateTime.Now.ToString("yyyyMMdd") + System.Guid.NewGuid().ToString() + ".jpg";
+        string saveName = DateTime.Now.ToString("yyyyMMdd") + gm.getUUID() + ".jpg";
         string serverPath = "http://140.127.22.4/PlatformAPI/QRCode/";
         string returnURL = serverPath + saveName;
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
@@ -43,7 +44,7 @@ public class QRCodeMethod
                 }
                 catch (Exception ex)
                 {
-                    //Response.Write(ex.Message);
+                    Console.WriteLine(ex.Message);
                     return "null";
                 }
             }
