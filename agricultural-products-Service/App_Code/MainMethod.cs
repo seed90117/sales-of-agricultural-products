@@ -210,7 +210,7 @@ public class MainMethod
         int totalPrice = 0;
         bool Bm = false;
         bool Bp = false;
-        sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify + "'";
+        sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "Account;Name;Phone;Address"));
         account = job["Account"].ToString();
         name = job["Name"].ToString();
@@ -218,19 +218,19 @@ public class MainMethod
         address = job["Address"].ToString();
         if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
             Bm = true;
-        sql = "select ProductName , Price  from Product where ProductID =" + productID + "'";
+        sql = "select ProductName , Price  from Product where ProductID =" + productID;
         job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Price"));
         productName = job["ProductName"].ToString();
         price = job["Price"].ToString();
         if (!productName.Equals("") && !price.Equals(""))
             Bp = true;
 
-        totalPrice = int.Parse(price) + int.Parse(shipment);
+        totalPrice = (int.Parse(price) * int.Parse(amount)) + int.Parse(shipment);
 
         if (Bm && Bp)
         {
             sql = "Insert into ProductOrder (MemberAccount, MemberName, MemberPhone, MemberAddress, ProductName,Amount," +
-                " Price, Delivery, Shipment, TotalPrice, Note)" + " values ('" + account + "','" + name + "','" + phone + 
+                " Price, Delivery, Shipment, TotalPrice, Note) values ('" + account + "','" + name + "','" + phone + 
                 "','" + address + "','" + productName + "','" + amount + "','" + price + "','" + delivery + "','" + 
                 shipment + "','" + totalPrice.ToString() + "','" + note + "') ";
             return sqlMethod.Insert(sql);

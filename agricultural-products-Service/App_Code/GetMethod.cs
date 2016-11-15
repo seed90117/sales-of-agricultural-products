@@ -76,7 +76,7 @@ public class GetMethod
 
     public string getUUID()
     {
-        return System.Guid.NewGuid().ToString();
+        return System.Guid.NewGuid().ToString().Replace("-","");
     }
 
     public string getCurrentDate()
