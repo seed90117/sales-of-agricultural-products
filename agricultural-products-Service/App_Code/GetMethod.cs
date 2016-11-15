@@ -30,6 +30,11 @@ public class GetMethod
         return JsonConvert.DeserializeObject<JObject>(jsonStr);
     }
 
+    public JArray getJsonArrayResult(string jsonStr)
+    {
+        return JsonConvert.DeserializeObject<JArray>(jsonStr);
+    }
+
     public string getJsonArray(string nameArray, string inputArray)
     {
         string[] name = nameArray.Split(';');
@@ -101,7 +106,7 @@ public class GetMethod
             memoryStream = new MemoryStream(bt);
             fileStream = new FileStream(savePath+saveName, FileMode.Create);
             memoryStream.WriteTo(fileStream);
-            return returnURL;
+            return getJson("ImageUrl", returnURL);
         }
 
         catch (Exception ex)

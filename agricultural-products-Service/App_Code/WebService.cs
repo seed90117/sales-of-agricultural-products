@@ -26,15 +26,9 @@ public class WebService : System.Web.Services.WebService
     // 用於測試方法，Commit前記得回復原狀
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string HelloWorld(string image)
+    public void HelloWorld()
     {
-        string tmp = gm.uploadImage(image);
-        if (!tmp.Equals(""))
-        {
-            return tmp;
-        }
-        else
-            return gm.getStageJson(false, msg.uploadFail_cht);
+        
     }
 
     [WebMethod]
@@ -109,11 +103,14 @@ public class WebService : System.Web.Services.WebService
             string verification = job["Verification"].ToString();
             string validityPeriod = job["ValidityPeriod"].ToString();
             string validityNumber = job["ValidityNumber"].ToString();
+            string amount = job["Amount"].ToString();
             string price = job["Price"].ToString();
+            string stage = job["Stage"].ToString();
             if (!companyID.Equals("") && !companyName.Equals("") && !productName.Equals("") && !type.Equals("") && !introduction.Equals("") &&
                 !additionalValue.Equals("") && !origin.Equals("") && !image.Equals("") && !packagingDate.Equals("") && !verification.Equals("") &&
                 !validityPeriod.Equals("") && !validityNumber.Equals("") && !price.Equals(""))
-                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, packagingDate, verification, validityPeriod, validityPeriod, price);
+                return main.NewProduct(companyID, companyName, productName, type, introduction, additionalValue, origin, packagingDate, 
+                                        verification, validityPeriod, validityPeriod, amount, price, stage);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -396,6 +393,13 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetTopHotProductJson()
+    {
+        return main.GetTopHotProduct();
+    }
+
 
     // Main Method
     [WebMethod]
@@ -409,10 +413,10 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewProduct(string CompanyID, string CompanyName, string ProductName, string Type, string Introduction,
                                 string AdditionalValue, string Origin, string Image, string PackagingDate, string Verification,
-                                string ValidityPeriod, string ValidityNumber, string Price)
+                                string ValidityPeriod, string ValidityNumber, string Amount, string Price, string Stage)
     {
         return main.NewProduct(CompanyID, CompanyName, ProductName, Type, Introduction, AdditionalValue, Origin, 
-                               PackagingDate, Verification, ValidityPeriod, ValidityNumber, Price);
+                               PackagingDate, Verification, ValidityPeriod, ValidityNumber, Amount, Price, Stage);
     }
 
     [WebMethod]
@@ -506,5 +510,12 @@ public class WebService : System.Web.Services.WebService
     public string NewProductImage(string ProductID, string ImageType, string Image)
     {
         return main.NewProductImage(ProductID, ImageType, Image);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetTopHotProduct()
+    {
+        return main.GetTopHotProduct();
     }
 }

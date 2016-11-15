@@ -1,6 +1,5 @@
-﻿using System.Data.SqlClient;
-using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
+﻿using Newtonsoft.Json.Linq;
+
 
 /// <summary>
 /// Summary description for MainMethod
@@ -67,17 +66,26 @@ public class MainMethod
 
     public string NewProduct(string companyID, string companyName, string productName, string type, string introduction,
                                 string additionalValue, string origin, string packagingDate, string verification,
-                                string validityPeriod, string validityNumber, string price) // By Kevin Yen
+                                string validityPeriod, string validityNumber, string amount, string price, string stage) // By Kevin Yen
     {
         string id = "null";
         string qr = "null";
+        string productStage = "Prepare";
         QRCodeMethod qrcm = new QRCodeMethod();
 
+        if (stage.Equals("S"))
+            productStage = "Sales";
+        if (stage.Equals("P"))
+            productStage = "Prepare";
+        if (stage.Equals("D"))
+            productStage = "Drop";
+
         sql = "insert into Product(CompanyID,CompanyName,ProductName,Type,Introduction,AdditionalValue,Origin," +
-                "PackagingDate,Verification,ValidityPeriod,ValidityNumber,Price) values ('" + companyID + "','" +
-                companyName + "','" + productName + "','" + type + "','" + introduction + "','" + additionalValue + "','" +
-                origin + "','" + packagingDate + "','" + verification + "','" + validityPeriod + "','" +
-                validityNumber + "'," + price + ");SELECT SCOPE_IDENTITY()";
+                "PackagingDate,Verification,ValidityPeriod,ValidityNumber,Amount,Price,OrderAmount,Stage) values " +
+                "('" + companyID + "','" + companyName + "','" + productName + "','" + type + "','" + introduction + 
+                "','" + additionalValue + "','" + origin + "','" + packagingDate + "','" + verification + "','" + 
+                validityPeriod + "','" + validityNumber + "'," + amount + "," + price + ",0,'" + productStage + ");SELECT SCOPE_IDENTITY()";
+
         JObject job = gm.getJsonResult(sqlMethod.InsertSelect(sql));
         id = job["ProductID"].ToString();
         qr = qrcm.GetQRCode(id);
@@ -201,15 +209,23 @@ public class MainMethod
 
     public string NewProductOrder(string identify, string productID, string amount, string delivery, string shipment, string note) // By Wei-Min Zhang
     {
+        string returnJson = "";
         string account = "";
         string name = "";
         string phone = "";
         string address = "";
         string productName = "";
         string price = "";
+        int productAmount = -1;
+        int orderAmount = -1;
         int totalPrice = 0;
-        bool Bm = false;
-        bool Bp = false;
+        bool amountCheck = false;
+        bool memberInfo = false;
+        bool productInfo = false;
+        bool checkOrder = false;
+        bool updateOrder = false;
+        bool updateProduct = false;
+
         sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
         JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "Account;Name;Phone;Address"));
         account = job["Account"].ToString();
@@ -217,31 +233,53 @@ public class MainMethod
         phone = job["Phone"].ToString();
         address = job["Address"].ToString();
         if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
-            Bm = true;
-        sql = "select ProductName , Price  from Product where ProductID =" + productID;
-        job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Price"));
+            memberInfo = true;
+
+        sql = "select ProductName,Amount,Price,OrderAmount  from Product where ProductID =" + productID;
+        job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Amount;Price;OrderAmount"));
         productName = job["ProductName"].ToString();
+        productAmount = int.Parse(job["Amount"].ToString());
+        orderAmount = int.Parse(job["OrderAmount"].ToString());
         price = job["Price"].ToString();
+
         if (!productName.Equals("") && !price.Equals(""))
-            Bp = true;
+            productInfo = true;
+
+        if (productAmount >= int.Parse(amount) && productAmount > 0)
+            amountCheck = true;
 
         totalPrice = (int.Parse(price) * int.Parse(amount)) + int.Parse(shipment);
 
-        if (Bm && Bp)
+        if (memberInfo && productInfo && amountCheck)
         {
             sql = "Insert into ProductOrder (MemberAccount, MemberName, MemberPhone, MemberAddress, ProductName,Amount," +
                 " Price, Delivery, Shipment, TotalPrice, Note) values ('" + account + "','" + name + "','" + phone + 
                 "','" + address + "','" + productName + "','" + amount + "','" + price + "','" + delivery + "','" + 
                 shipment + "','" + totalPrice.ToString() + "','" + note + "') ";
-            return sqlMethod.Insert(sql);
+            returnJson = sqlMethod.Insert(sql);
+            checkOrder = true;
         }
         else
         {
-            if (!Bm)
+            if (!memberInfo)
                 return gm.getStageJson(false, msg.memberInfoError_cht);
-            else
+            if (!productInfo)
                 return gm.getStageJson(false, msg.productInfoError_cht);
+            if (!amountCheck)
+                return gm.getStageJson(false, msg.amountError_cht);
+        }
 
+        if (checkOrder)
+        {
+            orderAmount++;
+            productAmount -= int.Parse(amount);
+            sql = "update Product set Amount = " + productAmount + ", OrderAmount = " + orderAmount + " where ProductID = " + productID;
+            sqlMethod.Update(sql);
+            return returnJson;
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.productAmountError_cht);
         }
     }
 
@@ -269,7 +307,7 @@ public class MainMethod
         {
             sql = "select * from Product where ProductID = '" + productID + "'";
             return sqlMethod.SelectSingle(sql, "CompanyID;CompanyName;ProductName;Type;Introduction;AdditionalValue;Origin;" +
-                "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Price");
+                "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Amount;Price;OrderAmount;Stage");
         }
     }
 
@@ -330,6 +368,24 @@ public class MainMethod
         }
         else
             return gm.getStageJson(false, msg.uploadFail_cht);
+    }
+
+    public string GetTopHotProduct()
+    {
+        int item = 8;
+        string sqlStr = "";
+        sql = "select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc";
+        JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
+        for(int i = 0;i < item; i++)
+        {
+            JObject jObject = gm.getJsonResult(jArray[i].ToString());
+            sqlStr += "ProductID = " + jObject["ProductID"].ToString();
+            if (i < item - 1)
+                sqlStr += " OR ";
+        }
+
+        sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND (" + sqlStr + ")";
+        return sqlMethod.Select(sql);
     }
 }
 
