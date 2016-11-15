@@ -25,7 +25,7 @@ public class MainMethod
         bool isIdentify = false;
         bool isLog = false;
         sql = "select MemberID,Password from Member where Account = '" + account + "'";
-        JObject job = gm.getJsonResult(sqlMethod.SignSelect(sql, "MemberID;Password"));
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         if (job["Password"].ToString().Equals(password))
         {
             isSign = true;
@@ -96,7 +96,7 @@ public class MainMethod
     public string ResetPassword(string identify, string oldPassword, string newPassword) // By Kevin Yen
     {
         sql = "select MemberID,Password from Member where Identify = '" + identify + "'";
-        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;Password"));
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         string id = job["MemberID"].ToString();
         if (job["Password"].ToString().Equals(oldPassword))
         {
@@ -116,7 +116,7 @@ public class MainMethod
     public string GetMemberInfo(string identify) //Huan-Chieh Chen
     {
         sql = "select Account,FirstName,LastName,Phone,Email,CompanyName,Address,Access from Member where Identify = '" + identify + "'";
-        return sqlMethod.SelectSingle(sql, "Account;FirstName;LastName;Phone;Email;CompanyName;Address;Access");
+        return gm.getJsonSingleResult(sqlMethod.Select(sql));
     }
 
     public string NewMember(string account, string password, string firstName, string lastName, string phone, string email,
@@ -138,7 +138,7 @@ public class MainMethod
 
         // Get memberID and creator
         sql = "select MemberID, FirstName, LastName from Member where Identify = '" + identify + "'";
-        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID;FirstName;LastName"));
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         memberID = job["MemberID"].ToString();
         creator = job["LastName"].ToString() + job["FirstName"].ToString();
         if (!memberID.Equals("") && !creator.Equals(""))
@@ -146,7 +146,7 @@ public class MainMethod
 
         // Get ProductName
         sql = "select ProductName from Product where ProductID = '" + productID + "'";
-        job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName"));
+        job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         productName = job["ProductName"].ToString();
         if (!productName.Equals(""))
             isProductName = true;
@@ -223,11 +223,9 @@ public class MainMethod
         bool memberInfo = false;
         bool productInfo = false;
         bool checkOrder = false;
-        bool updateOrder = false;
-        bool updateProduct = false;
 
         sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
-        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "Account;Name;Phone;Address"));
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         account = job["Account"].ToString();
         name = job["Name"].ToString();
         phone = job["Phone"].ToString();
@@ -236,7 +234,7 @@ public class MainMethod
             memberInfo = true;
 
         sql = "select ProductName,Amount,Price,OrderAmount  from Product where ProductID =" + productID;
-        job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "ProductName;Amount;Price;OrderAmount"));
+        job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         productName = job["ProductName"].ToString();
         productAmount = int.Parse(job["Amount"].ToString());
         orderAmount = int.Parse(job["OrderAmount"].ToString());
@@ -306,8 +304,7 @@ public class MainMethod
         else
         {
             sql = "select * from Product where ProductID = '" + productID + "'";
-            return sqlMethod.SelectSingle(sql, "CompanyID;CompanyName;ProductName;Type;Introduction;AdditionalValue;Origin;" +
-                "Image;PackagingDate;Verification;ValidityPeriod;ValidityNumber;Amount;Price;OrderAmount;Stage");
+            return gm.getJsonSingleResult(sqlMethod.Select(sql));
         }
     }
 
@@ -328,7 +325,7 @@ public class MainMethod
         string memberID = "";
         bool isGetID = false;
         sql = "select MemberID from SignLog where Identify = '" + identify + "'";
-        JObject job = gm.getJsonResult(sqlMethod.SelectSingle(sql, "MemberID"));
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         memberID = job["MemberID"].ToString();
         if (!memberID.Equals(""))
             isGetID = true;
@@ -370,7 +367,7 @@ public class MainMethod
             return gm.getStageJson(false, msg.uploadFail_cht);
     }
 
-    public string GetTopHotProduct()
+    public string GetTopHotProduct() // By Kevin Yen
     {
         int item = 8;
         string sqlStr = "";

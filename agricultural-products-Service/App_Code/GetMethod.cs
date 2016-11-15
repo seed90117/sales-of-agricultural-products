@@ -10,7 +10,7 @@ using System.IO;
 /// </summary>
 public class GetMethod
 {
-
+    // 回傳結果使用，輸入狀態與訊息
     public string getStageJson(bool stage, string msg)
     {
         ReturnMsg reMsg = new ReturnMsg();
@@ -19,22 +19,40 @@ public class GetMethod
         return JsonConvert.SerializeObject(reMsg);
     }
 
+    // 自訂單一JSON值
     public string getJson(string name, string input)
     {
         JObject job = JObject.Parse(@"{""" + name + @""": """ + input.ToString() + @"""}");
         return JsonConvert.SerializeObject(job, Formatting.None);
     }
 
+    // 輸入單一資料JSON字串，取得JObject物件
     public JObject getJsonResult(string jsonStr)
     {
         return JsonConvert.DeserializeObject<JObject>(jsonStr);
     }
 
+    // 輸入多資料JSON字串，取得JArray物件
     public JArray getJsonArrayResult(string jsonStr)
     {
         return JsonConvert.DeserializeObject<JArray>(jsonStr);
     }
 
+    // 輸入單一資料JSON字串，取得JSON字串
+    public string getJsonSingleResult(string jsonStr)
+    {
+        JArray jArray = getJsonArrayResult(jsonStr);
+        return jArray[0].ToString();
+    }
+
+    // 輸入陣列型態單一資料JSON字串，取得JObject物件
+    public JObject getJsonObjectResult(string jsonStr)
+    {
+        JArray jArray = getJsonArrayResult(jsonStr);
+        return getJsonResult(jArray[0].ToString());
+    }
+
+    // 自訂多資料JSON值，Key與Values內各筆資料用";"隔開
     public string getJsonArray(string nameArray, string inputArray)
     {
         string[] name = nameArray.Split(';');
@@ -55,6 +73,7 @@ public class GetMethod
         return json;
     }
 
+    // 取得客戶端IP位址
     public string getIpAddress()
     {
         //登入ip
@@ -79,16 +98,19 @@ public class GetMethod
         return strIpAddr; ;
     }
 
+    // 取得唯一碼
     public string getUUID()
     {
         return System.Guid.NewGuid().ToString().Replace("-","");
     }
 
+    // 取得現在時間，範例2016/12/30-23:59:59
     public string getCurrentDate()
     {
         return DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss");
     }
 
+    // 上傳圖片
     public string uploadImage(string image)
     {
         string savePath = HttpContext.Current.Server.MapPath("~/ProductImage/");

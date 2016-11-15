@@ -94,59 +94,6 @@ public class SQLMethod
         }
     }
 
-    // Simple select method, one data was returned, return{"Result" : "Value"}
-    public string SelectSingle(string sql, string returnName)
-    {
-        if (!sql.Equals(""))
-        {
-            SqlDataReader dr = null;
-            string[] tmp = returnName.Split(';');
-            int count = tmp.Length;
-            string drStr = "";
-            try
-            {
-                objcon.Open();
-                sqlcmd = new SqlCommand(sql, objcon);
-                dr = sqlcmd.ExecuteReader();
-                if (dr.IsClosed == false)
-                {
-                    if (dr.Read())
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            drStr += dr[i].ToString();
-                            if (i < count - 1)
-                            {
-                                drStr += ";";
-                            }
-                        }
-                        return gm.getJsonArray(returnName, drStr);
-                    }
-                    else
-                        return gm.getStageJson(false, msg.noData_cht);
-                }
-                else
-                {
-                    return gm.getStageJson(false, msg.contactError_cht);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return gm.getStageJson(false, msg.error_cht);
-            }
-            finally
-            {
-                dr.Close(); // 停止讀取資料
-                objcon.Close(); // 關閉連接
-            }
-        }
-        else
-        {
-            return gm.getStageJson(false, msg.sqlError_cht);
-        }
-    }
-
     // Simple update method
     public string Update(string sql)
     {
@@ -167,57 +114,6 @@ public class SQLMethod
             finally
             {
                 objcon.Close();
-            }
-        }
-        else
-        {
-            return gm.getStageJson(false, msg.sqlError_cht);
-        }
-    }
-    
-    // SignSelect
-    public string SignSelect(string sql, string returnNameArray)
-    {
-        if (!sql.Equals(""))
-        {
-            SqlDataReader dr = null;
-            string[] tmp = returnNameArray.Split(';');
-            int count = tmp.Length;
-            string content = "";
-            try
-            {
-                objcon.Open();
-                sqlcmd = new SqlCommand(sql, objcon);
-                dr = sqlcmd.ExecuteReader();
-                if (dr.IsClosed == false)
-                {
-                    if (dr.Read())
-                    {
-                        for (int i = 0; i < count; i++)
-                        {
-                            content += dr[i].ToString();
-                            if (i < count - 1)
-                                content += ";";
-                        }
-                        return gm.getJsonArray(returnNameArray, content);
-                    }
-                    else
-                        return gm.getStageJson(false, msg.noData_cht);
-                }
-                else
-                {
-                    return gm.getStageJson(false, msg.contactError_cht);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return gm.getStageJson(false, msg.error_cht);
-            }
-            finally
-            {
-                dr.Close(); // 停止讀取資料
-                objcon.Close(); // 關閉連接
             }
         }
         else
