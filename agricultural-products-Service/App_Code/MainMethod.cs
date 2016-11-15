@@ -376,11 +376,12 @@ public class MainMethod
         string sqlStr = "";
         sql = "select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc";
         JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
-        for(int i = 0;i < item; i++)
+
+        for(int i = 0;i < jArray.Count; i++)
         {
             JObject jObject = gm.getJsonResult(jArray[i].ToString());
             sqlStr += "ProductID = " + jObject["ProductID"].ToString();
-            if (i < item - 1)
+            if (i < jArray.Count - 1)
                 sqlStr += " OR ";
         }
 
