@@ -188,11 +188,10 @@ public class WebService : System.Web.Services.WebService
             string companyName = job["CompanyName"].ToString();
             string address = job["Address"].ToString();
             string image = job["Image"].ToString();
-            string access = job["Access"].ToString();
             if (!account.Equals("") && !password.Equals("") && !firstName.Equals("") && 
                 !lastName.Equals("") && !phone.Equals("") && !identifyID.Equals("") && 
-                !email.Equals("") && !companyName.Equals("") && !address.Equals("") && !access.Equals(""))
-                return main.NewMember(account, password, firstName, lastName, phone, fax, identifyID, email, companyName, address, image, access);
+                !email.Equals("") && !companyName.Equals("") && !address.Equals(""))
+                return main.NewMember(account, password, firstName, lastName, phone, fax, identifyID, email, companyName, address, image);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -403,6 +402,34 @@ public class WebService : System.Web.Services.WebService
         return main.GetTopHotProduct();
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetCooperationJson()
+    {
+        return main.GetCooperation();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductKeyJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string type = job["Type"].ToString();
+            string value = job["Value"].ToString();
+            if (!type.Equals("") && !value.Equals(""))
+                return main.GetProductKey(type, value);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
 
     // Main Method
     [WebMethod]
@@ -447,9 +474,9 @@ public class WebService : System.Web.Services.WebService
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone,
-        string fax, string identifyID, string Email, string CompanyName, string Address, string image, string Access)
+        string fax, string identifyID, string Email, string CompanyName, string Address, string image)
     {
-        return main.NewMember(Account, Password, FirstName, LastName, Phone, fax, identifyID, Email, CompanyName, Address, image, Access);
+        return main.NewMember(Account, Password, FirstName, LastName, Phone, fax, identifyID, Email, CompanyName, Address, image);
     }
 
     [WebMethod]
@@ -520,5 +547,19 @@ public class WebService : System.Web.Services.WebService
     public string GetTopHotProduct()
     {
         return main.GetTopHotProduct();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetCooperation()
+    {
+        return main.GetCooperation();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductKey(string Type, string Value)
+    {
+        return main.GetProductKey(Type, Value);
     }
 }

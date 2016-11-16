@@ -18,19 +18,21 @@ public class MainMethod
     {
         string identify = "";
         string memberID = "";
+        string access = "";
         string ip = "";
         string reMsg = "";
         string jsonStr = "";
         bool isSign = false;
         bool isIdentify = false;
         bool isLog = false;
-        sql = "select MemberID,Password from Member where Account = '" + account + "'";
+        sql = "select MemberID,Password,Access from Member where Account = '" + account + "'";
         JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         if (job["Password"].ToString().Equals(password))
         {
             isSign = true;
             identify = gm.getUUID();
             memberID = job["MemberID"].ToString();
+            access = job["Access"].ToString();
             ip = gm.getIpAddress();
             reMsg = msg.success;
         }
@@ -54,12 +56,12 @@ public class MainMethod
         }
         if (isSign && isIdentify && isLog)
         {
-            jsonStr = gm.getJsonArray("stage;message;uuid", isSign.ToString() + ";" + reMsg + ";" + identify);
+            jsonStr = gm.getJsonArray("stage;message;UUID;Access", isSign.ToString() + ";" + reMsg + ";" + identify + ";" + access);
             return jsonStr;
         }
         else
         {
-            jsonStr = gm.getJsonArray("stage;message;uuid", false.ToString() + ";" + reMsg + ";null");
+            jsonStr = gm.getStageJson(false, reMsg);
             return jsonStr;
         }
     }
@@ -120,13 +122,13 @@ public class MainMethod
     }
 
     public string NewMember(string account, string password, string firstName, string lastName, string phone, 
-        string fax, string identifyID,string email, string companyName, string address, string image, string access) // By Wei-Min Zhang
+        string fax, string identifyID,string email, string companyName, string address, string image) // By Wei-Min Zhang
     {
         image = gm.uploadImage(image);
         sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
                   "values('" + account + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
                   fax + "','" + identifyID + "','" + email + "','" + companyName + "','" + address + "','" + image +
-                  "','" + access + "')";
+                  "','" + gm.getMemberAccess("C") + "')";
         return sqlMethod.Insert(sql);
     }
 
@@ -291,12 +293,12 @@ public class MainMethod
         }
         else
         {
-            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + access + "'";
+            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + gm.getMemberAccess(access) + "'";
         }
         return sqlMethod.Select(sql);
     }
 
-    public string GetProduct(string productID)
+    public string GetProduct(string productID) // By Kevin Yen
     {
         if (productID.Equals("ALL"))
         {
@@ -308,6 +310,61 @@ public class MainMethod
             sql = "select * from Product where ProductID = '" + productID + "'";
             return gm.getJsonSingleResult(sqlMethod.Select(sql));
         }
+    }
+
+    public string GetProductKey(string type, string value) // By Kevin Yen
+    {
+        // 取得商品表單內資料
+        if (type.Equals("ALL"))
+            sql = "select ProductID,ProductName from Product where ";
+        else
+            sql = "select ProductID,ProductName from Product where Tpye = '" + type + "' AND (";
+        for (int i=0; i< value.Length; i++)
+        {
+            sql += "ProductName like '%" + value[i].ToString() + "%'";
+            if (i < value.Length - 1)
+                sql += " OR ";
+        }
+        if (!type.Equals("ALL"))
+            sql += ")";
+
+        // 暫存商品表單，ProductID與ProductName
+        JArray jarray = gm.getJsonArrayResult(sqlMethod.Select(sql));
+        string[] id = new string[jarray.Count];
+        string[] name = new string[jarray.Count];
+        for (int i = 0; i < jarray.Count; i++)
+        {
+            JObject job = gm.getJsonResult(jarray[i].ToString());
+            id[i] = job["ProductID"].ToString();
+            name[i] = job["ProductName"].ToString();
+        }
+        jarray = null;
+
+        // 取得商品圖片表單內資料
+        sql = "select ImageUrl from ProductImage where Type ='Main' AND (";
+        for (int i = 0; i < id.Length; i++)
+        {
+            sql += "ProductID = '" + id[i] + "'";
+            if (i < id.Length - 1)
+                sql += " OR ";
+            else
+                sql += ")";
+        }
+
+        // 輸出JSON，欄位ProductID, ProductName, Image
+        jarray = gm.getJsonArrayResult(sqlMethod.Select(sql));
+        string json = "[";
+        for (int i = 0; i < id.Length; i++)
+        {
+            JObject job = gm.getJsonResult(jarray[i].ToString());
+            json += gm.getJsonArray("ProductID;ProductName;Image", id[i] + ";" + name[i] + ";" + job["ImageUrl"].ToString());
+            if (i < id.Length - 1)
+                json += ",";
+            else
+                json += "]";
+        }
+
+        return json;
     }
 
     public string GetProductColumn(string column, string value) //Huan-Chieh Chen
@@ -345,20 +402,7 @@ public class MainMethod
     public string NewProductImage(string productID, string imageType, string image) // By Kevin Yen
     {
         string imageUrl = gm.uploadImage(image);
-        string type = "";
-
-        switch (imageUrl)
-        {
-            case "M":
-                type = "Main";
-                break;
-            case "I":
-                type = "Introduction";
-                break;
-            case "G":
-                type = "General";
-                break;
-        }
+        string type = gm.getImageType(imageType);
 
         if (!image.Equals("") && !type.Equals(""))
         {
@@ -387,6 +431,13 @@ public class MainMethod
         sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND (" + sqlStr + ")";
         return sqlMethod.Select(sql);
     }
+
+    public string GetCooperation() // By Kevin Yen
+    {
+        sql = "select CompanyUrl,ImageUrl from Cooperation";
+        return sqlMethod.Select(sql);
+    }
+
 }
 
 

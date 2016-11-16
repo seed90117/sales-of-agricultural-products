@@ -144,4 +144,46 @@ public class GetMethod
             memoryStream = null;
         }
     }
+
+    // 上傳圖片類型判斷
+    public string getImageType(string type)
+    {
+        switch (type)
+        {
+            case "M":
+                type = "Main";
+                break;
+            case "I":
+                type = "Introduction";
+                break;
+            case "G":
+                type = "General";
+                break;
+            default:
+                type = "";
+                break;
+        }
+        return type;
+    }
+
+    // 會員權限類型判斷
+    public string getMemberAccess(string type)
+    {
+        switch (type)
+        {
+            case "A":
+                type = "ㄍㄌㄓ";
+                break;
+            case "E":
+                type = "ㄔㄕ";
+                break;
+            case "C":
+                type = "ㄍㄎ";
+                break;
+            default:
+                type = "";
+                break;
+        }
+        return type;
+    }
 }
