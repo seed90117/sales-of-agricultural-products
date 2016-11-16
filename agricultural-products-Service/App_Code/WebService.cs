@@ -182,14 +182,17 @@ public class WebService : System.Web.Services.WebService
             string firstName = job["FirstName"].ToString();
             string lastName = job["LastName"].ToString();
             string phone = job["Phone"].ToString();
+            string fax = job["Fax"].ToString();
+            string identifyID = job["IdentifyID"].ToString();
             string email = job["Email"].ToString();
             string companyName = job["CompanyName"].ToString();
             string address = job["Address"].ToString();
+            string image = job["Image"].ToString();
             string access = job["Access"].ToString();
             if (!account.Equals("") && !password.Equals("") && !firstName.Equals("") && 
-                !lastName.Equals("") && !phone.Equals("") && !email.Equals("") && 
-                !companyName.Equals("") && !address.Equals("") && !access.Equals(""))
-                return main.NewMember(account, password, firstName, lastName, phone, email, companyName, address, access);
+                !lastName.Equals("") && !phone.Equals("") && !identifyID.Equals("") && 
+                !email.Equals("") && !companyName.Equals("") && !address.Equals("") && !access.Equals(""))
+                return main.NewMember(account, password, firstName, lastName, phone, fax, identifyID, email, companyName, address, image, access);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -443,10 +446,10 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone, string Email,
-                            string CompanyName, string Address, string Access)
+    public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone,
+        string fax, string identifyID, string Email, string CompanyName, string Address, string image, string Access)
     {
-        return main.NewMember(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access);
+        return main.NewMember(Account, Password, FirstName, LastName, Phone, fax, identifyID, Email, CompanyName, Address, image, Access);
     }
 
     [WebMethod]

@@ -119,12 +119,14 @@ public class MainMethod
         return gm.getJsonSingleResult(sqlMethod.Select(sql));
     }
 
-    public string NewMember(string account, string password, string firstName, string lastName, string phone, string email,
-                            string companyName, string address, string access) // By Wei-Min Zhang
+    public string NewMember(string account, string password, string firstName, string lastName, string phone, 
+        string fax, string identifyID,string email, string companyName, string address, string image, string access) // By Wei-Min Zhang
     {
+        image = gm.uploadImage(image);
         sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
                   "values('" + account + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
-                  email + "','" + companyName + "','" + address + "','" + access + "')";
+                  fax + "','" + identifyID + "','" + email + "','" + companyName + "','" + address + "','" + image +
+                  "','" + access + "')";
         return sqlMethod.Insert(sql);
     }
 
