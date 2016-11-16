@@ -401,7 +401,7 @@ public class MainMethod
 
     public string NewProductImage(string productID, string imageType, string image) // By Kevin Yen
     {
-        string imageUrl = gm.uploadImage(image, "Product");
+        string imageUrl = gm.uploadImage(image);
         string type = gm.getImageType(imageType);
 
         if (!image.Equals("") && !type.Equals(""))

@@ -111,9 +111,21 @@ public class GetMethod
     }
 
     // 上傳圖片
-    public string uploadImage(string image)
+    public string uploadImage(string image, string type)
     {
         string savePath = HttpContext.Current.Server.MapPath("~/ProductImage/");
+        switch (type)
+        {
+            case "Product":
+                savePath = HttpContext.Current.Server.MapPath("~/ProductImage/");
+                break;
+            case "Company":
+                savePath = HttpContext.Current.Server.MapPath("~/Company/");
+                break;
+            case "Member":
+                savePath = HttpContext.Current.Server.MapPath("~/Member/");
+                break;
+        }
         string saveName = getUUID() + ".jpg";
         string serverPath = "http://140.127.22.4/PlatformAPI/ProductImage/";
         string returnURL = serverPath + saveName;
