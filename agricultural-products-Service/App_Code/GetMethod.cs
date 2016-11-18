@@ -15,7 +15,7 @@ public class GetMethod
     {
         ReturnMsg reMsg = new ReturnMsg();
         reMsg.stage = stage;
-        reMsg.msg = msg;
+        reMsg.message = msg;
         return JsonConvert.SerializeObject(reMsg);
     }
 

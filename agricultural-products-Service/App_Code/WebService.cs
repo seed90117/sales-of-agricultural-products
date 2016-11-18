@@ -177,21 +177,16 @@ public class WebService : System.Web.Services.WebService
         job = gm.getJsonResult(inputJsonStr);
         try
         {
-            string account = job["Account"].ToString();
             string password = job["Password"].ToString();
             string firstName = job["FirstName"].ToString();
             string lastName = job["LastName"].ToString();
             string phone = job["Phone"].ToString();
             string fax = job["Fax"].ToString();
-            string identifyID = job["IdentifyID"].ToString();
+            string cellPhone = job["CellPhone"].ToString();
             string email = job["Email"].ToString();
-            string companyName = job["CompanyName"].ToString();
             string address = job["Address"].ToString();
-            string image = job["Image"].ToString();
-            if (!account.Equals("") && !password.Equals("") && !firstName.Equals("") && 
-                !lastName.Equals("") && !phone.Equals("") && !identifyID.Equals("") && 
-                !email.Equals("") && !companyName.Equals("") && !address.Equals(""))
-                return main.NewMember(account, password, firstName, lastName, phone, fax, identifyID, email, companyName, address, image);
+            if (!password.Equals("") && !firstName.Equals("") && !lastName.Equals("") && !email.Equals(""))
+                return main.NewMember(email, password, firstName, lastName, phone, fax, cellPhone,address);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -473,10 +468,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string NewMember(string Account, string Password, string FirstName, string LastName, string Phone,
-        string fax, string identifyID, string Email, string CompanyName, string Address, string image)
+    public string NewMember(string Email, string Password, string FirstName, string LastName, string Phone, string fax, string cellPhone, string Address)
     {
-        return main.NewMember(Account, Password, FirstName, LastName, Phone, fax, identifyID, Email, CompanyName, Address, image);
+        return main.NewMember(Email, Password, FirstName, LastName, Phone, fax, cellPhone, Address);
     }
 
     [WebMethod]

@@ -9,5 +9,5 @@ using System.Web;
 public class ReturnMsg
 {
     public bool stage;
-    public string msg;
+    public string message;
 }

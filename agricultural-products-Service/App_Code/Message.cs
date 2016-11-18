@@ -26,4 +26,5 @@ public class Message
     public string uploadFail_cht = "上傳失敗";
     public string amountError_cht = "商品數量不足";
     public string productAmountError_cht = "更新產品訂單量失敗";
+    public string emailRepeat = "電子郵件重複";
 }

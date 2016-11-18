@@ -25,14 +25,14 @@ public class MainMethod
         bool isSign = false;
         bool isIdentify = false;
         bool isLog = false;
-        sql = "select MemberID,Password,Access from Member where Account = '" + account + "'";
+        sql = "select MemberID,Email,Password from Member where Email = '" + account + "'";
         JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         if (job["Password"].ToString().Equals(password))
         {
             isSign = true;
             identify = gm.getUUID();
             memberID = job["MemberID"].ToString();
-            access = job["Access"].ToString();
+            access = job["Email"].ToString();
             ip = gm.getIpAddress();
             reMsg = msg.success;
         }
@@ -121,15 +121,20 @@ public class MainMethod
         return gm.getJsonSingleResult(sqlMethod.Select(sql));
     }
 
-    public string NewMember(string account, string password, string firstName, string lastName, string phone, 
-        string fax, string identifyID,string email, string companyName, string address, string image) // By Wei-Min Zhang
+    public string NewMember(string email, string password, string firstName, string lastName, string phone, 
+        string fax, string cellPhone, string address) // By Wei-Min Zhang
     {
-        image = gm.uploadImage(image, "Member");
-        sql = "insert into Member(Account, Password, FirstName, LastName, Phone, Email, CompanyName, Address, Access) " +
-                  "values('" + account + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
-                  fax + "','" + identifyID + "','" + email + "','" + companyName + "','" + address + "','" + image +
-                  "','" + gm.getMemberAccess("C") + "')";
-        return sqlMethod.Insert(sql);
+        sql = "select Email from Member where = '" + email + "'";
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
+        if (job["message"].ToString().Equals(msg.noData_cht))
+        {
+            sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Fax, CellPhone, Address, Access) " +
+                  "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
+                  fax + "','" + cellPhone + "','" + address + "','" + gm.getMemberAccess("C") + "')";
+            return sqlMethod.Insert(sql);
+        }
+        else
+            return gm.getStageJson(false, msg.emailRepeat);
     }
 
     public string NewRecord(string identify, string productID, string type, string action, string note) // By Kevin Yen
