@@ -118,13 +118,13 @@ public class GetMethod
         string serverPath = "";
         if (type.Equals(""))
         {
-            HttpContext.Current.Server.MapPath("~/Other/");
+            savePath = HttpContext.Current.Server.MapPath("~/Other/");
             serverPath = "http://140.127.22.4/PlatformAPI/Other/";
 
         }
         else
         {
-            HttpContext.Current.Server.MapPath("~/" + type + "/");
+            savePath = HttpContext.Current.Server.MapPath("~/" + type + "/");
             serverPath = "http://140.127.22.4/PlatformAPI/" + type + "/";
         }
         string[] fileType = fileName.Split('.');

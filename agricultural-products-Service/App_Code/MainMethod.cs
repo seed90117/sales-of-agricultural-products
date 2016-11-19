@@ -325,20 +325,21 @@ public class MainMethod
 
     public string GetTopHotProduct() // By Kevin Yen
     {
-        int item = 8;
-        string sqlStr = "";
-        sql = "select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc";
-        JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
+        int item = 7;
+        //string sqlStr = "";
+        //sql = "select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc";
+        //JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
 
-        for (int i = 0; i < jArray.Count; i++)
-        {
-            JObject jObject = gm.getJsonResult(jArray[i].ToString());
-            sqlStr += "ProductID = " + jObject["ProductID"].ToString();
-            if (i < jArray.Count - 1)
-                sqlStr += " OR ";
-        }
+        //for (int i = 0; i < jArray.Count; i++)
+        //{
+        //    JObject jObject = gm.getJsonResult(jArray[i].ToString());
+        //    sqlStr += "ProductID = " + jObject["ProductID"].ToString();
+        //    if (i < jArray.Count - 1)
+        //        sqlStr += " OR ";
+        //}
 
-        sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND (" + sqlStr + ")";
+        //sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND (" + sqlStr + ")";
+        sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND ProductID in (select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc)";
         return sqlMethod.Select(sql);
     }
 
