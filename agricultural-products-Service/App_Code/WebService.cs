@@ -228,10 +228,11 @@ public class WebService : System.Web.Services.WebService
         job = gm.getJsonResult(inputJsonStr);
         try
         {
+            string idnetify = job["Identify"].ToString();
             string column = job["Column"].ToString();
             string value = job["Value"].ToString();
             if (!column.Equals("") && !value.Equals(""))
-                return main.UpdateMemberInfo(column, value);
+                return main.UpdateMemberInfo(idnetify,column, value);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -458,7 +459,7 @@ public class WebService : System.Web.Services.WebService
             string fileName = job["FileName"].ToString();
             string video = job["Video"].ToString();
             if (!identify.Equals("") && !name.Equals("") && !fileName.Equals("") && !video.Equals(""))
-                return main.NewProductVideo(identify, name, fileName, video);
+                return main.NewVideo(identify, name, fileName, video);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -571,9 +572,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string UpdateMemberInfo(string column, string value)
+    public string UpdateMemberInfo(string Identify, string Column, string Value)
     {
-        return main.UpdateMemberInfo(column, value);
+        return main.UpdateMemberInfo(Identify, Column, Value);
     }
 
     [WebMethod]
@@ -657,7 +658,7 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewVideo(string Identify, string Name, string FileName, string Video)
     {
-        return main.NewProductVideo(Identify, Name, FileName, Video);
+        return main.NewVideo(Identify, Name, FileName, Video);
     }
 
     [WebMethod]
