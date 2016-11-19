@@ -124,9 +124,8 @@ public class MainMethod
     public string NewMember(string email, string password, string firstName, string lastName, string phone, 
         string fax, string cellPhone, string address) // By Wei-Min Zhang
     {
-        sql = "select Email from Member where = '" + email + "'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        if (job["message"].ToString().Equals(msg.noData_cht))
+        sql = "select Email from Member where Email = '" + email + "'";
+        if (sqlMethod.Select(sql).Equals(gm.getStageJson(false, msg.noData_cht)))
         {
             sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Fax, CellPhone, Address, Access) " +
                   "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
@@ -404,15 +403,43 @@ public class MainMethod
 
     }
 
-    public string NewProductImage(string productID, string imageType, string image) // By Kevin Yen
+    public string NewProductImage(string productID, string imageType,string fileName, string image) // By Kevin Yen
     {
-        string imageUrl = gm.uploadImage(image, "Product");
+        string imageUrl = gm.upload(image, fileName, "Product");
         string type = gm.getImageType(imageType);
 
         if (!image.Equals("") && !type.Equals(""))
         {
             sql = "insert into ProductImage(ProductID, Type, ImageUrl) values('" + productID + "','" + type + "','"+ imageUrl +"')";
             return sqlMethod.Insert(sql);
+        }
+        else
+            return gm.getStageJson(false, msg.uploadFail_cht);
+    }
+
+    public string NewProductVideo(string identify, string name, string fileName, string video) // By Kevin Yen
+    {
+        sql = "select MemberID from Member where Identify ='" + identify + "'";
+        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
+        string memberID = job["MemberID"].ToString();
+        string videoUrl = gm.upload(video, fileName, "Video");
+        
+        if (!memberID.Equals("") && !videoUrl.Equals(""))
+        {
+            sql = "insert into Video(MemberID, Name, Url) values('" + memberID + "','" + name + "','" + video + "')";
+            return sqlMethod.Insert(sql);
+        }
+        else
+            return gm.getStageJson(false, msg.uploadFail_cht);
+    }
+
+    public string NewHeadShot(string identify, string fileName, string image) // By Kevin Yen
+    {
+        string imageUrl = gm.upload(image, fileName, "Member");
+        if (!imageUrl.Equals(""))
+        {
+            sql = "update Member set Image = '" + imageUrl + "' where Identify = '" + identify + "'";
+            return sqlMethod.Update(sql);
         }
         else
             return gm.getStageJson(false, msg.uploadFail_cht);
@@ -443,6 +470,23 @@ public class MainMethod
         return sqlMethod.Select(sql);
     }
 
+    public string GetVideo(string productID) // By Kevin Yen
+    {
+        sql = "select Name,Url from Video where ProductID = '" + productID + "'";
+        return sqlMethod.Select(sql);
+    }
+
+    public string NewCooperationImage(string companyName, string companyUrl, string fileName, string image) // By Kevin Yen
+    {
+        string imageUrl = gm.upload(image, fileName, "Company");
+        if (!image.Equals(""))
+        {
+            sql = "insert into Cooperation(CompanyName, CompanyUrl, ImageUrl) values('" + companyName + "','" + companyUrl + "','" + imageUrl + "')";
+            return sqlMethod.Insert(sql);
+        }
+        else
+            return gm.getStageJson(false, msg.uploadFail_cht);
+    }
 }
 
 

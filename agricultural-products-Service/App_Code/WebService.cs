@@ -377,9 +377,10 @@ public class WebService : System.Web.Services.WebService
         {
             string productID = job["ProductID"].ToString();
             string imageType = job["ImageType"].ToString();
+            string fileName = job["FileName"].ToString();
             string image = job["Image"].ToString();
-            if (!productID.Equals("") && !imageType.Equals("") && !image.Equals(""))
-                return main.NewProductImage(productID, imageType, image);
+            if (!productID.Equals("") && !imageType.Equals("") && !fileName.Equals("") && !image.Equals(""))
+                return main.NewProductImage(productID, imageType, fileName, image);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -415,6 +416,94 @@ public class WebService : System.Web.Services.WebService
             string value = job["Value"].ToString();
             if (!type.Equals("") && !value.Equals(""))
                 return main.GetProductKey(type, value);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetVideoJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string productID = job["ProductID"].ToString();
+            if (!productID.Equals(""))
+                return main.GetVideo(productID);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewVideoJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string name = job["Name"].ToString();
+            string fileName = job["FileName"].ToString();
+            string video = job["Video"].ToString();
+            if (!identify.Equals("") && !name.Equals("") && !fileName.Equals("") && !video.Equals(""))
+                return main.NewProductVideo(identify, name, fileName, video);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewMemberImageJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string fileName = job["FileName"].ToString();
+            string image = job["Image"].ToString();
+            if (!identify.Equals("") && !fileName.Equals("") && !image.Equals(""))
+                return main.NewHeadShot(identify, fileName, image);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewCooperationImageJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string companyName = job["CompanyName"].ToString();
+            string companyUrl = job["CompanyUrl"].ToString();
+            string fileName = job["FileName"].ToString();
+            string image = job["Image"].ToString();
+            if (!companyName.Equals("") && !companyUrl.Equals("") && !fileName.Equals("") && !image.Equals(""))
+                return main.NewCooperationImage(companyName, companyUrl, fileName, image);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -531,9 +620,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string NewProductImage(string ProductID, string ImageType, string Image)
+    public string NewProductImage(string ProductID, string ImageType,string FileName, string Image)
     {
-        return main.NewProductImage(ProductID, ImageType, Image);
+        return main.NewProductImage(ProductID, ImageType,  FileName, Image);
     }
 
     [WebMethod]
@@ -555,5 +644,33 @@ public class WebService : System.Web.Services.WebService
     public string GetProductKey(string Type, string Value)
     {
         return main.GetProductKey(Type, Value);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetVideo(string ProductID)
+    {
+        return main.GetVideo(ProductID);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewVideo(string Identify, string Name, string FileName, string Video)
+    {
+        return main.NewProductVideo(Identify, Name, FileName, Video);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewMemberImage(string Identify, string FileName, string Image)
+    {
+        return main.NewHeadShot(Identify, FileName, Image);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewCooperationImage(string CompanyName, string CompanyUrl, string FileName, string Image)
+    {
+        return main.NewCooperationImage(CompanyName, CompanyUrl, FileName, Image);
     }
 }

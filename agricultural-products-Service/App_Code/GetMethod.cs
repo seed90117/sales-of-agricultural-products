@@ -111,36 +111,34 @@ public class GetMethod
     }
 
     // 上傳圖片
-    public string uploadImage(string image, string type)
+    public string upload(string file, string fileName, string type)
     {
-        string savePath = HttpContext.Current.Server.MapPath("~/ProductImage/");
-        switch (type)
+        string savePath = "";
+        string saveName = "";
+        string serverPath = "";
+        if (type.Equals(""))
         {
-            case "Product":
-                savePath = HttpContext.Current.Server.MapPath("~/ProductImage/");
-                break;
-            case "Company":
-                savePath = HttpContext.Current.Server.MapPath("~/Company/");
-                break;
-            case "Member":
-                savePath = HttpContext.Current.Server.MapPath("~/Member/");
-                break;
+            HttpContext.Current.Server.MapPath("~/Other/");
+            serverPath = "http://140.127.22.4/PlatformAPI/Other/";
+
         }
-        string saveName = getUUID() + ".jpg";
-        string serverPath = "http://140.127.22.4/PlatformAPI/ProductImage/";
+        else
+        {
+            HttpContext.Current.Server.MapPath("~/" + type + "/");
+            serverPath = "http://140.127.22.4/PlatformAPI/" + type + "/";
+        }
+        string[] fileType = fileName.Split('.');
+        saveName = getUUID() + "." + fileType[fileType.Length-1];
         string returnURL = serverPath + saveName;
-        byte[] bt = Convert.FromBase64String(image);
-        System.IO.MemoryStream stream = new System.IO.MemoryStream(bt);
-        Bitmap bitmap = new Bitmap(stream);
+        byte[] bt = Convert.FromBase64String(file);
         MemoryStream memoryStream = null;
         FileStream fileStream = null;
-        // string fileName = "uploadImage.jpg";
         try
         {
             memoryStream = new MemoryStream(bt);
             fileStream = new FileStream(savePath+saveName, FileMode.Create);
             memoryStream.WriteTo(fileStream);
-            return getJson("ImageUrl", returnURL);
+            return returnURL;
         }
 
         catch (Exception ex)
