@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Summary description for MainMethod
@@ -201,6 +201,16 @@ public class MainMethod
         }
         else
             return gm.getStageJson(false, msg.passwordError_cht);
+    }
+
+    public string IsEmail(string email) // By Kevin Yen
+    {
+        bool isemail = Regex.IsMatch(email, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))" +
+              @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
+        if (isemail)
+            return gm.getStageJson(true, msg.success);
+        else
+            return gm.getStageJson(false, msg.emailError);
     }
 
 

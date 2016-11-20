@@ -515,6 +515,26 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string IsEmailJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string email = job["Email"].ToString();
+            if (!email.Equals(""))
+                return main.IsEmail(email);
+            else
+                return gm.getStageJson(false, msg.inputDataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.jsonError_cht);
+        }
+    }
+
 
     // Main Method
     [WebMethod]
@@ -673,5 +693,12 @@ public class WebService : System.Web.Services.WebService
     public string NewCooperationImage(string CompanyName, string CompanyUrl, string FileName, string Image)
     {
         return main.NewCooperationImage(CompanyName, CompanyUrl, FileName, Image);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string IsEmail(string Email)
+    {
+        return main.IsEmail(Email);
     }
 }
