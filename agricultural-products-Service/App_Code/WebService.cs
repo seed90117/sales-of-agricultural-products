@@ -26,9 +26,9 @@ public class WebService : System.Web.Services.WebService
     // 用於測試方法，Commit前記得回復原狀
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public void HelloWorld()
+    public string HelloWorld()
     {
-        
+        return main.GetProductType();
     }
 
     [WebMethod]
@@ -276,10 +276,10 @@ public class WebService : System.Web.Services.WebService
         try
         {
             string access = job["Access"].ToString();
-            if (!access.Equals(""))
-                return main.GetMember(access);
+            if (access.Equals(""))
+                return main.GetMember("ALL");
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return main.GetMember(access);
         }
         catch (Exception ex)
         {
@@ -296,10 +296,10 @@ public class WebService : System.Web.Services.WebService
         try
         {
             string productID = job["ProductID"].ToString();
-            if (!productID.Equals(""))
-                return main.GetProduct(productID);
+            if (productID.Equals(""))
+                return main.GetProduct("ALL");
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return main.GetProduct(productID);
         }
         catch (Exception ex)
         {
@@ -413,10 +413,11 @@ public class WebService : System.Web.Services.WebService
         job = gm.getJsonResult(inputJsonStr);
         try
         {
-            string type = job["Type"].ToString();
+            string bigItem = job["BigItem"].ToString();
+            string smallItem = job["SmallItem"].ToString();
             string value = job["Value"].ToString();
-            if (!type.Equals("") && !value.Equals(""))
-                return main.GetProductKey(type, value);
+            if (!bigItem.Equals("") && !smallItem.Equals("") && !value.Equals(""))
+                return main.GetProductKey(bigItem, smallItem, value);
             else
                 return gm.getStageJson(false, msg.inputDataError_cht);
         }
@@ -535,6 +536,13 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductTypeJson()
+    {
+        return main.GetProductType();
+    }
+
 
     // Main Method
     [WebMethod]
@@ -574,7 +582,6 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetMemberInfo(Identify);
     }
-
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
@@ -662,9 +669,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetProductKey(string Type, string Value)
+    public string GetProductKey(string BigItem, string SmallItem, string Value)
     {
-        return main.GetProductKey(Type, Value);
+        return main.GetProductKey(BigItem, SmallItem, Value);
     }
 
     [WebMethod]
@@ -700,5 +707,12 @@ public class WebService : System.Web.Services.WebService
     public string IsEmail(string Email)
     {
         return main.IsEmail(Email);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductType()
+    {
+        return main.GetProductType();
     }
 }

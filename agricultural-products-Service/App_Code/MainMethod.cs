@@ -27,14 +27,14 @@ public class MainMethod
         bool isSign = false;
         bool isIdentify = false;
         bool isLog = false;
-        sql = "select MemberID,Email,Password from Member where Email = '" + account + "'";
+        sql = "select MemberID,Password,Access from Member where Email = '" + account + "'";
         JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         if (job["Password"].ToString().Equals(password))
         {
             isSign = true;
             identify = gm.getUUID();
             memberID = job["MemberID"].ToString();
-            access = job["Email"].ToString();
+            access = job["Access"].ToString();
             ip = gm.getIpAddress();
             reMsg = msg.success;
         }
@@ -50,7 +50,7 @@ public class MainMethod
                 isIdentify = true;
 
             // insert SignLog table
-            sql = "insert into SignLog(MemberID,Account,SignTime,Identify,IP) values('" + memberID + "','"
+            sql = "insert into SignLog(MemberID,Account,SignInTime,Identify,IP) values('" + memberID + "','"
                 + account + "','" + gm.getCurrentDate() + "','" + identify + "','" + ip + "')";
             job = JObject.Parse(sqlMethod.Update(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
@@ -63,9 +63,29 @@ public class MainMethod
         }
         else
         {
+            if (!isLog)
+                reMsg = msg.signError_cht;
             jsonStr = gm.getStageJson(false, reMsg);
             return jsonStr;
         }
+    }
+
+    public string SignOut(string identify) // By Kevin Yen
+    {
+        bool isLog = false;
+        sql = "update Member set Identify = '' where Identify = '" + identify + "'";
+        JObject jObject = gm.getJsonResult(sqlMethod.Update(sql));
+        if (jObject["stage"].ToString().Equals(true.ToString()))
+        {
+            sql = "update SignLog set SignOutTime = '" + gm.getCurrentDate() + "' where Identify = '" + identify + "'";
+            jObject = gm.getJsonResult(sqlMethod.Update(sql));
+            if (jObject["stage"].ToString().Equals(true.ToString()))
+                isLog = true;
+        }
+        if (isLog)
+            return gm.getStageJson(true, msg.success);
+        else
+            return gm.getStageJson(false, msg.identifyError_cht);
     }
 
     public string GetSignLog(string identify) // By Kevin Yen
@@ -90,15 +110,14 @@ public class MainMethod
 
 
     // Member
-    public string NewMember(string email, string password, string firstName, string lastName, string phone,
-    string fax, string cellPhone, string address) // By Wei-Min Zhang
+    public string NewMember(string email, string password, string firstName, string lastName, string phone, string address) // By Wei-Min Zhang
     {
         sql = "select Email from Member where Email = '" + email + "'";
         if (sqlMethod.Select(sql).Equals(gm.getStageJson(false, msg.noData_cht)))
         {
-            sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Fax, CellPhone, Address, Access) " +
+            sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access) " +
                   "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
-                  fax + "','" + cellPhone + "','" + address + "','" + gm.getMemberAccess("C") + "')";
+                  address + "','" + gm.getMemberAccess("C") + "')";
             return sqlMethod.Insert(sql);
         }
         else
@@ -110,7 +129,7 @@ public class MainMethod
         string imageUrl = gm.upload(image, fileName, "Member");
         if (!imageUrl.Equals(""))
         {
-            sql = "update Member set Image = '" + imageUrl + "' where Identify = '" + identify + "'";
+            sql = "update Farm set Mugshot = '" + imageUrl + "' where Identify = '" + identify + "'";
             return sqlMethod.Update(sql);
         }
         else
@@ -135,7 +154,7 @@ public class MainMethod
 
     public string GetMemberInfo(string identify) //Huan-Chieh Chen
     {
-        sql = "select Email,FirstName,LastName,Phone,Fax,CellPhone,IdentifyID,CompanyName,Address,Image,Access from Member where Identify = '" + identify + "'";
+        sql = "select Email,FirstName,LastName,Phone,Address,Access from Member where Identify = '" + identify + "'";
         return gm.getJsonSingleResult(sqlMethod.Select(sql));
     }
 
@@ -215,30 +234,24 @@ public class MainMethod
 
 
     // Product
-    public string NewProduct(string companyID, string companyName, string productName, string type, string introduction,
-                            string additionalValue, string origin, string packagingDate, string verification,
-                            string validityPeriod, string validityNumber, string amount, string price, string stage) // By Kevin Yen
+    public string NewProduct(string identify, string farmID, string productName, string typeBig, string typeSmall, 
+                            string introduction, string additionalValue, string origin, string price, string amount, 
+                            string packagingDate, string validityPeriod, string verificationID, string stage) // By Kevin Yen
     {
         string id = "null";
         string qr = "null";
-        string productStage = "Prepare";
+        string productStage = gm.getProductStage(stage);
         QRCodeMethod qrcm = new QRCodeMethod();
-
-        if (stage.Equals("S"))
-            productStage = "Sales";
-        if (stage.Equals("P"))
-            productStage = "Prepare";
-        if (stage.Equals("D"))
-            productStage = "Drop";
-
-        sql = "insert into Product(CompanyID,CompanyName,ProductName,Type,Introduction,AdditionalValue,Origin," +
-                "PackagingDate,Verification,ValidityPeriod,ValidityNumber,Amount,Price,OrderAmount,Stage) values " +
-                "('" + companyID + "','" + companyName + "','" + productName + "','" + type + "','" + introduction +
-                "','" + additionalValue + "','" + origin + "','" + packagingDate + "','" + verification + "','" +
-                validityPeriod + "','" + validityNumber + "'," + amount + "," + price + ",0,'" + productStage + ");SELECT SCOPE_IDENTITY()";
-
-        JObject job = gm.getJsonResult(sqlMethod.InsertSelect(sql));
-        id = job["ProductID"].ToString();
+        sql = "select FarmName from Farm where FarmID = '" + farmID + "'";
+        JObject jObject = gm.getJsonObjectResult(sqlMethod.Select(sql));
+        string farmName = jObject["FarmName"].ToString();
+        sql = "insert into Product(FarmID,FarmName,ProductName,TypeBig,TypeSmall,Introduction,AdditionalValue,Origin," +
+                "Price,Amount,PackagingDate,ValidityPeriod,ValidityID,Stage,OrderAmount) values " +
+                "('" + farmID + "','" + farmName + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + introduction +
+                "','" + additionalValue + "','" + origin + "','" + price + "','" + amount + "','" + packagingDate + "','" +
+                validityPeriod + "','" + verificationID + "','" + productStage + "',0);SELECT SCOPE_IDENTITY()";
+        jObject = gm.getJsonResult(sqlMethod.InsertSelect(sql));
+        id = jObject["ProductID"].ToString();
         qr = qrcm.GetQRCode(id);
         sql = "update Product set QRCode = '" + qr + "' where ProductID = '" + id + "'";
         return sqlMethod.Update(sql);
@@ -272,20 +285,23 @@ public class MainMethod
         }
     }
 
-    public string GetProductKey(string type, string value) // By Kevin Yen
+    public string GetProductKey(string bigItem, string smallItem, string value) // By Kevin Yen
     {
         // 取得商品表單內資料
-        if (type.Equals("ALL"))
+        if (bigItem.Equals("") && smallItem.Equals(""))
             sql = "select ProductID,ProductName from Product where ";
+        else if (smallItem.Equals(""))
+            sql = "select ProductID,ProductName from Product where TypeSmall = '" + smallItem + "' AND (";
         else
-            sql = "select ProductID,ProductName from Product where Tpye = '" + type + "' AND (";
+            sql = "select ProductID,ProductName from Product where TypeBig = '" + bigItem + "' AND (";
+
         for (int i = 0; i < value.Length; i++)
         {
             sql += "ProductName like '%" + value[i].ToString() + "%'";
             if (i < value.Length - 1)
                 sql += " OR ";
         }
-        if (!type.Equals("ALL"))
+        if (bigItem.Equals("") && smallItem.Equals(""))
             sql += ")";
 
         // 暫存商品表單，ProductID與ProductName
@@ -351,6 +367,39 @@ public class MainMethod
         //sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND (" + sqlStr + ")";
         sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND ProductID in (select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc)";
         return sqlMethod.Select(sql);
+    }
+
+    public string GetProductType() // By Kevin Yen
+    {
+        // 取得BigItem
+        sql = "select distinct BigItem from Introduction";
+        JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
+        string[] bigItem = new string[jArray.Count];
+        for (int i = 0; i < jArray.Count; i++)
+        {
+            JObject jObject = (JObject)jArray[i];
+            bigItem[i] = jObject["BigItem"].ToString();
+        }
+
+        // 取得SmallItem
+        string[] smallItem = new string[bigItem.Length];
+        for (int i = 0; i < bigItem.Length; i++)
+        {
+            sql = "select distinct SmallItem from Introduction where BigItem ='" + bigItem[i] + "'";
+            smallItem[i] = sqlMethod.Select(sql);
+        }
+
+        // 合併Json
+        string jsonStr = "[";
+        for (int i = 0; i < bigItem.Length; i++)
+        {
+            jsonStr += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + smallItem[i]);
+            if (i < bigItem.Length - 1)
+                jsonStr += ",";
+            else
+                jsonStr += "]";
+        }
+        return jsonStr;
     }
 
 
@@ -483,7 +532,7 @@ public class MainMethod
     // Cooperation
     public string GetCooperation() // By Kevin Yen
     {
-        sql = "select CompanyUrl,ImageUrl from Cooperation";
+        sql = "select WebsiteUrl,ImageUrl from Cooperation";
         return sqlMethod.Select(sql);
     }
 

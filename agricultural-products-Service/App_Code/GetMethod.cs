@@ -73,6 +73,27 @@ public class GetMethod
         return json;
     }
 
+    // 自訂多資料JSON值，Key與Values(雙引號需自行輸入)內各筆資料用";"隔開
+    public string getJsonItemArray(string nameArray, string inputArray)
+    {
+        string[] name = nameArray.Split(';');
+        string[] input = inputArray.Split(';');
+        string json = "{";
+        for (int i = 0; i < name.Length; i++)
+        {
+            json += @"""" + name[i] + @""": " + input[i];
+            if (i == name.Length - 1)
+            {
+                json += "}";
+            }
+            else
+            {
+                json += ",";
+            }
+        }
+        return json;
+    }
+
     // 取得客戶端IP位址
     public string getIpAddress()
     {
@@ -192,6 +213,27 @@ public class GetMethod
                 break;
             default:
                 type = "";
+                break;
+        }
+        return type;
+    }
+
+    // 產品狀態判斷
+    public string getProductStage(string type)
+    {
+        switch (type)
+        {
+            case "S":
+                type = "Sales";
+                break;
+            case "P":
+                type = "Prepare";
+                break;
+            case "D":
+                type = "Drop";
+                break;
+            default:
+                type = "Prepare";
                 break;
         }
         return type;
