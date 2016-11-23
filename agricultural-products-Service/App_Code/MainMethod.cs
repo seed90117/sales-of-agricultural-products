@@ -287,13 +287,20 @@ public class MainMethod
 
     public string GetProductKey(string bigItem, string smallItem, string value) // By Kevin Yen
     {
+        string[] id = null;
+        string[] name = null;
+        string[] price = null;
+        JArray jarray = null;
+        string json = msg.noData_cht;
+        bool isProduct = false;
+        
         // 取得商品表單內資料
         if (bigItem.Equals("") && smallItem.Equals(""))
-            sql = "select ProductID,ProductName from Product where ";
+            sql = "select ProductID,ProductName,Price from Product where ";
         else if (smallItem.Equals(""))
-            sql = "select ProductID,ProductName from Product where TypeSmall = '" + smallItem + "' AND (";
+            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND (";
         else
-            sql = "select ProductID,ProductName from Product where TypeBig = '" + bigItem + "' AND (";
+            sql = "select ProductID,ProductName,Price from Product where TypeSmall = '" + smallItem + "' AND (";
 
         for (int i = 0; i < value.Length; i++)
         {
@@ -301,43 +308,57 @@ public class MainMethod
             if (i < value.Length - 1)
                 sql += " OR ";
         }
-        if (bigItem.Equals("") && smallItem.Equals(""))
+        if (!bigItem.Equals("") && !smallItem.Equals(""))
             sql += ")";
 
         // 暫存商品表單，ProductID與ProductName
-        JArray jarray = gm.getJsonArrayResult(sqlMethod.Select(sql));
-        string[] id = new string[jarray.Count];
-        string[] name = new string[jarray.Count];
-        for (int i = 0; i < jarray.Count; i++)
+        string tmp = sqlMethod.Select(sql);
+        if (!tmp.Equals(gm.getStageJson(false, msg.noData_cht)))
         {
-            JObject job = gm.getJsonResult(jarray[i].ToString());
-            id[i] = job["ProductID"].ToString();
-            name[i] = job["ProductName"].ToString();
+            jarray = gm.getJsonArrayResult(tmp);
+            id = new string[jarray.Count];
+            name = new string[jarray.Count];
+            price = new string[jarray.Count];
+            for (int i = 0; i < jarray.Count; i++)
+            {
+                JObject job = gm.getJsonResult(jarray[i].ToString());
+                id[i] = job["ProductID"].ToString();
+                name[i] = job["ProductName"].ToString();
+                price[i] = job["Price"].ToString();
+            }
+            jarray = null;
+            isProduct = true;
         }
-        jarray = null;
 
         // 取得商品圖片表單內資料
-        sql = "select ImageUrl from ProductImage where Type ='Main' AND (";
-        for (int i = 0; i < id.Length; i++)
+        if (isProduct)
         {
-            sql += "ProductID = '" + id[i] + "'";
-            if (i < id.Length - 1)
-                sql += " OR ";
-            else
-                sql += ")";
-        }
+            sql = "select ImageUrl from ProductImage where Type ='Main' AND (";
+            for (int i = 0; i < id.Length; i++)
+            {
+                sql += "ProductID = '" + id[i] + "'";
+                if (i < id.Length - 1)
+                    sql += " OR ";
+                else
+                    sql += ")";
+            }
 
-        // 輸出JSON，欄位ProductID, ProductName, Image
-        jarray = gm.getJsonArrayResult(sqlMethod.Select(sql));
-        string json = "[";
-        for (int i = 0; i < id.Length; i++)
-        {
-            JObject job = gm.getJsonResult(jarray[i].ToString());
-            json += gm.getJsonArray("ProductID;ProductName;Image", id[i] + ";" + name[i] + ";" + job["ImageUrl"].ToString());
-            if (i < id.Length - 1)
-                json += ",";
-            else
-                json += "]";
+            // 輸出JSON，欄位ProductID, ProductName, Image
+            tmp = sqlMethod.Select(sql);
+            if (!tmp.Equals(gm.getStageJson(false, msg.noData_cht)))
+            {
+                jarray = gm.getJsonArrayResult(tmp);
+                json = "[";
+                for (int i = 0; i < id.Length; i++)
+                {
+                    JObject job = gm.getJsonResult(jarray[i].ToString());
+                    json += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + job["ImageUrl"].ToString());
+                    if (i < id.Length - 1)
+                        json += ",";
+                    else
+                        json += "]";
+                }
+            }
         }
 
         return json;
