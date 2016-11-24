@@ -29,17 +29,24 @@ public class MainMethod
         bool isLog = false;
         sql = "select MemberID,Password,Access from Member where Email = '" + account + "'";
         JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        if (job["Password"].ToString().Equals(password))
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
-            isSign = true;
-            identify = gm.getUUID();
-            memberID = job["MemberID"].ToString();
-            access = job["Access"].ToString();
-            ip = gm.getIpAddress();
-            reMsg = msg.success;
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            if (job["Password"].ToString().Equals(password))
+            {
+                isSign = true;
+                identify = gm.getUUID();
+                memberID = job["MemberID"].ToString();
+                access = job["Access"].ToString();
+                ip = gm.getIpAddress();
+                reMsg = msg.success;
+            }
+            else
+                reMsg = msg.signError_cht;// 帳號密碼錯誤
         }
         else
-            reMsg = msg.signError_cht;
+            reMsg = msg.signError_cht; // 帳號密碼錯誤
 
         if (isSign)
         {
@@ -58,13 +65,13 @@ public class MainMethod
         }
         if (isSign && isIdentify && isLog)
         {
-            jsonStr = gm.getJsonArray("stage;message;UUID;Access", isSign.ToString() + ";" + reMsg + ";" + identify + ";" + access);
+            jsonStr = gm.getStageJson(true, gm.getJsonArray("UUID;Access", identify + ";" + access));
             return jsonStr;
         }
         else
         {
             if (!isLog)
-                reMsg = msg.signError_cht;
+                reMsg = msg.signError_cht; // 帳號密碼錯誤
             jsonStr = gm.getStageJson(false, reMsg);
             return jsonStr;
         }
@@ -72,20 +79,15 @@ public class MainMethod
 
     public string SignOut(string identify) // By Kevin Yen
     {
-        bool isLog = false;
         sql = "update Member set Identify = '' where Identify = '" + identify + "'";
         JObject jObject = gm.getJsonResult(sqlMethod.Update(sql));
         if (jObject["stage"].ToString().Equals(true.ToString()))
         {
             sql = "update SignLog set SignOutTime = '" + gm.getCurrentDate() + "' where Identify = '" + identify + "'";
-            jObject = gm.getJsonResult(sqlMethod.Update(sql));
-            if (jObject["stage"].ToString().Equals(true.ToString()))
-                isLog = true;
+            return sqlMethod.Update(sql);
         }
-        if (isLog)
-            return gm.getStageJson(true, msg.success);
         else
-            return gm.getStageJson(false, msg.identifyError_cht);
+            return gm.getStageJson(false, msg.fail);
     }
 
     public string GetSignLog(string identify) // By Kevin Yen
@@ -93,10 +95,15 @@ public class MainMethod
         string memberID = "";
         bool isGetID = false;
         sql = "select MemberID from SignLog where Identify = '" + identify + "'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        memberID = job["MemberID"].ToString();
-        if (!memberID.Equals(""))
-            isGetID = true;
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            memberID = job["MemberID"].ToString();
+            if (!memberID.Equals(""))
+                isGetID = true;
+        }
 
         if (isGetID)
         {
@@ -104,7 +111,7 @@ public class MainMethod
             return sqlMethod.Select(sql);
         }
         else
-            return gm.getStageJson(false, msg.memberInfoError_cht);
+            return gm.getStageJson(false, msg.noData_cht); // 無此資料
 
     }
 
@@ -113,7 +120,8 @@ public class MainMethod
     public string NewMember(string email, string password, string firstName, string lastName, string phone, string address) // By Wei-Min Zhang
     {
         sql = "select Email from Member where Email = '" + email + "'";
-        if (sqlMethod.Select(sql).Equals(gm.getStageJson(false, msg.noData_cht)))
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(false.ToString()))
         {
             sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access) " +
                   "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
@@ -121,7 +129,7 @@ public class MainMethod
             return sqlMethod.Insert(sql);
         }
         else
-            return gm.getStageJson(false, msg.emailRepeat);
+            return gm.getStageJson(false, msg.emailRepeat_cht);
     }
 
     public string NewHeadShot(string identify, string fileName, string image) // By Kevin Yen
@@ -133,15 +141,22 @@ public class MainMethod
             return sqlMethod.Update(sql);
         }
         else
-            return gm.getStageJson(false, msg.uploadFail_cht);
+            return gm.getStageJson(false, msg.uploadFail_cht); // 上傳失敗
     }
 
     public string NewVideo(string identify, string name, string fileName, string video) // By Kevin Yen
     {
+        string memberID = "";
+        string videoUrl = "";
         sql = "select MemberID from Member where Identify ='" + identify + "'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        string memberID = job["MemberID"].ToString();
-        string videoUrl = gm.upload(video, fileName, "Video");
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()));
+        {
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            memberID = job["MemberID"].ToString();
+            videoUrl = gm.upload(video, fileName, "Video");
+        }
 
         if (!memberID.Equals("") && !videoUrl.Equals(""))
         {
@@ -149,13 +164,13 @@ public class MainMethod
             return sqlMethod.Insert(sql);
         }
         else
-            return gm.getStageJson(false, msg.uploadFail_cht);
+            return gm.getStageJson(false, msg.uploadFail_cht); // 上傳失敗
     }
 
     public string GetMemberInfo(string identify) //Huan-Chieh Chen
     {
         sql = "select Email,FirstName,LastName,Phone,Address,Access from Member where Identify = '" + identify + "'";
-        return gm.getJsonSingleResult(sqlMethod.Select(sql));
+        return sqlMethod.Select(sql);
     }
 
     public string GetMember(string access) // By Kevin Yen
@@ -199,12 +214,12 @@ public class MainMethod
             }
             else
             {
-                return gm.getStageJson(false, msg.identifyError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
             }
         }
         else
         {
-            return gm.getStageJson(false, msg.columnError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -212,11 +227,18 @@ public class MainMethod
     {
         sql = "select MemberID,Password from Member where Identify = '" + identify + "'";
         JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        string id = job["MemberID"].ToString();
-        if (job["Password"].ToString().Equals(oldPassword))
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
-            sql = "update Member set Password = '" + newPassword + "' where MemberID = '" + id + "'";
-            return sqlMethod.Update(sql);
+            string message = job["message"].ToString();
+            job = gm.getJsonResult(message);
+            string id = job["MemberID"].ToString();
+            if (job["Password"].ToString().Equals(oldPassword))
+            {
+                sql = "update Member set Password = '" + newPassword + "' where MemberID = '" + id + "'";
+                return sqlMethod.Update(sql);
+            }
+            else
+                return gm.getStageJson(false, msg.passwordError_cht);
         }
         else
             return gm.getStageJson(false, msg.passwordError_cht);
@@ -229,7 +251,7 @@ public class MainMethod
         if (isemail)
             return gm.getStageJson(true, msg.success);
         else
-            return gm.getStageJson(false, msg.emailError);
+            return gm.getStageJson(false, msg.emailError_cht);
     }
 
 
@@ -240,21 +262,37 @@ public class MainMethod
     {
         string id = "null";
         string qr = "null";
+        string farmName = "";
         string productStage = gm.getProductStage(stage);
         QRCodeMethod qrcm = new QRCodeMethod();
         sql = "select FarmName from Farm where FarmID = '" + farmID + "'";
-        JObject jObject = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        string farmName = jObject["FarmName"].ToString();
-        sql = "insert into Product(FarmID,FarmName,ProductName,TypeBig,TypeSmall,Introduction,AdditionalValue,Origin," +
-                "Price,Amount,PackagingDate,ValidityPeriod,ValidityID,Stage,OrderAmount) values " +
-                "('" + farmID + "','" + farmName + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + introduction +
-                "','" + additionalValue + "','" + origin + "','" + price + "','" + amount + "','" + packagingDate + "','" +
-                validityPeriod + "','" + verificationID + "','" + productStage + "',0);SELECT SCOPE_IDENTITY()";
-        jObject = gm.getJsonResult(sqlMethod.InsertSelect(sql));
-        id = jObject["ProductID"].ToString();
-        qr = qrcm.GetQRCode(id);
-        sql = "update Product set QRCode = '" + qr + "' where ProductID = '" + id + "'";
-        return sqlMethod.Update(sql);
+        JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
+        if (jObject["stage"].ToString().Equals(true.ToString()))
+        {
+            string message = jObject["message"].ToString();
+            jObject = gm.getJsonObjectResult(message);
+            farmName = jObject["FarmName"].ToString();
+            sql = "insert into Product(FarmID,FarmName,ProductName,TypeBig,TypeSmall,Introduction,AdditionalValue,Origin," +
+                    "Price,Amount,PackagingDate,ValidityPeriod,ValidityID,Stage,OrderAmount) values " +
+                    "('" + farmID + "','" + farmName + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + introduction +
+                    "','" + additionalValue + "','" + origin + "','" + price + "','" + amount + "','" + packagingDate + "','" +
+                    validityPeriod + "','" + verificationID + "','" + productStage + "',0);SELECT SCOPE_IDENTITY()";
+            jObject = gm.getJsonResult(sqlMethod.Select(sql));
+            if (jObject["stage"].ToString().Equals(true.ToString()))
+            {
+                message = jObject["message"].ToString();
+                jObject = gm.getJsonObjectResult(message);
+                id = jObject["ProductID"].ToString();
+                qr = qrcm.GetQRCode(id);
+                sql = "update Product set QRCode = '" + qr + "' where ProductID = '" + id + "'";
+                return sqlMethod.Update(sql);
+            }
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        else
+            return gm.getStageJson(false, msg.dataError_cht);
+        
     }
 
     public string NewProductImage(string productID, string imageType, string fileName, string image) // By Kevin Yen
@@ -271,6 +309,21 @@ public class MainMethod
             return gm.getStageJson(false, msg.uploadFail_cht);
     }
 
+    public string NewProductFile(string productID, string fileName, string file) // By Kevin Yen
+    {
+        string fileUrl = gm.upload(file, fileName, "File");
+        string[] name = fileName.Split('.');
+        fileName = name[0];
+
+        if (!fileName.Equals("") && !fileUrl.Equals(""))
+        {
+            sql = "insert into File(ProductID, FileName, FileUrl) values('" + productID + "','" + fileName + "','" + fileUrl + "')";
+            return sqlMethod.Insert(sql);
+        }
+        else
+            return gm.getStageJson(false, msg.uploadFail_cht);
+    }
+
     public string GetProduct(string productID) // By Kevin Yen
     {
         if (productID.Equals("ALL"))
@@ -281,7 +334,7 @@ public class MainMethod
         else
         {
             sql = "select * from Product where ProductID = '" + productID + "'";
-            return gm.getJsonSingleResult(sqlMethod.Select(sql));
+            return sqlMethod.Select(sql);
         }
     }
 
@@ -291,37 +344,57 @@ public class MainMethod
         string[] name = null;
         string[] price = null;
         JArray jarray = null;
-        string json = msg.noData_cht;
+        JObject job = null;
+        string json = gm.getStageJson(false, msg.noData_cht);
         bool isProduct = false;
-        
-        // 取得商品表單內資料
-        if (bigItem.Equals("") && smallItem.Equals(""))
-            sql = "select ProductID,ProductName,Price from Product where ";
-        else if (smallItem.Equals(""))
-            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND (";
-        else
-            sql = "select ProductID,ProductName,Price from Product where TypeSmall = '" + smallItem + "' AND (";
+        bool isValue = false;
 
-        for (int i = 0; i < value.Length; i++)
+        // 取得商品表單內資料
+        if (bigItem.Equals("") && smallItem.Equals("") && value.Equals(""))
+            sql = "select ProductID,ProductName,Price from Product";
+        else if (bigItem.Equals("") && smallItem.Equals(""))
         {
-            sql += "ProductName like '%" + value[i].ToString() + "%'";
-            if (i < value.Length - 1)
-                sql += " OR ";
+            sql = "select ProductID,ProductName,Price from Product where (";
+            isValue = true;
         }
-        if (!bigItem.Equals("") && !smallItem.Equals(""))
+        else if (smallItem.Equals("") && value.Equals(""))
+            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "'";
+        else if (smallItem.Equals(""))
+        {
+            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND (";
+            isValue = true;
+        }
+        else if (value.Equals(""))
+            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND TypeSmall = '" + smallItem + "'";
+        else
+        {
+            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND TypeSmall = '" + smallItem + "' AND (";
+            isValue = true;
+        }
+
+        if (isValue)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                sql += "ProductName like '%" + value[i].ToString() + "%'";
+                if (i < value.Length - 1)
+                    sql += " OR ";
+            }
             sql += ")";
+        }
 
         // 暫存商品表單，ProductID與ProductName
-        string tmp = sqlMethod.Select(sql);
-        if (!tmp.Equals(gm.getStageJson(false, msg.noData_cht)))
+        job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
-            jarray = gm.getJsonArrayResult(tmp);
+            string message = job["message"].ToString();
+            jarray = gm.getJsonArrayResult(message);
             id = new string[jarray.Count];
             name = new string[jarray.Count];
             price = new string[jarray.Count];
             for (int i = 0; i < jarray.Count; i++)
             {
-                JObject job = gm.getJsonResult(jarray[i].ToString());
+                job = gm.getJsonResult(jarray[i].ToString());
                 id[i] = job["ProductID"].ToString();
                 name[i] = job["ProductName"].ToString();
                 price[i] = job["Price"].ToString();
@@ -329,6 +402,7 @@ public class MainMethod
             jarray = null;
             isProduct = true;
         }
+        
 
         // 取得商品圖片表單內資料
         if (isProduct)
@@ -344,20 +418,22 @@ public class MainMethod
             }
 
             // 輸出JSON，欄位ProductID, ProductName, Image
-            tmp = sqlMethod.Select(sql);
-            if (!tmp.Equals(gm.getStageJson(false, msg.noData_cht)))
+            job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(true.ToString()))
             {
-                jarray = gm.getJsonArrayResult(tmp);
-                json = "[";
+                string message = job["message"].ToString();
+                jarray = gm.getJsonArrayResult(message);
+                string rejson = "[";
                 for (int i = 0; i < id.Length; i++)
                 {
-                    JObject job = gm.getJsonResult(jarray[i].ToString());
-                    json += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + job["ImageUrl"].ToString());
+                    job = gm.getJsonResult(jarray[i].ToString());
+                    rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + job["ImageUrl"].ToString());
                     if (i < id.Length - 1)
-                        json += ",";
+                        rejson += ",";
                     else
-                        json += "]";
+                        rejson += "]";
                 }
+                json = gm.getStageJson(true, rejson);
             }
         }
 
@@ -373,52 +449,65 @@ public class MainMethod
     public string GetTopHotProduct() // By Kevin Yen
     {
         int item = 7;
-        //string sqlStr = "";
-        //sql = "select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc";
-        //JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
-
-        //for (int i = 0; i < jArray.Count; i++)
-        //{
-        //    JObject jObject = gm.getJsonResult(jArray[i].ToString());
-        //    sqlStr += "ProductID = " + jObject["ProductID"].ToString();
-        //    if (i < jArray.Count - 1)
-        //        sqlStr += " OR ";
-        //}
-
-        //sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND (" + sqlStr + ")";
         sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND ProductID in (select top(" + item.ToString() + ") ProductID from Product order by OrderAmount desc)";
         return sqlMethod.Select(sql);
     }
 
     public string GetProductType() // By Kevin Yen
     {
+        string jsonStr = gm.getStageJson(false, msg.noData_cht);
+        string[] bigItem = null;
+        string[] smallItem = null;
+        bool isBigItem = false;
+        bool isSmallItem = false;
         // 取得BigItem
         sql = "select distinct BigItem from Introduction";
-        JArray jArray = gm.getJsonArrayResult(sqlMethod.Select(sql));
-        string[] bigItem = new string[jArray.Count];
-        for (int i = 0; i < jArray.Count; i++)
+        JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
+        if (jObject["stage"].ToString().Equals(true.ToString()))
         {
-            JObject jObject = (JObject)jArray[i];
-            bigItem[i] = jObject["BigItem"].ToString();
+            string message = jObject["message"].ToString();
+            JArray jArray = gm.getJsonArrayResult(message);
+            bigItem = new string[jArray.Count];
+            for (int i = 0; i < jArray.Count; i++)
+            {
+                jObject = (JObject)jArray[i];
+                bigItem[i] = jObject["BigItem"].ToString();
+            }
+            isBigItem = true;
         }
+        
 
         // 取得SmallItem
-        string[] smallItem = new string[bigItem.Length];
-        for (int i = 0; i < bigItem.Length; i++)
+        if (isBigItem)
         {
-            sql = "select distinct SmallItem from Introduction where BigItem ='" + bigItem[i] + "'";
-            smallItem[i] = sqlMethod.Select(sql);
+            smallItem = new string[bigItem.Length];
+            for (int i = 0; i < bigItem.Length; i++)
+            {
+                sql = "select distinct SmallItem from Introduction where BigItem ='" + bigItem[i] + "'";
+                jObject = gm.getJsonResult(sqlMethod.Select(sql));
+                if (jObject["stage"].ToString().Equals(true.ToString()))
+                {
+                    string message = jObject["message"].ToString();
+                    jObject = gm.getJsonObjectResult(message);
+                    smallItem[i] = sqlMethod.Select(sql);
+                }
+            }
+            isSmallItem = true;
         }
 
         // 合併Json
-        string jsonStr = "[";
-        for (int i = 0; i < bigItem.Length; i++)
+        if (isSmallItem)
         {
-            jsonStr += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + smallItem[i]);
-            if (i < bigItem.Length - 1)
-                jsonStr += ",";
-            else
-                jsonStr += "]";
+            string reJsonStr = "[";
+            for (int i = 0; i < bigItem.Length; i++)
+            {
+                reJsonStr += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + smallItem[i]);
+                if (i < bigItem.Length - 1)
+                    reJsonStr += ",";
+                else
+                    reJsonStr += "]";
+            }
+            jsonStr = gm.getStageJson(true, reJsonStr);
         }
         return jsonStr;
     }
@@ -435,18 +524,30 @@ public class MainMethod
 
         // Get memberID and creator
         sql = "select MemberID, FirstName, LastName from Member where Identify = '" + identify + "'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        memberID = job["MemberID"].ToString();
-        creator = job["LastName"].ToString() + job["FirstName"].ToString();
-        if (!memberID.Equals("") && !creator.Equals(""))
-            isMember = true;
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(false.ToString()))
+        {
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            memberID = job["MemberID"].ToString();
+            creator = job["LastName"].ToString() + job["FirstName"].ToString();
+            if (!memberID.Equals("") && !creator.Equals(""))
+                isMember = true;
+        }
+
 
         // Get ProductName
         sql = "select ProductName from Product where ProductID = '" + productID + "'";
-        job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        productName = job["ProductName"].ToString();
-        if (!productName.Equals(""))
-            isProductName = true;
+        job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(false.ToString()))
+        {
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            productName = job["ProductName"].ToString();
+            if (!productName.Equals(""))
+                isProductName = true;
+        }
+        
 
         // Insert record data
         if (isProductName && isMember)
@@ -458,12 +559,7 @@ public class MainMethod
         }
         else
         {
-            if (!isMember)
-                return gm.getStageJson(false, "Member information is wrong.");
-            else if (!isProductName)
-                return gm.getStageJson(false, "ProductID is wrong.");
-            else
-                return gm.getStageJson(false, "Inserting record is wrong.");
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -493,28 +589,39 @@ public class MainMethod
         bool checkOrder = false;
 
         sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        account = job["Account"].ToString();
-        name = job["Name"].ToString();
-        phone = job["Phone"].ToString();
-        address = job["Address"].ToString();
-        if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
-            memberInfo = true;
-
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(false.ToString()))
+        {
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            account = job["Account"].ToString();
+            name = job["Name"].ToString();
+            phone = job["Phone"].ToString();
+            address = job["Address"].ToString();
+            if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
+                memberInfo = true;
+        }
+        
         sql = "select ProductName,Amount,Price,OrderAmount  from Product where ProductID =" + productID;
-        job = gm.getJsonObjectResult(sqlMethod.Select(sql));
-        productName = job["ProductName"].ToString();
-        productAmount = int.Parse(job["Amount"].ToString());
-        orderAmount = int.Parse(job["OrderAmount"].ToString());
-        price = job["Price"].ToString();
+        job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(false.ToString()))
+        {
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            productName = job["ProductName"].ToString();
+            productAmount = int.Parse(job["Amount"].ToString());
+            orderAmount = int.Parse(job["OrderAmount"].ToString());
+            price = job["Price"].ToString();
+            if (!productName.Equals("") && !price.Equals("") && !productAmount.Equals(""))
+                productInfo = true;
+        }
 
-        if (!productName.Equals("") && !price.Equals(""))
-            productInfo = true;
-
-        if (productAmount >= int.Parse(amount) && productAmount > 0)
-            amountCheck = true;
-
-        totalPrice = (int.Parse(price) * int.Parse(amount)) + int.Parse(shipment);
+        if (productInfo)
+        {
+            if (productAmount >= int.Parse(amount) && productAmount > 0)
+                amountCheck = true;
+            totalPrice = (int.Parse(price) * int.Parse(amount)) + int.Parse(shipment);
+        }
 
         if (memberInfo && productInfo && amountCheck)
         {
@@ -527,12 +634,7 @@ public class MainMethod
         }
         else
         {
-            if (!memberInfo)
-                return gm.getStageJson(false, msg.memberInfoError_cht);
-            if (!productInfo)
-                return gm.getStageJson(false, msg.productInfoError_cht);
-            if (!amountCheck)
-                return gm.getStageJson(false, msg.amountError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
 
         if (checkOrder)

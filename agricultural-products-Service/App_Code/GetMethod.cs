@@ -39,11 +39,11 @@ public class GetMethod
     }
 
     // 輸入單一資料JSON字串，取得JSON字串
-    public string getJsonSingleResult(string jsonStr)
-    {
-        JArray jArray = getJsonArrayResult(jsonStr);
-        return jArray[0].ToString();
-    }
+    //public string getJsonSingleResult(string jsonStr)
+    //{
+    //    JArray jArray = getJsonArrayResult(jsonStr);
+    //    return jArray[0].ToString();
+    //}
 
     // 輸入陣列型態單一資料JSON字串，取得JObject物件
     public JObject getJsonObjectResult(string jsonStr)
@@ -131,7 +131,7 @@ public class GetMethod
         return DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss");
     }
 
-    // 上傳圖片
+    // 上傳
     public string upload(string file, string fileName, string type)
     {
         string savePath = "";

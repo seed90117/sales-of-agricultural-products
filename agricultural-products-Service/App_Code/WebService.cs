@@ -53,7 +53,7 @@ public class WebService : System.Web.Services.WebService
         }
         catch (Exception ex)
         {
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.fail);
         }
     }
 
@@ -81,7 +81,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.signError_cht);
         }
     }
 
@@ -101,7 +101,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.fail);
         }
     }
 
@@ -116,12 +116,12 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals(""))
                 return main.GetSignLog(identify);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -144,12 +144,12 @@ public class WebService : System.Web.Services.WebService
             if (!password.Equals("") && !firstName.Equals("") && !lastName.Equals("") && !email.Equals(""))
                 return main.NewMember(email, password, firstName, lastName, phone, address);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -166,12 +166,17 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !fileName.Equals("") && !image.Equals(""))
                 return main.NewHeadShot(identify, fileName, image);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+            {
+                if (image.Equals(""))
+                    return gm.getStageJson(false, msg.unSelectFile);
+                else
+                    return gm.getStageJson(false, msg.dataError_cht);
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -189,12 +194,17 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !name.Equals("") && !fileName.Equals("") && !video.Equals(""))
                 return main.NewVideo(identify, name, fileName, video);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+            {
+                if(video.Equals(""))
+                    return gm.getStageJson(false, msg.unSelectFile);
+                else
+                    return gm.getStageJson(false, msg.dataError_cht);
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -209,12 +219,12 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals(""))
                 return main.GetMemberInfo(identify);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -234,7 +244,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -249,12 +259,12 @@ public class WebService : System.Web.Services.WebService
             if (!productID.Equals(""))
                 return main.GetVideo(productID);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -271,12 +281,12 @@ public class WebService : System.Web.Services.WebService
             if (!column.Equals("") && !value.Equals(""))
                 return main.UpdateMemberInfo(idnetify, column, value);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -293,12 +303,12 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !oldPassword.Equals("") && !newPassword.Equals(""))
                 return main.ResetPassword(identify, oldPassword, newPassword);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -313,12 +323,12 @@ public class WebService : System.Web.Services.WebService
             if (!email.Equals(""))
                 return main.IsEmail(email);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -351,12 +361,12 @@ public class WebService : System.Web.Services.WebService
                 return main.NewProduct(identify, farmID, productName, typeBig, typeSmall, introduction, additionalValue, origin, 
                     price, amount,packagingDate, validityPeriod, verificationID, stage);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -374,12 +384,44 @@ public class WebService : System.Web.Services.WebService
             if (!productID.Equals("") && !imageType.Equals("") && !fileName.Equals("") && !image.Equals(""))
                 return main.NewProductImage(productID, imageType, fileName, image);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+            {
+                if (image.Equals(""))
+                    return gm.getStageJson(false, msg.unSelectFile);
+                else
+                    return gm.getStageJson(false, msg.dataError_cht);
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProductFileJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string productID = job["ProductID"].ToString();
+            string fileName = job["FileName"].ToString();
+            string file = job["File"].ToString();
+            if (!productID.Equals("") && !fileName.Equals("") && !file.Equals(""))
+                return main.NewProductFile(productID, fileName, file);
+            else
+            {
+                if (file.Equals(""))
+                    return gm.getStageJson(false, msg.unSelectFile);
+                else
+                    return gm.getStageJson(false, msg.dataError_cht);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -399,7 +441,7 @@ public class WebService : System.Web.Services.WebService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -413,15 +455,12 @@ public class WebService : System.Web.Services.WebService
             string bigItem = job["BigItem"].ToString();
             string smallItem = job["SmallItem"].ToString();
             string value = job["Value"].ToString();
-            if (!bigItem.Equals("") && !smallItem.Equals("") && !value.Equals(""))
-                return main.GetProductKey(bigItem, smallItem, value);
-            else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+            return main.GetProductKey(bigItem, smallItem, value);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -437,12 +476,12 @@ public class WebService : System.Web.Services.WebService
             if (!column.Equals("") && !value.Equals(""))
                 return main.GetProductColumn(column, value);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -477,12 +516,12 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !productID.Equals("") && !type.Equals("") && !action.Equals("") && !note.Equals(""))
                 return main.NewRecord(identify, productID, type, action, note);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -497,12 +536,12 @@ public class WebService : System.Web.Services.WebService
             if (!productID.Equals(""))
                 return main.GetRecord(productID);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.noData_cht);
         }
     }
 
@@ -524,12 +563,12 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !productID.Equals("") && !amount.Equals("") && !delivery.Equals("") && !shipment.Equals("") && !note.Equals(""))
                 return main.NewProductOrder(identify, productID, amount, delivery, shipment, note);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -549,12 +588,12 @@ public class WebService : System.Web.Services.WebService
             if (!companyName.Equals("") && !companyUrl.Equals("") && !fileName.Equals("") && !image.Equals(""))
                 return main.NewCooperationImage(companyName, companyUrl, fileName, image);
             else
-                return gm.getStageJson(false, msg.inputDataError_cht);
+                return gm.getStageJson(false, msg.dataError_cht);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.jsonError_cht);
+            return gm.getStageJson(false, msg.dataError_cht);
         }
     }
 
@@ -680,6 +719,13 @@ public class WebService : System.Web.Services.WebService
     public string NewProductImage(string ProductID, string ImageType, string FileName, string Image)
     {
         return main.NewProductImage(ProductID, ImageType, FileName, Image);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProductFile(string ProductID, string FileName, string File)
+    {
+        return main.NewProductFile(ProductID, FileName, File);
     }
 
     [WebMethod]
