@@ -156,7 +156,7 @@ public class MainMethod
         string videoUrl = "";
         sql = "select MemberID from Member where Identify ='" + identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(true.ToString()));
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
             string message = job["message"].ToString();
             job = gm.getJsonObjectResult(message);
@@ -323,7 +323,7 @@ public class MainMethod
 
         if (!fileName.Equals("") && !fileUrl.Equals(""))
         {
-            sql = "insert into File(ProductID, FileName, FileUrl) values('" + productID + "','" + fileName + "','" + fileUrl + "')";
+            sql = "insert into ProductFile (ProductID,FileName,FileUrl) values ('" + productID + "','" + fileName + "','" + fileUrl + "')";
             return sqlMethod.Insert(sql);
         }
         else
