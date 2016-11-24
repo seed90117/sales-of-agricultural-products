@@ -13,7 +13,8 @@ public class MainMethod
 
     public string test()
     {
-        return "";
+        sql = "select * from SignLog where SignInTime <'2016-11-24 23:50:54.5054'";
+        return sqlMethod.Select(sql);
     }
 
     // 方法名稱直白，單字第一個字需大寫
@@ -64,7 +65,7 @@ public class MainMethod
             // insert SignLog table
             sql = "insert into SignLog(MemberID,Account,SignInTime,Identify,IP) values('" + memberID + "','"
                 + account + "','" + gm.getCurrentDate() + "','" + identify + "','" + ip + "')";
-            job = JObject.Parse(sqlMethod.Update(sql));
+            job = gm.getJsonResult(sqlMethod.Insert(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
                 isLog = true;
         }
