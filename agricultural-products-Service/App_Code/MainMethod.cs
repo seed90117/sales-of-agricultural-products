@@ -140,11 +140,21 @@ public class MainMethod
 
     public string NewHeadShot(string identify, string fileName, string image) // By Kevin Yen
     {
-        string imageUrl = gm.upload(image, fileName, "Member");
-        if (!imageUrl.Equals(""))
+        sql = "select MemberID from Member where Identify = '" + identify + "'";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
-            sql = "update Farm set Mugshot = '" + imageUrl + "' where Identify = '" + identify + "'";
-            return sqlMethod.Update(sql);
+            string message = job["message"].ToString();
+            job = gm.getJsonObjectResult(message);
+            string memeberID = job["MemberID"].ToString();
+            string imageUrl = gm.upload(image, fileName, "Member");
+            if (!imageUrl.Equals(""))
+            {
+                sql = "update Farm set Mugshot = '" + imageUrl + "' where MemberID = '" + memeberID + "'";
+                return sqlMethod.Update(sql);
+            }
+            else
+                return gm.getStageJson(false, msg.uploadFail_cht); // 上傳失敗
         }
         else
             return gm.getStageJson(false, msg.uploadFail_cht); // 上傳失敗
