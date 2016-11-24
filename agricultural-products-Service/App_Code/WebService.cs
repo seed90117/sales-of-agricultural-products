@@ -28,7 +28,7 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string HelloWorld()
     {
-        return main.GetProductType();
+        return "";
     }
 
     [WebMethod]

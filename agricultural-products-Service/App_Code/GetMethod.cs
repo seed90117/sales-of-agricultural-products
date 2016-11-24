@@ -2,7 +2,6 @@
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Drawing;
 using System.IO;
 
 /// <summary>
@@ -125,10 +124,10 @@ public class GetMethod
         return System.Guid.NewGuid().ToString().Replace("-","");
     }
 
-    // 取得現在時間，範例2016/12/30-23:59:59
+    // 取得現在時間，範例2016/12/30 23:59:59.025
     public string getCurrentDate()
     {
-        return DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss");
+        return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ms");
     }
 
     // 上傳

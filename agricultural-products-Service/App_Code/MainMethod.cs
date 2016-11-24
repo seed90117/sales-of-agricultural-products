@@ -11,6 +11,11 @@ public class MainMethod
     private GetMethod gm = new GetMethod();
     private Message msg = new Message();
 
+    public string test()
+    {
+        return "";
+    }
+
     // 方法名稱直白，單字第一個字需大寫
     // 變數第一個單字須小寫
 
@@ -28,7 +33,7 @@ public class MainMethod
         bool isIdentify = false;
         bool isLog = false;
         sql = "select MemberID,Password,Access from Member where Email = '" + account + "'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
             string message = job["message"].ToString();
@@ -65,7 +70,7 @@ public class MainMethod
         }
         if (isSign && isIdentify && isLog)
         {
-            jsonStr = gm.getStageJson(true, gm.getJsonArray("UUID;Access", identify + ";" + access));
+            jsonStr = gm.getStageJson(true, gm.getJsonArray("Identify;Access", identify + ";" + access));
             return jsonStr;
         }
         else
@@ -177,11 +182,11 @@ public class MainMethod
     {
         if (access.Equals("ALL"))
         {
-            sql = "select MemberID,Email,FirstName,LastName,Phone,Fax,CellPhone,IdentifyID,CompanyName,Address,Image,Access from Member";
+            sql = "select MemberID,Email,FirstName,LastName,Phone,Address,Access from Member";
         }
         else
         {
-            sql = "select MemberID, Account, FirstName, LastName, Phone, Email, CompanyName, Address, Access from Member where Access = '" + gm.getMemberAccess(access) + "'";
+            sql = "select MemberID,Email,FirstName,LastName,Phone,Address,Access from Member where Access = '" + gm.getMemberAccess(access) + "'";
         }
         return sqlMethod.Select(sql);
     }
