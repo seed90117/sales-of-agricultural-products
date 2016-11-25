@@ -250,4 +250,19 @@ public class GetMethod
               @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
         return check;
     }
+
+    // Item1要比對資料，Item2比對資料，Item需排序資料
+    public string[] selectOrder(string[] item1, string[] item2, string[] item3)
+    {
+        string[] reOrder = new string[item1.Length];
+        for (int i = 0; i < item1.Length; i++)
+        {
+            for (int j = 0; j < item2.Length; j++)
+            {
+                if (item1[i].Equals(item2[j]))
+                    reOrder[i] = item3[j];
+            }
+        }
+        return reOrder;
+    }
 }

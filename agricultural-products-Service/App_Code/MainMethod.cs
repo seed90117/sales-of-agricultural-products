@@ -399,6 +399,7 @@ public class MainMethod
             }
             sql += ")";
         }
+        sql += " order by ProductID";
 
         // 暫存商品表單，ProductID與ProductName
         job = gm.getJsonResult(sqlMethod.Select(sql));
@@ -443,7 +444,7 @@ public class MainMethod
                 {
                     job = gm.getJsonResult(jarray[i].ToString());
                     rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + job["ImageUrl"].ToString());
-                    if (i < id.Length - 1)
+                    if (i < jarray.Count - 1)
                         rejson += ",";
                     else
                         rejson += "]";
@@ -516,16 +517,7 @@ public class MainMethod
                     id[i] = job["ProductID"].ToString();
                     imageUrl[i] = job["ImageUrl"].ToString();
                 }
-                string[] tmp = new string[id.Length];
-                for (int i = 0; i < productID.Length; i++)
-                {
-                    for (int j = 0; j < id.Length; j++)
-                    {
-                        if (productID[i] == id[j])
-                            tmp[i] = imageUrl[j];
-                    }
-                }
-                imageUrl = tmp;
+                imageUrl = gm.selectOrder(productID, id, imageUrl);
                 isImage = true;
             }
         }
@@ -705,16 +697,7 @@ public class MainMethod
                     introduction[i] = jObject["Introduction"].ToString();
                 }
             }
-            string[] tmp = new string[item.Length];
-            for (int i = 0; i < typeSmaill.Length; i++)
-            {
-                for (int j = 0; j < item.Length; j++)
-                {
-                    if (typeSmaill[i].Equals(item[j]))
-                        tmp[i] = introduction[j];
-                }
-            }
-            introduction = tmp;
+            introduction = gm.selectOrder(typeSmaill, item, introduction);
         }
 
 
