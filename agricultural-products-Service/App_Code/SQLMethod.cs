@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 public class SQLMethod
 {
     private static string strdbcon = "server=140.127.22.4;database=AgriculturalProducts;uid=CCBDA;pwd=CCBDA";
+    //private static string strdbcon = "server=140.127.22.12;database=AgriculturalProducts;uid=AgriculturalProducts;pwd=CCBDA";
     private SqlConnection objcon = new SqlConnection(strdbcon);
     private SqlCommand sqlcmd;
     private GetMethod gm = new GetMethod();

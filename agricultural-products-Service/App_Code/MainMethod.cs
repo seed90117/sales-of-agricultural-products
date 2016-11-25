@@ -469,11 +469,10 @@ public class MainMethod
                 for (int i = 0; i < id.Length; i++)
                 {
                     rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + image[i]);
-                    if (i < jarray.Count - 1)
+                    if (i < id.Length - 1)
                         rejson += ",";
-                    else
-                        rejson += "]";
                 }
+                rejson += "]";
                 json = gm.getStageJson(true, rejson);
             }
             
