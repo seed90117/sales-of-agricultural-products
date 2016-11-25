@@ -401,13 +401,19 @@ public class MainMethod
             sql += ")";
         }
 
-        if (p.Equals("H"))
-            sql += " order by Price desc";
-        else if (p.Equals("L"))
-            sql += " order by Price asc";
+        if (!p.Equals(""))
+        {
+            if (p.Equals("H"))
+                sql += " order by Price desc";
+            else if (p.Equals("L"))
+                sql += " order by Price asc";
+        }
         else if (!h.Equals(""))
         {
-            sql += " order by OrderAmount desc";
+            if (p.Equals("H"))
+                sql += " order by OrderAmount desc";
+            else if (p.Equals("L"))
+                sql += " order by OrderAmount asc";
         }
         else
             sql += " order by ProductID";
