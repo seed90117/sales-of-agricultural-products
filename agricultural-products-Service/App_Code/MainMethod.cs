@@ -355,16 +355,18 @@ public class MainMethod
         }
     }
 
-    public string GetProductKey(string bigItem, string smallItem, string value) // By Kevin Yen
+    public string GetProductKey(string bigItem, string smallItem, string value, string p, string h) // By Kevin Yen
     {
         string[] id = null;
         string[] name = null;
         string[] price = null;
+        string[] image = null;
         JArray jarray = null;
         JObject job = null;
         string json = gm.getStageJson(false, msg.noData_cht);
         bool isProduct = false;
         bool isValue = false;
+        bool isImage = false;
 
         // 取得商品表單內資料
         if (bigItem.Equals("") && smallItem.Equals("") && value.Equals(""))
@@ -399,7 +401,17 @@ public class MainMethod
             }
             sql += ")";
         }
-        sql += " order by ProductID";
+
+        if (p.Equals("H"))
+            sql += " order by Price desc";
+        else if (p.Equals("L"))
+            sql += " order by Price asc";
+        else if (!h.Equals(""))
+        {
+            sql += " order by OrderAmount desc";
+        }
+        else
+            sql += " order by ProductID";
 
         // 暫存商品表單，ProductID與ProductName
         job = gm.getJsonResult(sqlMethod.Select(sql));
@@ -424,26 +436,40 @@ public class MainMethod
         // 取得商品圖片表單內資料
         if (isProduct)
         {
-            sql = "select ImageUrl from ProductImage where Type ='Main' AND (";
+            sql = "select ProductID,ImageUrl from ProductImage where Type ='Main' AND (";
             for (int i = 0; i < id.Length; i++)
             {
                 sql += "ProductID = '" + id[i] + "'";
                 if (i < id.Length - 1)
                     sql += " OR ";
                 else
-                    sql += ") order by ProductID";
+                    sql += ")";
             }
-
-            // 輸出JSON，欄位ProductID, ProductName, Image
             job = gm.getJsonResult(sqlMethod.Select(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
             {
                 jarray = gm.getJsonArrayResult(job["message"].ToString());
-                string rejson = "[";
+                image = new string[jarray.Count];
+                string[] productID = new string[jarray.Count];
                 for (int i = 0; i < jarray.Count; i++)
                 {
                     job = gm.getJsonResult(jarray[i].ToString());
-                    rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + job["ImageUrl"].ToString());
+                    image[i] = job["ImageUrl"].ToString();
+                    productID[i] = job["ProductID"].ToString();
+                }
+                image = gm.selectOrder(id, productID, image);
+                isImage = true;
+            }
+
+
+
+            // 輸出JSON，欄位ProductID, ProductName, Image
+            if (isImage && isProduct)
+            {
+                string rejson = "[";
+                for (int i = 0; i < id.Length; i++)
+                {
+                    rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + image[i]);
                     if (i < jarray.Count - 1)
                         rejson += ",";
                     else
@@ -451,6 +477,7 @@ public class MainMethod
                 }
                 json = gm.getStageJson(true, rejson);
             }
+            
         }
 
         return json;
@@ -599,13 +626,11 @@ public class MainMethod
         string jsonStr = gm.getStageJson(false, msg.noData_cht);
         string[] bigItem = null;
         string[] smallItem = null;
-        string[] prodcuct = null;
-        string[] typeSmaill = null;
-        string[] introduction = null;
+        string[] smallItemValue = null;
         bool isBigItem = false;
         bool isSmallItem = false;
-        bool isProduct = false;
-        // 取得BigItem
+
+        // 取得BigItem，陣列大小4
         sql = "select distinct BigItem from Introduction";
         JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
         if (jObject["stage"].ToString().Equals(true.ToString()))
@@ -621,7 +646,7 @@ public class MainMethod
         }
 
 
-        // 取得SmallItem
+        // 取得SmallItem，陣列大小4
         if (isBigItem)
         {
             smallItem = new string[bigItem.Length];
@@ -638,98 +663,80 @@ public class MainMethod
         }
 
 
-        // 取得ProductID, ImageUrl
+        // 取得Introduction,Product並輸出Json
         if (isSmallItem)
         {
-            for (int k=0;k<smallItem.Length;k++)
+            string reJson = "[";
+            smallItemValue = new string[bigItem.Length];
+            for (int i = 0; i < smallItem.Length; i++) // BigItem size 4
             {
-                JArray jAr = gm.getJsonArrayResult(smallItem[k]);
-                prodcuct = new string[jAr.Count];
-                typeSmaill = new string[jAr.Count];
-                for (int i = 0; i < jAr.Count; i++)
+                JArray jArray = gm.getJsonArrayResult(smallItem[i]);
+                smallItemValue[i] = "[";
+                for (int j = 0; j < jArray.Count; j++)
                 {
-                    JObject job = gm.getJsonResult(jAr[i].ToString());
-                    typeSmaill[i] = job["SmallItem"].ToString();
-                    sql = "select top(3) ProductID from Product where TypeSmall = '" + job["SmallItem"].ToString() + "' order by OrderAmount desc";
+                    JObject job = gm.getJsonResult(jArray[j].ToString());
+
+                    // 取得Introduction
+                    string tmpSmallItem = job["SmallItem"].ToString(); ;
+                    string tmpIntroduction = "";
+                    string tmpProduct = "";
+                    sql = "select Introduction from Type where Item = '" + tmpSmallItem + "'";
+
                     jObject = gm.getJsonResult(sqlMethod.Select(sql));
                     if (jObject["stage"].ToString().Equals(true.ToString()))
                     {
-                        sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND ProductID in (";
-                        JArray jArray = gm.getJsonArrayResult(jObject["message"].ToString());
-                        for (int j = 0; j < jArray.Count; j++)
+                        jObject = gm.getJsonObjectResult(jObject["message"].ToString());
+                        tmpIntroduction = jObject["Introduction"].ToString();
+                    }
+
+                    // 取得ProductID
+                    string tmpProductArray = "(";
+                    sql = "select TOP(3) ProductID from Product where TypeSmall = '" + tmpSmallItem + "' order by OrderAmount desc";
+                    jObject = gm.getJsonResult(sqlMethod.Select(sql));
+                    if (jObject["stage"].ToString().Equals(true.ToString()))
+                    {
+                        JArray jAr = gm.getJsonArrayResult(jObject["message"].ToString());
+                        for (int k = 0; k < jAr.Count; k++)
                         {
-                            jObject = gm.getJsonResult(jArray[j].ToString());
-                            sql += jObject["ProductID"].ToString();
-                            if (j < jArray.Count - 1)
-                                sql += ",";
+                            jObject = (JObject)jAr[k];
+                            tmpProductArray += jObject["ProductID"].ToString();
+                            if (k < jAr.Count - 1)
+                                tmpProductArray += ",";
                             else
-                                sql += ")";
+                                tmpProductArray += ")";
                         }
+                    }
+
+                    // 取得ProductID, ImageUrl
+                    if (!tmpProductArray.Equals("("))
+                    {
+                        sql = "select ProductID, ImageUrl from ProductImage where Type = 'Main' AND ProductID in" + tmpProductArray;
                         jObject = gm.getJsonResult(sqlMethod.Select(sql));
                         if (jObject["stage"].ToString().Equals(true.ToString()))
                         {
-                            prodcuct[i] = jObject["message"].ToString();
+                            tmpProduct = jObject["message"].ToString();
                         }
                     }
                     else
-                        prodcuct[i] = null;
+                        tmpProduct = "[" + gm.getJsonArray("ProductID,ImageUrl", " ; ") + "]";
+
+                    // 放入BigItem Json
+                    smallItemValue[i] += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + tmpSmallItem + @"""" +
+                                                              ";" + @"""" + tmpIntroduction + @"""" + ";" + tmpProduct);
+                    if (j < jArray.Count - 1)
+                        smallItemValue[i] += ",";
                 }
-                isProduct = true;
-            }
-        }
-
-
-        // 取得種類介紹
-        if (isProduct)
-        {
-            string[] item = null;
-            sql = "select Item,Introduction from Type";
-            jObject = gm.getJsonResult(sqlMethod.Select(sql));
-            if (jObject["stage"].ToString().Equals(true.ToString()))
-            {
-                JArray jArray = gm.getJsonArrayResult(jObject["message"].ToString());
-                item = new string[jArray.Count];
-                introduction = new string[jArray.Count];
-                for (int i=0;i< jArray.Count;i++)
-                {
-                    jObject = gm.getJsonResult(jArray[i].ToString());
-                    item[i] = jObject["Item"].ToString();
-                    introduction[i] = jObject["Introduction"].ToString();
-                }
-            }
-            introduction = gm.selectOrder(typeSmaill, item, introduction);
-        }
-
-
-        // 合併Json
-        if (isProduct)
-        {
-            string json = "[";
-            for (int i = 0; i < typeSmaill.Length; i++)
-            {
-                if (prodcuct[i] != null)
-                {
-                    json += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + typeSmaill[i] + @"""" + ";" + @"""" + introduction[i] + @"""" + ";" + prodcuct[i]);
-                    if (i < typeSmaill.Length - 1)
-                        json += ",";
-                }
-                if (i == typeSmaill.Length - 1)
-                    json += "]";
-            }
-
-
-            string reJsonStr = "[";
-            for (int i = 0; i < bigItem.Length; i++)
-            {
-                reJsonStr += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + json);
-                if (i < bigItem.Length - 1)
-                    reJsonStr += ",";
+                smallItemValue[i] += "]";
+                reJson += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + smallItemValue[i]);
+                if (i < smallItem.Length - 1)
+                    reJson += ",";
                 else
-                    reJsonStr += "]";
+                    reJson += "]";
             }
-            jsonStr = gm.getStageJson(true, reJsonStr);
+            return gm.getStageJson(true, reJson);
         }
-        return jsonStr;
+        else
+            return jsonStr;
     }
 
 

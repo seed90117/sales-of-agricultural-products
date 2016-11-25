@@ -453,7 +453,9 @@ public class WebService : System.Web.Services.WebService
             string bigItem = job["BigItem"].ToString();
             string smallItem = job["SmallItem"].ToString();
             string value = job["Value"].ToString();
-            return main.GetProductKey(bigItem, smallItem, value);
+            string orderPrice = job["Price"].ToString();
+            string orderHot = job["Hot"].ToString();
+            return main.GetProductKey(bigItem, smallItem, value, orderPrice, orderHot);
         }
         catch (Exception ex)
         {
@@ -752,9 +754,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetProductKey(string BigItem, string SmallItem, string Value)
+    public string GetProductKey(string BigItem, string SmallItem, string Value, string Price, string Hot)
     {
-        return main.GetProductKey(BigItem, SmallItem, Value);
+        return main.GetProductKey(BigItem, SmallItem, Value, Price, Hot);
     }
 
     [WebMethod]
