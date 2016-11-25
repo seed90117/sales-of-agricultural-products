@@ -148,7 +148,7 @@ public class GetMethod
             savePath = HttpContext.Current.Server.MapPath("~/" + type + "/");
             serverPath = "http://140.127.22.4/PlatformAPI/" + type + "/";
         }
-        if (file.Equals("") || fileName.Equals(""))
+        if (!file.Equals("") && !fileName.Equals(""))
         {
             string[] fileType = fileName.Split('.');
             saveName = getUUID() + "." + fileType[fileType.Length - 1];

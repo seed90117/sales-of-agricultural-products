@@ -504,6 +504,13 @@ public class WebService : System.Web.Services.WebService
         return main.GetProductType();
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductTypeItemJson()
+    {
+        return main.GetProductTypeItem();
+    }
+
 
     // Record
     [WebMethod]
@@ -776,6 +783,13 @@ public class WebService : System.Web.Services.WebService
     public string GetProductType()
     {
         return main.GetProductType();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductTypeItem()
+    {
+        return main.GetProductTypeItem();
     }
 
 

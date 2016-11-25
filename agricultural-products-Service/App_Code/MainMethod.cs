@@ -41,8 +41,7 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             if (job["Password"].ToString().Equals(password))
             {
                 isSign = true;
@@ -108,8 +107,7 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             memberID = job["MemberID"].ToString();
             if (!memberID.Equals(""))
                 isGetID = true;
@@ -153,8 +151,7 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             string memeberID = job["MemberID"].ToString();
             string imageUrl = gm.upload(image, fileName, "Member");
             if (!imageUrl.Equals(""))
@@ -177,8 +174,7 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             memberID = job["MemberID"].ToString();
             videoUrl = gm.upload(video, fileName, "Video");
         }
@@ -254,8 +250,7 @@ public class MainMethod
         JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonResult(message);
+            job = gm.getJsonResult(job["message"].ToString());
             string id = job["MemberID"].ToString();
             if (job["Password"].ToString().Equals(oldPassword))
             {
@@ -292,8 +287,7 @@ public class MainMethod
         JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
         if (jObject["stage"].ToString().Equals(true.ToString()))
         {
-            string message = jObject["message"].ToString();
-            jObject = gm.getJsonObjectResult(message);
+            jObject = gm.getJsonObjectResult(jObject["message"].ToString());
             farmName = jObject["FarmName"].ToString();
             sql = "insert into Product(FarmID,FarmName,ProductName,TypeBig,TypeSmall,Introduction,AdditionalValue,Origin," +
                     "Price,Amount,PackagingDate,ValidityPeriod,ValidityID,Stage,OrderAmount) values " +
@@ -303,8 +297,7 @@ public class MainMethod
             jObject = gm.getJsonResult(sqlMethod.Select(sql));
             if (jObject["stage"].ToString().Equals(true.ToString()))
             {
-                message = jObject["message"].ToString();
-                jObject = gm.getJsonObjectResult(message);
+                jObject = gm.getJsonObjectResult(jObject["message"].ToString());
                 id = jObject["ProductID"].ToString();
                 qr = qrcm.GetQRCode(id);
                 sql = "update Product set QRCode = '" + qr + "' where ProductID = '" + id + "'";
@@ -410,8 +403,7 @@ public class MainMethod
         job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            jarray = gm.getJsonArrayResult(message);
+            jarray = gm.getJsonArrayResult(job["message"].ToString());
             id = new string[jarray.Count];
             name = new string[jarray.Count];
             price = new string[jarray.Count];
@@ -437,15 +429,14 @@ public class MainMethod
                 if (i < id.Length - 1)
                     sql += " OR ";
                 else
-                    sql += ")";
+                    sql += ") order by ProductID";
             }
 
             // 輸出JSON，欄位ProductID, ProductName, Image
             job = gm.getJsonResult(sqlMethod.Select(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
             {
-                string message = job["message"].ToString();
-                jarray = gm.getJsonArrayResult(message);
+                jarray = gm.getJsonArrayResult(job["message"].ToString());
                 string rejson = "[";
                 for (int i = 0; i < id.Length; i++)
                 {
@@ -488,8 +479,7 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            string message = job["message"].ToString();
-            JArray jarray = gm.getJsonArrayResult(message);
+            JArray jarray = gm.getJsonArrayResult(job["message"].ToString());
             productID = new string[jarray.Count];
             productName = new string[jarray.Count];
             for (int i=0; i<jarray.Count; i++)
@@ -508,15 +498,14 @@ public class MainMethod
             {
                 sql += "'" + productID[i] + "'";
                 if (i < productID.Length - 1)
-                    sql += ")";
-                else
                     sql += ",";
+                else
+                    sql += ")";
             }
             job = gm.getJsonResult(sqlMethod.Select(sql));
             if (job["stage"].ToString().Equals(true.ToString()))
             {
-                string message = job["message"].ToString();
-                JArray jarray = gm.getJsonArrayResult(message);
+                JArray jarray = gm.getJsonArrayResult(job["message"].ToString());
                 imageUrl = new string[jarray.Count];
                 for (int i = 0; i < jarray.Count; i++)
                 {
@@ -533,11 +522,11 @@ public class MainMethod
             {
                 reJson += gm.getJsonArray("ProductID;ProductName;ImageUrl", productID[i] + ";" + productName[i] + ";" + imageUrl[i]);
                 if (i < productID.Length - 1)
-                    sql += "]";
+                    reJson += ",";
                 else
-                    sql += ",";
+                    reJson += "]";
             }
-            return reJson;
+            return gm.getStageJson(true, reJson);
         }
         else
             return gm.getStageJson(false, msg.noData_cht);
@@ -555,8 +544,7 @@ public class MainMethod
         JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
         if (jObject["stage"].ToString().Equals(true.ToString()))
         {
-            string message = jObject["message"].ToString();
-            JArray jArray = gm.getJsonArrayResult(message);
+            JArray jArray = gm.getJsonArrayResult(jObject["message"].ToString());
             bigItem = new string[jArray.Count];
             for (int i = 0; i < jArray.Count; i++)
             {
@@ -577,8 +565,7 @@ public class MainMethod
                 jObject = gm.getJsonResult(sqlMethod.Select(sql));
                 if (jObject["stage"].ToString().Equals(true.ToString()))
                 {
-                    string message = jObject["message"].ToString();
-                    smallItem[i] = message;
+                    smallItem[i] = jObject["message"].ToString();
                 }
             }
             isSmallItem = true;
@@ -591,6 +578,123 @@ public class MainMethod
             for (int i = 0; i < bigItem.Length; i++)
             {
                 reJsonStr += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + smallItem[i]);
+                if (i < bigItem.Length - 1)
+                    reJsonStr += ",";
+                else
+                    reJsonStr += "]";
+            }
+            jsonStr = gm.getStageJson(true, reJsonStr);
+        }
+        return jsonStr;
+    }
+
+    public string GetProductTypeItem() // By Kevin Yen
+    {
+        string jsonStr = gm.getStageJson(false, msg.noData_cht);
+        string[] bigItem = null;
+        string[] smallItem = null;
+        string[] prodcuct = null;
+        string[] typeSmaill = null;
+        bool isBigItem = false;
+        bool isSmallItem = false;
+        bool isProduct = false;
+        // 取得BigItem
+        sql = "select distinct BigItem from Introduction";
+        JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
+        if (jObject["stage"].ToString().Equals(true.ToString()))
+        {
+            JArray jArray = gm.getJsonArrayResult(jObject["message"].ToString());
+            bigItem = new string[jArray.Count];
+            for (int i = 0; i < jArray.Count; i++)
+            {
+                jObject = (JObject)jArray[i];
+                bigItem[i] = jObject["BigItem"].ToString();
+            }
+            isBigItem = true;
+        }
+
+
+        // 取得SmallItem
+        if (isBigItem)
+        {
+            smallItem = new string[bigItem.Length];
+            for (int i = 0; i < bigItem.Length; i++)
+            {
+                sql = "select distinct SmallItem from Introduction where BigItem ='" + bigItem[i] + "'";
+                jObject = gm.getJsonResult(sqlMethod.Select(sql));
+                if (jObject["stage"].ToString().Equals(true.ToString()))
+                {
+                    smallItem[i] = jObject["message"].ToString();
+                }
+            }
+            isSmallItem = true;
+        }
+
+
+        // 取得ProductID, ImageUrl
+        if (isSmallItem)
+        {
+            for (int k=0;k<smallItem.Length;k++)
+            {
+                JArray jAr = gm.getJsonArrayResult(smallItem[k]);
+                prodcuct = new string[jAr.Count];
+                typeSmaill = new string[jAr.Count];
+                for (int i = 0; i < jAr.Count; i++)
+                {
+                    JObject job = gm.getJsonResult(jAr[i].ToString());
+                    typeSmaill[i] = job["SmallItem"].ToString();
+                    sql = "select top(3) ProductID from Product where TypeSmall = '" + job["SmallItem"].ToString() + "' order by OrderAmount desc";
+                    jObject = gm.getJsonResult(sqlMethod.Select(sql));
+                    if (jObject["stage"].ToString().Equals(true.ToString()))
+                    {
+                        sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND ProductID in (";
+                        JArray jArray = gm.getJsonArrayResult(jObject["message"].ToString());
+                        for (int j = 0; j < jArray.Count; j++)
+                        {
+                            jObject = gm.getJsonResult(jArray[j].ToString());
+                            sql += jObject["ProductID"].ToString();
+                            if (j < jArray.Count - 1)
+                                sql += ",";
+                            else
+                                sql += ")";
+                        }
+                        jObject = gm.getJsonResult(sqlMethod.Select(sql));
+                        if (jObject["stage"].ToString().Equals(true.ToString()))
+                        {
+                            prodcuct[i] = jObject["message"].ToString();
+                        }
+                    }
+                    else
+                        prodcuct[i] = null;
+                }
+                isProduct = true;
+            }
+            
+            
+        }
+
+
+        // 合併Json
+        if (isProduct)
+        {
+            string json = "[";
+            for (int i = 0; i < typeSmaill.Length; i++)
+            {
+                if (prodcuct[i] != null)
+                {
+                    json += gm.getJsonItemArray("SmallItem;Product", @"""" + typeSmaill[i] + @"""" + ";" + prodcuct[i]);
+                    if (i < typeSmaill.Length - 1)
+                        json += ",";
+                }
+                if (i == typeSmaill.Length - 1)
+                    json += "]";
+            }
+
+
+            string reJsonStr = "[";
+            for (int i = 0; i < bigItem.Length; i++)
+            {
+                reJsonStr += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + json);
                 if (i < bigItem.Length - 1)
                     reJsonStr += ",";
                 else
@@ -616,8 +720,7 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(false.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             memberID = job["MemberID"].ToString();
             creator = job["LastName"].ToString() + job["FirstName"].ToString();
             if (!memberID.Equals("") && !creator.Equals(""))
@@ -630,8 +733,7 @@ public class MainMethod
         job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(false.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             productName = job["ProductName"].ToString();
             if (!productName.Equals(""))
                 isProductName = true;
@@ -677,13 +779,12 @@ public class MainMethod
         bool productInfo = false;
         bool checkOrder = false;
 
-        sql = "select Account , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
+        sql = "select Email , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(false.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
-            account = job["Account"].ToString();
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            account = job["Email"].ToString();
             name = job["Name"].ToString();
             phone = job["Phone"].ToString();
             address = job["Address"].ToString();
@@ -695,8 +796,7 @@ public class MainMethod
         job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(false.ToString()))
         {
-            string message = job["message"].ToString();
-            job = gm.getJsonObjectResult(message);
+            job = gm.getJsonObjectResult(job["message"].ToString());
             productName = job["ProductName"].ToString();
             productAmount = int.Parse(job["Amount"].ToString());
             orderAmount = int.Parse(job["OrderAmount"].ToString());
