@@ -13,7 +13,8 @@ public class MainMethod
 
     public string test(string file)
     {
-        sql = "select TOP(8) ProductName from Product ORDER BY NEWID()";
+        //sql = "select TOP(8) ProductName from Product ORDER BY NEWID()";
+        sql = "select Item,Introduction from Type where Item in ('瓜果類','大漿果','果菜類')";
         return sqlMethod.Select(sql);
         //sql = "insert into Test (ContentText,Date) values ('" + file + "','" + gm.getCurrentDate() + "')";
         //return sqlMethod.Insert(sql);
@@ -247,10 +248,10 @@ public class MainMethod
     public string ResetPassword(string identify, string oldPassword, string newPassword) // By Kevin Yen
     {
         sql = "select MemberID,Password from Member where Identify = '" + identify + "'";
-        JObject job = gm.getJsonObjectResult(sqlMethod.Select(sql));
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            job = gm.getJsonResult(job["message"].ToString());
+            job = gm.getJsonObjectResult(job["message"].ToString());
             string id = job["MemberID"].ToString();
             if (job["Password"].ToString().Equals(oldPassword))
             {
@@ -438,7 +439,7 @@ public class MainMethod
             {
                 jarray = gm.getJsonArrayResult(job["message"].ToString());
                 string rejson = "[";
-                for (int i = 0; i < id.Length; i++)
+                for (int i = 0; i < jarray.Count; i++)
                 {
                     job = gm.getJsonResult(jarray[i].ToString());
                     rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + job["ImageUrl"].ToString());
@@ -493,7 +494,8 @@ public class MainMethod
         }
         if (isProduct)
         {
-            sql = "select ImageUrl from ProductImage where ProductID in (";
+            string[] id = null;
+            sql = "select ProductID,ImageUrl from ProductImage where Type = 'Main' AND ProductID in (";
             for (int i = 0; i < productID.Length; i++)
             {
                 sql += "'" + productID[i] + "'";
@@ -507,11 +509,23 @@ public class MainMethod
             {
                 JArray jarray = gm.getJsonArrayResult(job["message"].ToString());
                 imageUrl = new string[jarray.Count];
+                id = new string[jarray.Count];
                 for (int i = 0; i < jarray.Count; i++)
                 {
                     job = gm.getJsonResult(jarray[i].ToString());
+                    id[i] = job["ProductID"].ToString();
                     imageUrl[i] = job["ImageUrl"].ToString();
                 }
+                string[] tmp = new string[id.Length];
+                for (int i = 0; i < productID.Length; i++)
+                {
+                    for (int j = 0; j < id.Length; j++)
+                    {
+                        if (productID[i] == id[j])
+                            tmp[i] = imageUrl[j];
+                    }
+                }
+                imageUrl = tmp;
                 isImage = true;
             }
         }
@@ -595,6 +609,7 @@ public class MainMethod
         string[] smallItem = null;
         string[] prodcuct = null;
         string[] typeSmaill = null;
+        string[] introduction = null;
         bool isBigItem = false;
         bool isSmallItem = false;
         bool isProduct = false;
@@ -669,8 +684,37 @@ public class MainMethod
                 }
                 isProduct = true;
             }
-            
-            
+        }
+
+
+        // 取得種類介紹
+        if (isProduct)
+        {
+            string[] item = null;
+            sql = "select Item,Introduction from Type";
+            jObject = gm.getJsonResult(sqlMethod.Select(sql));
+            if (jObject["stage"].ToString().Equals(true.ToString()))
+            {
+                JArray jArray = gm.getJsonArrayResult(jObject["message"].ToString());
+                item = new string[jArray.Count];
+                introduction = new string[jArray.Count];
+                for (int i=0;i< jArray.Count;i++)
+                {
+                    jObject = gm.getJsonResult(jArray[i].ToString());
+                    item[i] = jObject["Item"].ToString();
+                    introduction[i] = jObject["Introduction"].ToString();
+                }
+            }
+            string[] tmp = new string[item.Length];
+            for (int i = 0; i < typeSmaill.Length; i++)
+            {
+                for (int j = 0; j < item.Length; j++)
+                {
+                    if (typeSmaill[i].Equals(item[j]))
+                        tmp[i] = introduction[j];
+                }
+            }
+            introduction = tmp;
         }
 
 
@@ -682,7 +726,7 @@ public class MainMethod
             {
                 if (prodcuct[i] != null)
                 {
-                    json += gm.getJsonItemArray("SmallItem;Product", @"""" + typeSmaill[i] + @"""" + ";" + prodcuct[i]);
+                    json += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + typeSmaill[i] + @"""" + ";" + @"""" + introduction[i] + @"""" + ";" + prodcuct[i]);
                     if (i < typeSmaill.Length - 1)
                         json += ",";
                 }
@@ -718,7 +762,7 @@ public class MainMethod
         // Get memberID and creator
         sql = "select MemberID, FirstName, LastName from Member where Identify = '" + identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(false.ToString()))
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
             job = gm.getJsonObjectResult(job["message"].ToString());
             memberID = job["MemberID"].ToString();
@@ -731,7 +775,7 @@ public class MainMethod
         // Get ProductName
         sql = "select ProductName from Product where ProductID = '" + productID + "'";
         job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(false.ToString()))
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
             job = gm.getJsonObjectResult(job["message"].ToString());
             productName = job["ProductName"].ToString();
