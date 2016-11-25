@@ -716,15 +716,12 @@ public class MainMethod
                         {
                             tmpProduct = jObject["message"].ToString();
                         }
+                        if (j < jArray.Count - 1 && j != 0)
+                            smallItemValue[i] += ",";
+                        // 放入BigItem Json
+                        smallItemValue[i] += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + tmpSmallItem + @"""" +
+                                                                  ";" + @"""" + tmpIntroduction + @"""" + ";" + tmpProduct);
                     }
-                    else
-                        tmpProduct = "[" + gm.getJsonArray("ProductID,ImageUrl", " ; ") + "]";
-
-                    // 放入BigItem Json
-                    smallItemValue[i] += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + tmpSmallItem + @"""" +
-                                                              ";" + @"""" + tmpIntroduction + @"""" + ";" + tmpProduct);
-                    if (j < jArray.Count - 1)
-                        smallItemValue[i] += ",";
                 }
                 smallItemValue[i] += "]";
                 reJson += gm.getJsonItemArray("BigItem;SmallItem", @"""" + bigItem[i] + @"""" + ";" + smallItemValue[i]);
