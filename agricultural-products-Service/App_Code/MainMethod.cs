@@ -673,8 +673,9 @@ public class MainMethod
                 smallItemValue[i] = "[";
                 for (int j = 0; j < jArray.Count; j++)
                 {
+                    if (j > 0)
+                        smallItemValue[i] += ",";
                     JObject job = gm.getJsonResult(jArray[j].ToString());
-
                     // 取得Introduction
                     string tmpSmallItem = job["SmallItem"].ToString(); ;
                     string tmpIntroduction = "";
@@ -715,8 +716,8 @@ public class MainMethod
                         {
                             tmpProduct = jObject["message"].ToString();
                         }
-                        if (j < jArray.Count - 1 && j != 0)
-                            smallItemValue[i] += ",";
+                        
+
                         // 放入BigItem Json
                         smallItemValue[i] += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + tmpSmallItem + @"""" +
                                                                   ";" + @"""" + tmpIntroduction + @"""" + ";" + tmpProduct);
