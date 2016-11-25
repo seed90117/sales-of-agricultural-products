@@ -673,8 +673,6 @@ public class MainMethod
                 smallItemValue[i] = "[";
                 for (int j = 0; j < jArray.Count; j++)
                 {
-                    if (j > 0)
-                        smallItemValue[i] += ",";
                     JObject job = gm.getJsonResult(jArray[j].ToString());
                     // 取得Introduction
                     string tmpSmallItem = job["SmallItem"].ToString(); ;
@@ -710,6 +708,8 @@ public class MainMethod
                     // 取得ProductID, ImageUrl
                     if (!tmpProductArray.Equals("("))
                     {
+                        if (j > 0)
+                            smallItemValue[i] += ",";
                         sql = "select ProductID, ImageUrl from ProductImage where Type = 'Main' AND ProductID in" + tmpProductArray;
                         jObject = gm.getJsonResult(sqlMethod.Select(sql));
                         if (jObject["stage"].ToString().Equals(true.ToString()))
