@@ -290,7 +290,7 @@ public class MainMethod
             jObject = gm.getJsonObjectResult(jObject["message"].ToString());
             farmName = jObject["FarmName"].ToString();
             sql = "insert into Product(FarmID,FarmName,ProductName,TypeBig,TypeSmall,Introduction,AdditionalValue,Origin," +
-                    "Price,Amount,PackagingDate,ValidityPeriod,ValidityID,Stage,OrderAmount) values " +
+                    "Price,Amount,PackagingDate,ValidityPeriod,VerificationID,Stage,OrderAmount) values " +
                     "('" + farmID + "','" + farmName + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + introduction +
                     "','" + additionalValue + "','" + origin + "','" + price + "','" + amount + "','" + packagingDate + "','" +
                     validityPeriod + "','" + verificationID + "','" + productStage + "',0);SELECT SCOPE_IDENTITY()";
@@ -298,7 +298,7 @@ public class MainMethod
             if (jObject["stage"].ToString().Equals(true.ToString()))
             {
                 jObject = gm.getJsonObjectResult(jObject["message"].ToString());
-                id = jObject["ProductID"].ToString();
+                id = jObject["Column1"].ToString();
                 qr = qrcm.GetQRCode(id);
                 sql = "update Product set QRCode = '" + qr + "' where ProductID = '" + id + "'";
                 return sqlMethod.Update(sql);
@@ -781,7 +781,7 @@ public class MainMethod
 
         sql = "select Email , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(false.ToString()))
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
             job = gm.getJsonObjectResult(job["message"].ToString());
             account = job["Email"].ToString();
@@ -792,17 +792,20 @@ public class MainMethod
                 memberInfo = true;
         }
         
-        sql = "select ProductName,Amount,Price,OrderAmount  from Product where ProductID =" + productID;
-        job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(false.ToString()))
+        if (memberInfo)
         {
-            job = gm.getJsonObjectResult(job["message"].ToString());
-            productName = job["ProductName"].ToString();
-            productAmount = int.Parse(job["Amount"].ToString());
-            orderAmount = int.Parse(job["OrderAmount"].ToString());
-            price = job["Price"].ToString();
-            if (!productName.Equals("") && !price.Equals("") && !productAmount.Equals(""))
-                productInfo = true;
+            sql = "select ProductName,Amount,Price,OrderAmount  from Product where ProductID =" + productID;
+            job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(true.ToString()))
+            {
+                job = gm.getJsonObjectResult(job["message"].ToString());
+                productName = job["ProductName"].ToString();
+                productAmount = int.Parse(job["Amount"].ToString());
+                orderAmount = int.Parse(job["OrderAmount"].ToString());
+                price = job["Price"].ToString();
+                if (!productName.Equals("") && !price.Equals("") && !productAmount.Equals(""))
+                    productInfo = true;
+            }
         }
 
         if (productInfo)
