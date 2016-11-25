@@ -3,6 +3,7 @@ using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Summary description for GetMethod
@@ -147,32 +148,37 @@ public class GetMethod
             savePath = HttpContext.Current.Server.MapPath("~/" + type + "/");
             serverPath = "http://140.127.22.4/PlatformAPI/" + type + "/";
         }
-        string[] fileType = fileName.Split('.');
-        saveName = getUUID() + "." + fileType[fileType.Length-1];
-        string returnURL = serverPath + saveName;
-        byte[] bt = Convert.FromBase64String(file);
-        MemoryStream memoryStream = null;
-        FileStream fileStream = null;
-        try
+        if (file.Equals("") || fileName.Equals(""))
         {
-            memoryStream = new MemoryStream(bt);
-            fileStream = new FileStream(savePath+saveName, FileMode.Create);
-            memoryStream.WriteTo(fileStream);
-            return returnURL;
-        }
+            string[] fileType = fileName.Split('.');
+            saveName = getUUID() + "." + fileType[fileType.Length - 1];
+            string returnURL = serverPath + saveName;
+            byte[] bt = Convert.FromBase64String(file);
+            MemoryStream memoryStream = null;
+            FileStream fileStream = null;
+            try
+            {
+                memoryStream = new MemoryStream(bt);
+                fileStream = new FileStream(savePath + saveName, FileMode.Create);
+                memoryStream.WriteTo(fileStream);
+                return returnURL;
+            }
 
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return "";
+            }
+            finally
+            {
+                memoryStream.Close();
+                fileStream.Close();
+                fileStream = null;
+                memoryStream = null;
+            }
+        }
+        else
             return "";
-        }
-        finally
-        {
-            memoryStream.Close();
-            fileStream.Close();
-            fileStream = null;
-            memoryStream = null;
-        }
     }
 
     // 上傳圖片類型判斷
@@ -236,5 +242,12 @@ public class GetMethod
                 break;
         }
         return type;
+    }
+
+    public bool isEmail(string email)
+    {
+        bool check = Regex.IsMatch(email, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))" +
+              @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
+        return check;
     }
 }

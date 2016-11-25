@@ -11,11 +11,15 @@ public class MainMethod
     private GetMethod gm = new GetMethod();
     private Message msg = new Message();
 
-    public string test()
+    public string test(string file)
     {
-        sql = "select * from SignLog where SignInTime <'2016-11-24 23:50:54.5054'";
+        sql = "select TOP(8) ProductName from Product ORDER BY NEWID()";
         return sqlMethod.Select(sql);
+        //sql = "insert into Test (ContentText,Date) values ('" + file + "','" + gm.getCurrentDate() + "')";
+        //return sqlMethod.Insert(sql);
+
     }
+
 
     // 方法名稱直白，單字第一個字需大寫
     // 變數第一個單字須小寫
@@ -125,17 +129,22 @@ public class MainMethod
     // Member
     public string NewMember(string email, string password, string firstName, string lastName, string phone, string address) // By Wei-Min Zhang
     {
-        sql = "select Email from Member where Email = '" + email + "'";
-        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(false.ToString()))
+        if (gm.isEmail(email))
         {
-            sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access) " +
-                  "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
-                  address + "','" + gm.getMemberAccess("C") + "')";
-            return sqlMethod.Insert(sql);
+            sql = "select Email from Member where Email = '" + email + "'";
+            JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(false.ToString()))
+            {
+                sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access) " +
+                      "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
+                      address + "','" + gm.getMemberAccess("C") + "')";
+                return sqlMethod.Insert(sql);
+            }
+            else
+                return gm.getStageJson(false, msg.emailRepeat_cht);
         }
         else
-            return gm.getStageJson(false, msg.emailRepeat_cht);
+            return gm.getStageJson(false, msg.emailError_cht);
     }
 
     public string NewHeadShot(string identify, string fileName, string image) // By Kevin Yen
@@ -262,9 +271,7 @@ public class MainMethod
 
     public string IsEmail(string email) // By Kevin Yen
     {
-        bool isemail = Regex.IsMatch(email, @"^(?("")("".+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))" +
-              @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
-        if (isemail)
+        if (gm.isEmail(email))
             return gm.getStageJson(true, msg.success);
         else
             return gm.getStageJson(false, msg.emailError_cht);
@@ -469,6 +476,73 @@ public class MainMethod
         return sqlMethod.Select(sql);
     }
 
+    public string GetRandomProduct() // By Kevin Yen
+    {
+        int item = 8;
+        string[] productID = null;
+        string[] productName = null;
+        string[] imageUrl = null;
+        bool isProduct = false;
+        bool isImage = false;
+        sql = "select TOP(" + item + ") ProductID,ProductName from Product ORDER BY NEWID()";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            string message = job["message"].ToString();
+            JArray jarray = gm.getJsonArrayResult(message);
+            productID = new string[jarray.Count];
+            productName = new string[jarray.Count];
+            for (int i=0; i<jarray.Count; i++)
+            {
+                job = gm.getJsonResult(jarray[i].ToString());
+                productID[i] = job["ProductID"].ToString();
+                productName[i] = job["ProductName"].ToString();
+            }
+            jarray = null;
+            isProduct = true;
+        }
+        if (isProduct)
+        {
+            sql = "select ImageUrl from ProductImage where ProductID in (";
+            for (int i = 0; i < productID.Length; i++)
+            {
+                sql += "'" + productID[i] + "'";
+                if (i < productID.Length - 1)
+                    sql += ")";
+                else
+                    sql += ",";
+            }
+            job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(true.ToString()))
+            {
+                string message = job["message"].ToString();
+                JArray jarray = gm.getJsonArrayResult(message);
+                imageUrl = new string[jarray.Count];
+                for (int i = 0; i < jarray.Count; i++)
+                {
+                    job = gm.getJsonResult(jarray[i].ToString());
+                    imageUrl[i] = job["ImageUrl"].ToString();
+                }
+                isImage = true;
+            }
+        }
+        if (isImage && isProduct)
+        {
+            string reJson = "[";
+            for (int i = 0; i < productID.Length; i++)
+            {
+                reJson += gm.getJsonArray("ProductID;ProductName;ImageUrl", productID[i] + ";" + productName[i] + ";" + imageUrl[i]);
+                if (i < productID.Length - 1)
+                    sql += "]";
+                else
+                    sql += ",";
+            }
+            return reJson;
+        }
+        else
+            return gm.getStageJson(false, msg.noData_cht);
+    }
+
     public string GetProductType() // By Kevin Yen
     {
         string jsonStr = gm.getStageJson(false, msg.noData_cht);
@@ -504,8 +578,7 @@ public class MainMethod
                 if (jObject["stage"].ToString().Equals(true.ToString()))
                 {
                     string message = jObject["message"].ToString();
-                    jObject = gm.getJsonObjectResult(message);
-                    smallItem[i] = sqlMethod.Select(sql);
+                    smallItem[i] = message;
                 }
             }
             isSmallItem = true;

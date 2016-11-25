@@ -30,8 +30,10 @@ public class SQLMethod
             {
                 objcon.Open(); // 開啟連接
                 sqlcmd = new SqlCommand(sql, objcon); // 建立SQL命令對象
-                sqlcmd.ExecuteNonQuery();
-                return gm.getStageJson(true, msg.success);
+                if (sqlcmd.ExecuteNonQuery() == 1)
+                    return gm.getStageJson(true, msg.success);
+                else
+                    return gm.getStageJson(false, msg.fail);
             }
             catch (Exception ex)
             {
@@ -103,8 +105,10 @@ public class SQLMethod
             {
                 objcon.Open();
                 sqlcmd = new SqlCommand(sql, objcon);
-                sqlcmd.ExecuteNonQuery();
-                return gm.getStageJson(true, msg.success);
+                if (sqlcmd.ExecuteNonQuery() == 1)
+                    return gm.getStageJson(true, msg.success);
+                else
+                    return gm.getStageJson(false, msg.fail);
             }
             catch (Exception ex)
             {

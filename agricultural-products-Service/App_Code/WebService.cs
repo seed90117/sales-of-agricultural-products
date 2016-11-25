@@ -26,9 +26,9 @@ public class WebService : System.Web.Services.WebService
     // 用於測試方法，Commit前記得回復原狀
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string HelloWorld()
+    public string HelloWorld(string file)
     {
-        return main.test();
+        return main.test(file);
     }
 
     [WebMethod]
@@ -137,8 +137,6 @@ public class WebService : System.Web.Services.WebService
             string firstName = job["FirstName"].ToString();
             string lastName = job["LastName"].ToString();
             string phone = job["Phone"].ToString();
-            string fax = job["Fax"].ToString();
-            string cellPhone = job["CellPhone"].ToString();
             string email = job["Email"].ToString();
             string address = job["Address"].ToString();
             if (!password.Equals("") && !firstName.Equals("") && !lastName.Equals("") && !email.Equals(""))
@@ -494,6 +492,13 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRandomProductJson()
+    {
+        return main.GetRandomProduct();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string GetProductTypeJson()
     {
         return main.GetProductType();
@@ -641,7 +646,7 @@ public class WebService : System.Web.Services.WebService
     // Member
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string NewMember(string Email, string Password, string FirstName, string LastName, string Phone, string fax, string cellPhone, string Address)
+    public string NewMember(string Email, string Password, string FirstName, string LastName, string Phone, string Address)
     {
         return main.NewMember(Email, Password, FirstName, LastName, Phone, Address);
     }
@@ -757,6 +762,13 @@ public class WebService : System.Web.Services.WebService
     public string GetTopHotProduct()
     {
         return main.GetTopHotProduct();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRandomProduct()
+    {
+        return main.GetRandomProduct();
     }
 
     [WebMethod]
