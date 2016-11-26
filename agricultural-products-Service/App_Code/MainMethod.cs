@@ -410,9 +410,9 @@ public class MainMethod
         }
         else if (!h.Equals(""))
         {
-            if (p.Equals("H"))
+            if (h.Equals("H"))
                 sql += " order by OrderAmount desc";
-            else if (p.Equals("L"))
+            else if (h.Equals("L"))
                 sql += " order by OrderAmount asc";
         }
         else
