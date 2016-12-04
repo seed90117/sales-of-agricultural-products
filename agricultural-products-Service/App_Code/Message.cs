@@ -22,4 +22,6 @@ public class Message
     public string emailError_cht = "電子郵件格式不正確";
     public string dataError_cht = "資料輸入錯誤";
     public string unSelectFile = "尚未選取檔案";
+    public string EmailSuccess = "寄信成功，請確認信箱";
+    public string EMailResetPasswordFail = "此認證碼時效已過，請重新寄認證信";
 }

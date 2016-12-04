@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Net.Mail;
 
 /// <summary>
 /// Summary description for MainMethod
@@ -905,6 +906,255 @@ public class MainMethod
     {
         sql = "select * from Introduction";
         return sqlMethod.Select(sql);
+    }
+
+
+    //E-mail
+    public string EMailCheck(string MailTo)//Huan-Chieh Chen
+    {
+        string memberID, identify="";
+        bool NeedInsert=false;
+        System.DateTime time = System.DateTime.Now;
+        sql = "select MemberID from Member where Email = '" + MailTo+"'";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            memberID = job["MemberID"].ToString();
+        }
+        else
+            return gm.getStageJson(false, msg.dataError_cht);
+
+        sql = "select TOP (1) Identify, Time from ForgetPassword where MemberID = " + memberID+ " order by Time desc";
+        job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            time = System.Convert.ToDateTime((job["Time"].ToString()));
+            if (System.DateTime.Compare(System.DateTime.Now.AddHours(-1), time) > 0)//舊認證信超過1小時，寄出新的信
+            {
+                NeedInsert = true;
+            }
+            else
+            {
+                identify = job["Identify"].ToString();
+            }
+        }else
+        {
+            NeedInsert = true;
+            
+        }
+        if (NeedInsert)
+        {
+            identify = gm.getUUID();
+            sql = "insert into ForgetPassword(MemberID, Identify, Time) values('" + memberID + "','" + identify + "','" + gm.getCurrentDate() + "')";
+            sqlMethod.Insert(sql);
+        }
+
+        string MailFrom = "NPUSTProducePlatform@NPUSTProducePlatform.com.tw";//此網站的寄信人地址
+        string MailSub = "NPUSTProducePlatform忘記密碼認證信";//信件主旨
+        bool isBodyHtml = true;
+        //信件內容 在此處設定內容 由於isBodyHtml是ture 那這裡的語法將會是html)
+        string MailBody ="忘記密碼確認信<br />"+
+            "點選以下連結可以前往變更密碼<br />"+
+            "http://140.127.22.4/NPUSTProducePlatform/view/哪個網頁"+ "?MemberID="+ memberID+"<br />"+
+            "認證碼： "+ identify + "<br>"+
+            "若最近沒有使用忘記密碼，請無視此信件";
+        string smtpServer = "140.127.22.4";// 寄信smtp server
+        int smtpPort = 25;// 寄信smtp server的Port，預設25
+        try
+        {
+            MailMessage mms = new MailMessage();//建立MailMessage物件
+            mms.From = new MailAddress(MailFrom);//指定一位寄信人MailAddress
+            mms.Subject = MailSub;//信件主旨
+            mms.Body = MailBody;//信件內容
+            mms.IsBodyHtml = isBodyHtml;//信件內容 是否採用Html格式
+            mms.To.Add(new MailAddress(MailTo.Trim()));
+            using (SmtpClient client = new SmtpClient(smtpServer, smtpPort))//smtp_server
+            {
+                client.Send(mms);//寄出一封信
+            }//end using
+            return gm.getStageJson(true, msg.EmailSuccess);
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.fail);
+        }
+    }
+
+    //E-mail
+    public string EMailResetPassword(string Identify,string NewPassword)//Huan-Chieh Chen
+    {
+        if (!Identify.Equals("")&&!NewPassword.Equals(""))
+        {
+            System.DateTime time;
+            sql = "select ForgetPassID,MemberID,Time from ForgetPassword where Identify = '" + Identify + "'";
+            JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(true.ToString()))
+            {
+                job = gm.getJsonObjectResult(job["message"].ToString());
+                time = System.Convert.ToDateTime((job["Time"].ToString()));
+                if (System.DateTime.Compare(System.DateTime.Now.AddHours(-1), time) < 0)//信寄出還沒超過1小時，超過1小時就不給更改密碼
+                {
+                    string forgetpassid = job["ForgetPassID"].ToString();
+                    string memberid = job["MemberID"].ToString();
+                    sql = "update Member set Password = '" + NewPassword + "' where MemberID = " + memberid;
+                    sqlMethod.Update(sql);
+                    sql = "update ForgetPassword set Identify = '' where ForgetPassID = " + forgetpassid;
+                    return sqlMethod.Update(sql);
+                }else
+                {
+                    return gm.getStageJson(false, msg.EMailResetPasswordFail);
+                }
+            }
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.dataError_cht);
+        }
+    }
+
+    //支付方式
+    public string GetMemberPaymentMethod(string MemberID) //Huan-Chieh Chen
+    {
+        sql = "select RemittanceAccount,PickupAddress from Member where MemberID = " + MemberID + " and Access = '" + gm.getMemberAccess("E") + "'";
+        return sqlMethod.Select(sql);
+    }
+
+    public string GetProductKey2(string bigItem, string smallItem, string ValiditySpecies, string value, string p, string h) // By Kevin Yen Huan-Chieh Chen
+    {
+        string[] id = null;
+        string[] name = null;
+        string[] price = null;
+        string[] image = null;
+        JArray jarray = null;
+        JObject job = null;
+        string json = gm.getStageJson(false, msg.noData_cht);
+        bool isProduct = false;
+        bool isImage = false;
+
+        // 取得商品表單內資料
+        sql = "select ProductID,ProductName,Price from Product";
+        if (!bigItem.Equals("")|| !smallItem.Equals("") || !value.Equals("")|| !ValiditySpecies.Equals(""))
+        {
+            sql += " where";
+            if(!bigItem.Equals(""))
+                sql += " TypeBig = '" + bigItem + "'";
+            if (!smallItem.Equals(""))
+            {
+                if(!bigItem.Equals(""))
+                    sql += " AND";
+                sql += " TypeSmall = '" + smallItem + "'";
+            }
+            if (!ValiditySpecies.Equals(""))
+            {
+                if (!bigItem.Equals(""))
+                    sql += " AND";
+                sql += " ValiditySpecies = '" + ValiditySpecies + "'";
+            }
+                
+            if (!value.Equals(""))
+            {
+                if (!bigItem.Equals(""))
+                    sql += " AND";
+                sql += " (";
+                for (int i = 0; i < value.Length; i++)
+                {
+                    sql += "ProductName like '%" + value[i].ToString() + "%'";
+                    if (i < value.Length - 1)
+                        sql += " OR ";
+                }
+                sql += ")";
+            }
+        }
+
+        if (!p.Equals(""))
+        {
+            if (p.Equals("H"))
+                sql += " order by Price desc";
+            else if (p.Equals("L"))
+                sql += " order by Price asc";
+        }
+        else if (!h.Equals(""))
+        {
+            if (h.Equals("H"))
+                sql += " order by OrderAmount desc";
+            else if (h.Equals("L"))
+                sql += " order by OrderAmount asc";
+        }
+        else
+            sql += " order by ProductID";
+
+        // 暫存商品表單，ProductID與ProductName
+        job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            jarray = gm.getJsonArrayResult(job["message"].ToString());
+            id = new string[jarray.Count];
+            name = new string[jarray.Count];
+            price = new string[jarray.Count];
+            for (int i = 0; i < jarray.Count; i++)
+            {
+                job = gm.getJsonResult(jarray[i].ToString());
+                id[i] = job["ProductID"].ToString();
+                name[i] = job["ProductName"].ToString();
+                price[i] = job["Price"].ToString();
+            }
+            jarray = null;
+            isProduct = true;
+        }
+
+
+        // 取得商品圖片表單內資料
+        if (isProduct)
+        {
+            sql = "select ProductID,ImageUrl from ProductImage where Type ='Main' AND (";
+            for (int i = 0; i < id.Length; i++)
+            {
+                sql += "ProductID = '" + id[i] + "'";
+                if (i < id.Length - 1)
+                    sql += " OR ";
+                else
+                    sql += ")";
+            }
+            job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(true.ToString()))
+            {
+                jarray = gm.getJsonArrayResult(job["message"].ToString());
+                image = new string[jarray.Count];
+                string[] productID = new string[jarray.Count];
+                for (int i = 0; i < jarray.Count; i++)
+                {
+                    job = gm.getJsonResult(jarray[i].ToString());
+                    image[i] = job["ImageUrl"].ToString();
+                    productID[i] = job["ProductID"].ToString();
+                }
+                image = gm.selectOrder(id, productID, image);
+                isImage = true;
+            }
+
+
+
+            // 輸出JSON，欄位ProductID, ProductName, Image
+            if (isImage && isProduct)
+            {
+                string rejson = "[";
+                for (int i = 0; i < id.Length; i++)
+                {
+                    rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + image[i]);
+                    if (i < id.Length - 1)
+                        rejson += ",";
+                }
+                rejson += "]";
+                json = gm.getStageJson(true, rejson);
+            }
+
+        }
+
+        return json;
     }
 }
 

@@ -627,6 +627,69 @@ public class WebService : System.Web.Services.WebService
         return main.GetIntroduction();
     }
 
+    //E-mail
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string EMailCheckJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string mailto = job["MailTo"].ToString();
+            if (!mailto.Equals(""))
+                return main.EMailCheck(mailto);
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.noData_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string EMailResetPasswordJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string newpassword = job["NewPassword"].ToString();
+            if (!identify.Equals("")&&!newpassword.Equals(""))
+                return main.EMailResetPassword(identify, newpassword);
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.noData_cht);
+        }
+    }
+
+    //顯示農夫匯款帳號或地址
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMemberPaymentMethodJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string MemberID = job["MemberID"].ToString();
+            if (!MemberID.Equals(""))
+                return main.GetMemberPaymentMethod(MemberID);
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.noData_cht);
+        }
+    }
+
 
     // Main Method------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // SignIn
@@ -843,6 +906,36 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetIntroduction();
     }
-    
-      
+
+
+    //E-mail
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string EMailCheck(string MailTo)
+    {
+        return main.EMailCheck(MailTo);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string EMailResetPassword(string Identify, string NewPassword)
+    {
+        return main.EMailResetPassword(Identify, NewPassword);
+    }
+
+    //顯示農夫匯款帳號或地址
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetMemberdPaymentMethod(string MemberID)
+    {
+        return main.GetMemberPaymentMethod(MemberID);
+    }
+
+    //多有毒無毒篩選
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductKey2(string BigItem, string SmallItem,string ValiditySpecies, string Value, string Price, string Hot)
+    {
+        return main.GetProductKey2(BigItem, SmallItem, ValiditySpecies, Value, Price, Hot);
+    }
 }
