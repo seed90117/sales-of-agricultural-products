@@ -938,4 +938,20 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetProductKey2(BigItem, SmallItem, ValiditySpecies, Value, Price, Hot);
     }
+
+    //取得指定商品的圖片
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductImage(string ProductID)
+    {
+        return main.GetProductImage(ProductID);
+    }
+
+    //取得指定商品介紹
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetProductIntroduce(string ProductID)
+    {
+        return main.GetProductIntroduce(ProductID);
+    }
 }

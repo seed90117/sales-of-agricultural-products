@@ -1156,6 +1156,20 @@ public class MainMethod
 
         return json;
     }
+
+    //取得指定商品的圖片
+    public string GetProductImage(string id) // By chc
+    {
+        sql = "select ImageUrl from ProductImage where ProductID=" + id;
+        return sqlMethod.Select(sql);
+    }
+
+    //取得指定商品介紹
+    public string GetProductIntroduce(string id) // By chc
+    {
+        sql = "select * from ProductIntroduce where ProductID=" + id;
+        return sqlMethod.Select(sql);
+    }
 }
 
 
