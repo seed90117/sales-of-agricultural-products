@@ -1178,6 +1178,97 @@ public class MainMethod
         sql = "select Date, Type, Action, Note from RecordOperation where RecordID =" + id;
         return sqlMethod.Select(sql);
     }
+
+    //忘記密碼確認信箱
+    public string ForgetPasswordCheckEMail(string MailTo) //Huan-Chieh Chen
+    {
+        sql = "select MemberID from Member where Email = '" + MailTo + "'";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            return gm.getStageJson(true, msg.EmailSuccess);
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.EmailFail);
+        }
+    }
+
+    //忘記密碼寄信部分
+    public string ForgetPasswordEMail(string MailTo) //Huan-Chieh Chen
+    {
+        string memberID = "", identify = "";
+        bool NeedInsert = false;
+        System.DateTime time = System.DateTime.Now;
+        sql = "select MemberID from Member where Email = '" + MailTo + "'";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            memberID = job["MemberID"].ToString();
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.EmailFail);
+        }
+        sql = "select TOP (1) Identify, Time from ForgetPassword where MemberID = " + memberID + " order by Time desc";
+        job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            time = System.Convert.ToDateTime((job["Time"].ToString()));
+            if (System.DateTime.Compare(System.DateTime.Now.AddHours(-1), time) > 0)//舊認證信超過1小時，寄出新的信
+            {
+                NeedInsert = true;
+            }
+            else
+            {
+                identify = job["Identify"].ToString();
+            }
+        }
+        else
+        {
+            NeedInsert = true;
+        }
+
+        if (NeedInsert)
+        {
+            identify = gm.getUUID();
+            sql = "insert into ForgetPassword(MemberID, Identify, Time) values('" + memberID + "','" + identify + "','" + gm.getCurrentDate() + "')";
+            sqlMethod.Insert(sql);
+        }
+
+        string MailFrom = "NPUSTProducePlatform@NPUSTProducePlatform.com.tw";//此網站的寄信人地址
+        string MailSub = "NPUSTProducePlatform忘記密碼認證信";//信件主旨
+        bool isBodyHtml = true;
+        //信件內容 在此處設定內容 由於isBodyHtml是ture 那這裡的語法將會是html)
+        string MailBody = "忘記密碼確認信<br />" +
+            "點選以下連結可以前往變更密碼<br />" +
+            "http://140.127.22.4/NPUSTProducePlatform/view/哪個網頁" + "?MemberID=" + memberID + "<br />" +
+            "認證碼： " + identify + "<br>" +
+            "若最近沒有使用忘記密碼，請無視此信件";
+        string smtpServer = "140.127.22.4";// 寄信smtp server
+        int smtpPort = 25;// 寄信smtp server的Port，預設25
+        try
+        {
+            MailMessage mms = new MailMessage();//建立MailMessage物件
+            mms.From = new MailAddress(MailFrom);//指定一位寄信人MailAddress
+            mms.Subject = MailSub;//信件主旨
+            mms.Body = MailBody;//信件內容
+            mms.IsBodyHtml = isBodyHtml;//信件內容 是否採用Html格式
+            mms.To.Add(new MailAddress(MailTo.Trim()));
+            using (SmtpClient client = new SmtpClient(smtpServer, smtpPort))//smtp_server
+            {
+                client.Send(mms);//寄出一封信
+            }//end using
+            return gm.getStageJson(true, msg.EmailSuccess);
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.EmailFail);
+        }
+    }
 }
 
 

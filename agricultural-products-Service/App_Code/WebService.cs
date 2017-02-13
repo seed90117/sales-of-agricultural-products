@@ -954,4 +954,20 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetProductIntroduce(ProductID);
     }
+
+    //忘記密碼確認信箱
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string ForgetPasswordCheckEMail(string MailTo)
+    {
+        return main.ForgetPasswordCheckEMail(MailTo);
+    }
+
+    //忘記密碼寄信部分
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string ForgetPasswordEMail(string MailTo)
+    {
+        return main.ForgetPasswordEMail(MailTo);
+    }
 }
