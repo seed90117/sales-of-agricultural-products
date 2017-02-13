@@ -25,7 +25,7 @@ public class MainMethod
     // 方法名稱直白，單字第一個字需大寫
     // 變數第一個單字須小寫
 
-   
+
     // Sign
     public string SignIn(string account, string password) // By Kevin Yen
     {
@@ -275,9 +275,9 @@ public class MainMethod
 
 
     // Product
-    public string NewProduct(string identify, string farmID, string productName, string typeBig, string typeSmall, 
-                            string introduction, string additionalValue, string origin, string price, string amount, 
-                            string packagingDate, string validityPeriod, string verificationID, string stage) // By Kevin Yen
+    public string NewProduct(string identify, string farmID, string productName, string typeBig, string typeSmall,
+                            string introduction, string additionalValue, string origin, string price, string amount,
+                            string packagingDate, string validityPeriod, string verificationID, string stage) // By Kevin Yen //資料庫設定變更20170206
     {
         string id = "null";
         string qr = "null";
@@ -309,7 +309,7 @@ public class MainMethod
         }
         else
             return gm.getStageJson(false, msg.dataError_cht);
-        
+
     }
 
     public string NewProductImage(string productID, string imageType, string fileName, string image) // By Kevin Yen
@@ -341,18 +341,17 @@ public class MainMethod
             return gm.getStageJson(false, msg.uploadFail_cht);
     }
 
-    public string GetProduct(string productID) // By Kevin Yen
-    {
-        if (productID.Equals("ALL"))
+    public string GetProduct(string productID) // By Kevin Yen        by chc 20170207
+    {//OrderAmount, Stage 這兩個欄位是否使用到，再考慮
+        sql = "select ProductName, Price, Amount, PackagingDate, CertificationClassification.CertificationClassification, Certification.CertificationUnit, Certification.CertificationUnit2, Verification.VerificationUnit,Verification.ImgUrl, QRCode, OrderAmount, Stage from Product"
+            + " INNER JOIN CertificationClassification ON Product.CertificationClassificationID=CertificationClassification.CertificationClassificationID"
+            + " INNER JOIN Certification ON Product.CertificationID=Certification.CertificationID"
+            + " INNER JOIN Verification ON Product.VerificationID=Verification.VerificationID";
+        if (!productID.Equals("ALL"))
         {
-            sql = "select * from Product";
-            return sqlMethod.Select(sql);
+            sql += " where ProductID = '" + productID + "'";
         }
-        else
-        {
-            sql = "select * from Product where ProductID = '" + productID + "'";
-            return sqlMethod.Select(sql);
-        }
+        return sqlMethod.Select(sql);
     }
 
     public string GetProductKey(string bigItem, string smallItem, string value, string p, string h) // By Kevin Yen
@@ -437,7 +436,7 @@ public class MainMethod
             jarray = null;
             isProduct = true;
         }
-        
+
 
         // 取得商品圖片表單內資料
         if (isProduct)
@@ -482,7 +481,7 @@ public class MainMethod
                 rejson += "]";
                 json = gm.getStageJson(true, rejson);
             }
-            
+
         }
 
         return json;
@@ -516,7 +515,7 @@ public class MainMethod
             JArray jarray = gm.getJsonArrayResult(job["message"].ToString());
             productID = new string[jarray.Count];
             productName = new string[jarray.Count];
-            for (int i=0; i<jarray.Count; i++)
+            for (int i = 0; i < jarray.Count; i++)
             {
                 job = gm.getJsonResult(jarray[i].ToString());
                 productID[i] = job["ProductID"].ToString();
@@ -591,7 +590,7 @@ public class MainMethod
             }
             isBigItem = true;
         }
-        
+
 
         // 取得SmallItem
         if (isBigItem)
@@ -722,7 +721,7 @@ public class MainMethod
                         {
                             tmpProduct = jObject["message"].ToString();
                         }
-                        
+
 
                         // 放入BigItem Json
                         smallItemValue[i] += gm.getJsonItemArray("SmallItem;Introduction;Product", @"""" + tmpSmallItem + @"""" +
@@ -775,9 +774,9 @@ public class MainMethod
             if (!productName.Equals(""))
                 isProductName = true;
         }
-        
 
-        // Insert record data
+
+        // Insert record data//資料庫設定變更20170206
         if (isProductName && isMember)
         {
             sql = "insert into Record(MemberID, Creator, ProductID, ProductName, Date, Type, Action, Note) values('" + memberID + "','" +
@@ -791,9 +790,9 @@ public class MainMethod
         }
     }
 
-    public string GetRecord(string productID) //Huan-Chieh Chen
+    public string GetRecord(string id) //Huan-Chieh Chen
     {
-        sql = "select * from Record where ProductID = '" + productID + "'";
+        sql = "select TOP (1) RecordID, Creator, Origin, Package, CultivationID, YearNumber, CultivationRegion, CultivationArea from Record where ProductID = '" + id + "' order by RecordID desc";
         return sqlMethod.Select(sql);
     }
 
@@ -816,7 +815,7 @@ public class MainMethod
         bool productInfo = false;
         bool checkOrder = false;
 
-        sql = "select Email , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify +"'";
+        sql = "select Email , (LastName + ' ' + FirstName) As Name, Phone , Address from Member where Identify = '" + identify + "'";
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
@@ -828,7 +827,7 @@ public class MainMethod
             if (!account.Equals("") && !name.Equals("") && !phone.Equals("") && !address.Equals(""))
                 memberInfo = true;
         }
-        
+
         if (memberInfo)
         {
             sql = "select ProductName,Amount,Price,OrderAmount  from Product where ProductID =" + productID;
@@ -855,8 +854,8 @@ public class MainMethod
         if (memberInfo && productInfo && amountCheck)
         {
             sql = "Insert into ProductOrder (MemberAccount, MemberName, MemberPhone, MemberAddress, ProductName,Amount," +
-                " Price, Delivery, Shipment, TotalPrice, Note) values ('" + account + "','" + name + "','" + phone + 
-                "','" + address + "','" + productName + "','" + amount + "','" + price + "','" + delivery + "','" + 
+                " Price, Delivery, Shipment, TotalPrice, Note) values ('" + account + "','" + name + "','" + phone +
+                "','" + address + "','" + productName + "','" + amount + "','" + price + "','" + delivery + "','" +
                 shipment + "','" + totalPrice.ToString() + "','" + note + "') ";
             returnJson = sqlMethod.Insert(sql);
             checkOrder = true;
@@ -912,10 +911,10 @@ public class MainMethod
     //E-mail
     public string EMailCheck(string MailTo)//Huan-Chieh Chen
     {
-        string memberID, identify="";
-        bool NeedInsert=false;
+        string memberID = "", identify = "";
+        bool NeedInsert = false;
         System.DateTime time = System.DateTime.Now;
-        sql = "select MemberID from Member where Email = '" + MailTo+"'";
+        sql = "select MemberID from Member where Email = '" + MailTo + "'";
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
@@ -923,9 +922,10 @@ public class MainMethod
             memberID = job["MemberID"].ToString();
         }
         else
-            return gm.getStageJson(false, msg.dataError_cht);
-
-        sql = "select TOP (1) Identify, Time from ForgetPassword where MemberID = " + memberID+ " order by Time desc";
+        {
+            return gm.getStageJson(false, msg.EmailFail);
+        }
+        sql = "select TOP (1) Identify, Time from ForgetPassword where MemberID = " + memberID + " order by Time desc";
         job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
@@ -939,11 +939,12 @@ public class MainMethod
             {
                 identify = job["Identify"].ToString();
             }
-        }else
+        }
+        else
         {
             NeedInsert = true;
-            
         }
+
         if (NeedInsert)
         {
             identify = gm.getUUID();
@@ -955,10 +956,10 @@ public class MainMethod
         string MailSub = "NPUSTProducePlatform忘記密碼認證信";//信件主旨
         bool isBodyHtml = true;
         //信件內容 在此處設定內容 由於isBodyHtml是ture 那這裡的語法將會是html)
-        string MailBody ="忘記密碼確認信<br />"+
-            "點選以下連結可以前往變更密碼<br />"+
-            "http://140.127.22.4/NPUSTProducePlatform/view/哪個網頁"+ "?MemberID="+ memberID+"<br />"+
-            "認證碼： "+ identify + "<br>"+
+        string MailBody = "忘記密碼確認信<br />" +
+            "點選以下連結可以前往變更密碼<br />" +
+            "http://140.127.22.4/NPUSTProducePlatform/view/哪個網頁" + "?MemberID=" + memberID + "<br />" +
+            "認證碼： " + identify + "<br>" +
             "若最近沒有使用忘記密碼，請無視此信件";
         string smtpServer = "140.127.22.4";// 寄信smtp server
         int smtpPort = 25;// 寄信smtp server的Port，預設25
@@ -979,7 +980,7 @@ public class MainMethod
         catch (System.Exception ex)
         {
             System.Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.fail);
+            return gm.getStageJson(false, msg.EmailFail);
         }
     }
 
@@ -1158,16 +1159,23 @@ public class MainMethod
     }
 
     //取得指定商品的圖片
-    public string GetProductImage(string id) // By chc
+    public string GetProductImage(string id) //Huan-Chieh Chen
     {
-        sql = "select ImageUrl from ProductImage where ProductID=" + id;
+        sql = "select ImageUrl,Type from ProductImage where ProductID=" + id;
         return sqlMethod.Select(sql);
     }
 
     //取得指定商品介紹
-    public string GetProductIntroduce(string id) // By chc
+    public string GetProductIntroduce(string id) //Huan-Chieh Chen
     {
-        sql = "select * from ProductIntroduce where ProductID=" + id;
+        sql = "select TOP (1) Introduction, PackageSpecification, Date, Happy,Transportation from ProductIntroduce where ProductID=" + id + " order by ProductIntroduceID desc";
+        return sqlMethod.Select(sql);
+    }
+
+    //取得指定商品履歷
+    public string GetRecordOperation(string id) //Huan-Chieh Chen
+    {
+        sql = "select Date, Type, Action, Note from RecordOperation where RecordID =" + id;
         return sqlMethod.Select(sql);
     }
 }

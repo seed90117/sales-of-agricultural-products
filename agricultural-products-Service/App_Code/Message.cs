@@ -23,5 +23,6 @@ public class Message
     public string dataError_cht = "資料輸入錯誤";
     public string unSelectFile = "尚未選取檔案";
     public string EmailSuccess = "寄信成功，請確認信箱";
+    public string EmailFail = "寄信失敗，請確認電子信箱是否輸入正確";
     public string EMailResetPasswordFail = "此認證碼時效已過，請重新寄認證信";
 }
