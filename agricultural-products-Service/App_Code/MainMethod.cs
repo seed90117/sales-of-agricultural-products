@@ -360,7 +360,7 @@ public class MainMethod
         string json = gm.getStageJson(false, msg.noData_cht);
 
         // 取得商品表單內資料
-        sql = "select Product.ProductID, ProductName, Price, ProductImage.ImageUrl, CertificationClassification.CertificationClassification CC, Farm.FarmName from Product"
+        sql = "select Product.ProductID, ProductName, Price, ProductImage.ImageUrl Image, CertificationClassification.CertificationClassification CC, Farm.FarmName from Product"
             + " INNER JOIN CertificationClassification ON Product.CertificationClassificationID = CertificationClassification.CertificationClassificationID"
             + " INNER JOIN Farm ON Product.FarmID = Farm.FarmID"
             + " INNER JOIN ProductImage ON Product.ProductID = ProductImage.ProductID and ProductImage.Type = 'Main'";
