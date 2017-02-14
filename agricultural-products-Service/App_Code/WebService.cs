@@ -453,9 +453,10 @@ public class WebService : System.Web.Services.WebService
             string bigItem = job["BigItem"].ToString();
             string smallItem = job["SmallItem"].ToString();
             string value = job["Value"].ToString();
+            string CCID = job["CCID"].ToString();
             string orderPrice = job["Price"].ToString();
             string orderHot = job["Hot"].ToString();
-            return main.GetProductKey(bigItem, smallItem, value, orderPrice, orderHot);
+            return main.GetProductKey(bigItem, smallItem, value, CCID, orderPrice, orderHot);
         }
         catch (Exception ex)
         {
@@ -817,9 +818,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetProductKey(string BigItem, string SmallItem, string Value, string Price, string Hot)
+    public string GetProductKey(string BigItem, string SmallItem, string Value, string CCID, string Price, string Hot)
     {
-        return main.GetProductKey(BigItem, SmallItem, Value, Price, Hot);
+        return main.GetProductKey(BigItem, SmallItem, Value, CCID, Price, Hot);
     }
 
     [WebMethod]
@@ -929,14 +930,6 @@ public class WebService : System.Web.Services.WebService
     public string GetMemberdPaymentMethod(string MemberID)
     {
         return main.GetMemberPaymentMethod(MemberID);
-    }
-
-    //多有毒無毒篩選
-    [WebMethod]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string GetProductKey2(string BigItem, string SmallItem,string ValiditySpecies, string Value, string Price, string Hot)
-    {
-        return main.GetProductKey2(BigItem, SmallItem, ValiditySpecies, Value, Price, Hot);
     }
 
     //取得指定商品的圖片

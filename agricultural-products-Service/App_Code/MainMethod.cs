@@ -341,9 +341,9 @@ public class MainMethod
             return gm.getStageJson(false, msg.uploadFail_cht);
     }
 
-    public string GetProduct(string productID) // By Kevin Yen        by chc 20170207
-    {//OrderAmount, Stage 這兩個欄位是否使用到，再考慮
-        sql = "select ProductName, Price, Amount, PackagingDate, CertificationClassification.CertificationClassification, Certification.CertificationUnit, Certification.CertificationUnit2, Verification.VerificationUnit,Verification.ImgUrl, QRCode, OrderAmount, Stage from Product"
+    public string GetProduct(string productID) // By Kevin Yen        by Huan-Chieh Chen 20170207
+    {//Stage 這兩個欄位是否使用到，再考慮
+        sql = "select ProductName, Price, Amount, PackagingDate, CertificationClassification.CertificationClassification, Certification.CertificationUnit, Certification.CertificationUnit2, Verification.VerificationUnit,Verification.ImgUrl, QRCode, Stage from Product"
             + " INNER JOIN CertificationClassification ON Product.CertificationClassificationID=CertificationClassification.CertificationClassificationID"
             + " INNER JOIN Certification ON Product.CertificationID=Certification.CertificationID"
             + " INNER JOIN Verification ON Product.VerificationID=Verification.VerificationID";
@@ -354,51 +354,47 @@ public class MainMethod
         return sqlMethod.Select(sql);
     }
 
-    public string GetProductKey(string bigItem, string smallItem, string value, string p, string h) // By Kevin Yen
+    public string GetProductKey(string bigItem, string smallItem, string value, string CCID, string p, string h) // By Kevin Yen       by Huan-Chieh Chen 20170214
     {
-        string[] id = null;
-        string[] name = null;
-        string[] price = null;
-        string[] image = null;
-        JArray jarray = null;
         JObject job = null;
         string json = gm.getStageJson(false, msg.noData_cht);
-        bool isProduct = false;
-        bool isValue = false;
-        bool isImage = false;
 
         // 取得商品表單內資料
-        if (bigItem.Equals("") && smallItem.Equals("") && value.Equals(""))
-            sql = "select ProductID,ProductName,Price from Product";
-        else if (bigItem.Equals("") && smallItem.Equals(""))
+        sql = "select Product.ProductID, ProductName, Price, ProductImage.ImageUrl, CertificationClassification.CertificationClassification CC, Farm.FarmName from Product"
+            + " INNER JOIN CertificationClassification ON Product.CertificationClassificationID = CertificationClassification.CertificationClassificationID"
+            + " INNER JOIN Farm ON Product.FarmID = Farm.FarmID"
+            + " INNER JOIN ProductImage ON Product.ProductID = ProductImage.ProductID and ProductImage.Type = 'Main'";
+        if (!bigItem.Equals("") || !smallItem.Equals("") || !value.Equals("") || !CCID.Equals(""))
         {
-            sql = "select ProductID,ProductName,Price from Product where (";
-            isValue = true;
-        }
-        else if (smallItem.Equals("") && value.Equals(""))
-            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "'";
-        else if (smallItem.Equals(""))
-        {
-            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND (";
-            isValue = true;
-        }
-        else if (value.Equals(""))
-            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND TypeSmall = '" + smallItem + "'";
-        else
-        {
-            sql = "select ProductID,ProductName,Price from Product where TypeBig = '" + bigItem + "' AND TypeSmall = '" + smallItem + "' AND (";
-            isValue = true;
-        }
-
-        if (isValue)
-        {
-            for (int i = 0; i < value.Length; i++)
+            sql += " where";
+            if (!bigItem.Equals(""))
+                sql += " TypeBig = '" + bigItem + "'";
+            if (!smallItem.Equals(""))
             {
-                sql += "ProductName like '%" + value[i].ToString() + "%'";
-                if (i < value.Length - 1)
-                    sql += " OR ";
+                if (!bigItem.Equals(""))
+                    sql += " AND";
+                sql += " TypeSmall = '" + smallItem + "'";
             }
-            sql += ")";
+            if (!CCID.Equals(""))
+            {
+                if (!bigItem.Equals(""))
+                    sql += " AND";
+                sql += " Product.CertificationClassificationID in (" + CCID + ")";
+            }
+
+            if (!value.Equals(""))
+            {
+                if (!bigItem.Equals(""))
+                    sql += " AND";
+                sql += " (";
+                for (int i = 0; i < value.Length; i++)
+                {
+                    sql += "ProductName like '%" + value[i].ToString() + "%'";
+                    if (i < value.Length - 1)
+                        sql += " OR ";
+                }
+                sql += ")";
+            }
         }
 
         if (!p.Equals(""))
@@ -417,73 +413,12 @@ public class MainMethod
         }
         else
             sql += " order by ProductID";
-
-        // 暫存商品表單，ProductID與ProductName
+        
         job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            jarray = gm.getJsonArrayResult(job["message"].ToString());
-            id = new string[jarray.Count];
-            name = new string[jarray.Count];
-            price = new string[jarray.Count];
-            for (int i = 0; i < jarray.Count; i++)
-            {
-                job = gm.getJsonResult(jarray[i].ToString());
-                id[i] = job["ProductID"].ToString();
-                name[i] = job["ProductName"].ToString();
-                price[i] = job["Price"].ToString();
-            }
-            jarray = null;
-            isProduct = true;
+            json = gm.getStageJson(true, job["message"].ToString());
         }
-
-
-        // 取得商品圖片表單內資料
-        if (isProduct)
-        {
-            sql = "select ProductID,ImageUrl from ProductImage where Type ='Main' AND (";
-            for (int i = 0; i < id.Length; i++)
-            {
-                sql += "ProductID = '" + id[i] + "'";
-                if (i < id.Length - 1)
-                    sql += " OR ";
-                else
-                    sql += ")";
-            }
-            job = gm.getJsonResult(sqlMethod.Select(sql));
-            if (job["stage"].ToString().Equals(true.ToString()))
-            {
-                jarray = gm.getJsonArrayResult(job["message"].ToString());
-                image = new string[jarray.Count];
-                string[] productID = new string[jarray.Count];
-                for (int i = 0; i < jarray.Count; i++)
-                {
-                    job = gm.getJsonResult(jarray[i].ToString());
-                    image[i] = job["ImageUrl"].ToString();
-                    productID[i] = job["ProductID"].ToString();
-                }
-                image = gm.selectOrder(id, productID, image);
-                isImage = true;
-            }
-
-
-
-            // 輸出JSON，欄位ProductID, ProductName, Image
-            if (isImage && isProduct)
-            {
-                string rejson = "[";
-                for (int i = 0; i < id.Length; i++)
-                {
-                    rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + image[i]);
-                    if (i < id.Length - 1)
-                        rejson += ",";
-                }
-                rejson += "]";
-                json = gm.getStageJson(true, rejson);
-            }
-
-        }
-
         return json;
     }
 
@@ -1023,139 +958,6 @@ public class MainMethod
     {
         sql = "select RemittanceAccount,PickupAddress from Member where MemberID = " + MemberID + " and Access = '" + gm.getMemberAccess("E") + "'";
         return sqlMethod.Select(sql);
-    }
-
-    public string GetProductKey2(string bigItem, string smallItem, string ValiditySpecies, string value, string p, string h) // By Kevin Yen Huan-Chieh Chen
-    {
-        string[] id = null;
-        string[] name = null;
-        string[] price = null;
-        string[] image = null;
-        JArray jarray = null;
-        JObject job = null;
-        string json = gm.getStageJson(false, msg.noData_cht);
-        bool isProduct = false;
-        bool isImage = false;
-
-        // 取得商品表單內資料
-        sql = "select ProductID,ProductName,Price from Product";
-        if (!bigItem.Equals("")|| !smallItem.Equals("") || !value.Equals("")|| !ValiditySpecies.Equals(""))
-        {
-            sql += " where";
-            if(!bigItem.Equals(""))
-                sql += " TypeBig = '" + bigItem + "'";
-            if (!smallItem.Equals(""))
-            {
-                if(!bigItem.Equals(""))
-                    sql += " AND";
-                sql += " TypeSmall = '" + smallItem + "'";
-            }
-            if (!ValiditySpecies.Equals(""))
-            {
-                if (!bigItem.Equals(""))
-                    sql += " AND";
-                sql += " ValiditySpecies = '" + ValiditySpecies + "'";
-            }
-                
-            if (!value.Equals(""))
-            {
-                if (!bigItem.Equals(""))
-                    sql += " AND";
-                sql += " (";
-                for (int i = 0; i < value.Length; i++)
-                {
-                    sql += "ProductName like '%" + value[i].ToString() + "%'";
-                    if (i < value.Length - 1)
-                        sql += " OR ";
-                }
-                sql += ")";
-            }
-        }
-
-        if (!p.Equals(""))
-        {
-            if (p.Equals("H"))
-                sql += " order by Price desc";
-            else if (p.Equals("L"))
-                sql += " order by Price asc";
-        }
-        else if (!h.Equals(""))
-        {
-            if (h.Equals("H"))
-                sql += " order by OrderAmount desc";
-            else if (h.Equals("L"))
-                sql += " order by OrderAmount asc";
-        }
-        else
-            sql += " order by ProductID";
-
-        // 暫存商品表單，ProductID與ProductName
-        job = gm.getJsonResult(sqlMethod.Select(sql));
-        if (job["stage"].ToString().Equals(true.ToString()))
-        {
-            jarray = gm.getJsonArrayResult(job["message"].ToString());
-            id = new string[jarray.Count];
-            name = new string[jarray.Count];
-            price = new string[jarray.Count];
-            for (int i = 0; i < jarray.Count; i++)
-            {
-                job = gm.getJsonResult(jarray[i].ToString());
-                id[i] = job["ProductID"].ToString();
-                name[i] = job["ProductName"].ToString();
-                price[i] = job["Price"].ToString();
-            }
-            jarray = null;
-            isProduct = true;
-        }
-
-
-        // 取得商品圖片表單內資料
-        if (isProduct)
-        {
-            sql = "select ProductID,ImageUrl from ProductImage where Type ='Main' AND (";
-            for (int i = 0; i < id.Length; i++)
-            {
-                sql += "ProductID = '" + id[i] + "'";
-                if (i < id.Length - 1)
-                    sql += " OR ";
-                else
-                    sql += ")";
-            }
-            job = gm.getJsonResult(sqlMethod.Select(sql));
-            if (job["stage"].ToString().Equals(true.ToString()))
-            {
-                jarray = gm.getJsonArrayResult(job["message"].ToString());
-                image = new string[jarray.Count];
-                string[] productID = new string[jarray.Count];
-                for (int i = 0; i < jarray.Count; i++)
-                {
-                    job = gm.getJsonResult(jarray[i].ToString());
-                    image[i] = job["ImageUrl"].ToString();
-                    productID[i] = job["ProductID"].ToString();
-                }
-                image = gm.selectOrder(id, productID, image);
-                isImage = true;
-            }
-
-
-
-            // 輸出JSON，欄位ProductID, ProductName, Image
-            if (isImage && isProduct)
-            {
-                string rejson = "[";
-                for (int i = 0; i < id.Length; i++)
-                {
-                    rejson += gm.getJsonArray("ProductID;ProductName;Price;Image", id[i] + ";" + name[i] + ";" + price[i] + ";" + image[i]);
-                    if (i < id.Length - 1)
-                        rejson += ",";
-                }
-                rejson += "]";
-                json = gm.getStageJson(true, rejson);
-            }
-
-        }
-
-        return json;
     }
 
     //取得指定商品的圖片
