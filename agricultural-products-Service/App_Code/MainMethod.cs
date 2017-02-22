@@ -343,10 +343,11 @@ public class MainMethod
 
     public string GetProduct(string productID) // By Kevin Yen        by Huan-Chieh Chen 20170207
     {//Stage 這兩個欄位是否使用到，再考慮
-        sql = "select ProductName, Price, Amount, PackagingDate, FarmID, CertificationClassification.CertificationClassification, Certification.CertificationUnit, Certification.CertificationUnit2, Verification.VerificationUnit,Verification.ImgUrl, QRCode, Stage from Product"
+        sql = "select ProductName PN, Price, Amount, PackagingDate PKD, Product.FarmID, Farm.FarmName FN, CertificationClassification.CertificationClassification CC, Certification.CertificationUnit CCU, Certification.CertificationUnit2 CCU2, Verification.VerificationUnit VU,Verification.ImgUrl, QRCode, Stage from Product"
             + " INNER JOIN CertificationClassification ON Product.CertificationClassificationID=CertificationClassification.CertificationClassificationID"
             + " INNER JOIN Certification ON Product.CertificationID=Certification.CertificationID"
-            + " INNER JOIN Verification ON Product.VerificationID=Verification.VerificationID";
+            + " INNER JOIN Verification ON Product.VerificationID=Verification.VerificationID"
+            + " INNER JOIN Farm ON Product.FarmID=Farm.FarmID";
         if (!productID.Equals("ALL"))
         {
             sql += " where ProductID = '" + productID + "'";
