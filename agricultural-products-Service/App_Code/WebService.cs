@@ -883,6 +883,12 @@ public class WebService : System.Web.Services.WebService
         return main.GetRecord(ProductID);
     }
 
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetRecordOperation(string RecordID)
+    {
+        return main.GetRecordOperation(RecordID);
+    }
 
     // Order
     [WebMethod]
