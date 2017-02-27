@@ -312,6 +312,60 @@ public class MainMethod
 
     }
 
+    public string NewProduct2(string identify, string productName, string typeBig, string price, string paymentmethod, string shipmentsmethod, string location, string amount, string specification,
+        string imageBig, string imageSmall, string introduction) //Huan-Chieh Chen
+    {
+        string farmID="",memberID = "";
+        string typeSmall, packagingDate, CCID, CID, VID;//暫時
+        sql = "select TOP (1) SignLog.MemberID, Farm.FarmID from SignLog"
+            + " INNER JOIN Farm ON Farm.MemberID=SignLog.MemberID"
+            + " where Identify = '" + identify + "'"
+            + " order by SignLogID desc";
+        JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
+        if (jObject["stage"].ToString().Equals(true.ToString()))
+        {
+            jObject = gm.getJsonObjectResult(jObject["message"].ToString());
+            farmID = jObject["FarmID"].ToString();
+            memberID = jObject["MemberID"].ToString();
+            typeSmall = "大漿果";
+            packagingDate = gm.getCurrentDate().Split(' ')[0];
+            CCID = "";
+            CID = "";
+            VID = "";
+
+            sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID) values " +
+                    "('" + farmID + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + price + "','" + amount +
+                    "','" + packagingDate + "','" + CCID + "','" + CID + "','" + VID + "','" + paymentmethod + "','" +
+                    shipmentsmethod + "','" + location + "','" + specification + "','"+ memberID + "');SELECT SCOPE_IDENTITY()";
+            jObject = gm.getJsonResult(sqlMethod.Select(sql));
+            if (jObject["stage"].ToString().Equals(true.ToString()))
+            {
+                jObject = gm.getJsonObjectResult(jObject["message"].ToString());
+                string newproductid = jObject["Column1"].ToString();
+                sql = "insert into ProductImage(ProductID,Type,ImageUrl,DateTime) values('" + newproductid + "','Big','" + imageBig + "','" + gm.getCurrentDate() + "')";
+                jObject = gm.getJsonResult(sqlMethod.Insert(sql));
+                if (jObject["stage"].ToString().Equals(true.ToString()))
+                {
+                    sql = "insert into ProductImage(ProductID,Type,ImageUrl,DateTime) values('" + newproductid + "','Small','" + imageSmall + "','" + gm.getCurrentDate() + "')";
+                    jObject = gm.getJsonResult(sqlMethod.Insert(sql));
+                    if (jObject["stage"].ToString().Equals(true.ToString()))
+                    {
+                        sql = "insert into ProductIntroduce(ProductID,Introduction,DateTime) values('" + newproductid + "','"+ introduction + "','" + gm.getCurrentDate() + "')";
+                        return sqlMethod.Insert(sql);
+                    }
+                    else
+                        return gm.getStageJson(false, msg.newproduct_small_cht);
+                }
+                else
+                    return gm.getStageJson(false, msg.newproduct_big_cht);
+            }
+            else
+                return gm.getStageJson(false, msg.newproduct_first_cht);
+        }
+        else
+            return gm.getStageJson(false, msg.dataError_cht);
+    }
+
     public string NewProductImage(string productID, string imageType, string fileName, string image) // By Kevin Yen
     {
         string imageUrl = gm.upload(image, fileName, "Product");
@@ -859,7 +913,7 @@ public class MainMethod
         }
         else
         {
-            return gm.getStageJson(false, msg.EmailFail);
+            return gm.getStageJson(false, msg.EmailFail_cht);
         }
         sql = "select TOP (1) Identify, Time from ForgetPassword where MemberID = " + memberID + " order by Time desc";
         job = gm.getJsonResult(sqlMethod.Select(sql));
@@ -911,12 +965,12 @@ public class MainMethod
             {
                 client.Send(mms);//寄出一封信
             }//end using
-            return gm.getStageJson(true, msg.EmailSuccess);
+            return gm.getStageJson(true, msg.EmailSuccess_cht);
         }
         catch (System.Exception ex)
         {
             System.Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.EmailFail);
+            return gm.getStageJson(false, msg.EmailFail_cht);
         }
     }
 
@@ -942,7 +996,7 @@ public class MainMethod
                     return sqlMethod.Update(sql);
                 }else
                 {
-                    return gm.getStageJson(false, msg.EMailResetPasswordFail);
+                    return gm.getStageJson(false, msg.EMailResetPasswordFail_cht);
                 }
             }
             else
@@ -989,11 +1043,11 @@ public class MainMethod
         JObject job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
-            return gm.getStageJson(true, msg.EmailSuccess);
+            return gm.getStageJson(true, msg.EmailSuccess_cht);
         }
         else
         {
-            return gm.getStageJson(false, msg.EmailFail);
+            return gm.getStageJson(false, msg.EmailFail_cht);
         }
     }
 
@@ -1012,7 +1066,7 @@ public class MainMethod
         }
         else
         {
-            return gm.getStageJson(false, msg.EmailFail);
+            return gm.getStageJson(false, msg.EmailFail_cht);
         }
         sql = "select TOP (1) Identify, Time from ForgetPassword where MemberID = " + memberID + " order by Time desc";
         job = gm.getJsonResult(sqlMethod.Select(sql));
@@ -1064,14 +1118,12 @@ public class MainMethod
             {
                 client.Send(mms);//寄出一封信
             }//end using
-            return gm.getStageJson(true, msg.EmailSuccess);
+            return gm.getStageJson(true, msg.EmailSuccess_cht);
         }
         catch (System.Exception ex)
         {
             System.Console.WriteLine(ex.Message);
-            return gm.getStageJson(false, msg.EmailFail);
+            return gm.getStageJson(false, msg.EmailFail_cht);
         }
     }
 }
-
-

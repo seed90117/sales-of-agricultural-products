@@ -21,8 +21,12 @@ public class Message
     public string emailRepeat_cht = "電子郵件重複";
     public string emailError_cht = "電子郵件格式不正確";
     public string dataError_cht = "資料輸入錯誤";
-    public string unSelectFile = "尚未選取檔案";
-    public string EmailSuccess = "寄信成功，請確認信箱";
-    public string EmailFail = "寄信失敗，請確認電子信箱是否輸入正確";
-    public string EMailResetPasswordFail = "此認證碼時效已過，請重新寄認證信";
+    public string unSelectFile_cht = "尚未選取檔案";
+    public string EmailSuccess_cht = "寄信成功，請確認信箱";
+    public string EmailFail_cht = "寄信失敗，請確認電子信箱是否輸入正確";
+    public string EMailResetPasswordFail_cht = "此認證碼時效已過，請重新寄認證信";
+
+    public string newproduct_small_cht = "新增小圖失敗";
+    public string newproduct_big_cht = "新增大圖失敗";
+    public string newproduct_first_cht = "新增失敗";
 }

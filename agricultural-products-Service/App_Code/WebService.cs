@@ -166,7 +166,7 @@ public class WebService : System.Web.Services.WebService
             else
             {
                 if (image.Equals(""))
-                    return gm.getStageJson(false, msg.unSelectFile);
+                    return gm.getStageJson(false, msg.unSelectFile_cht);
                 else
                     return gm.getStageJson(false, msg.dataError_cht);
             }
@@ -194,7 +194,7 @@ public class WebService : System.Web.Services.WebService
             else
             {
                 if(video.Equals(""))
-                    return gm.getStageJson(false, msg.unSelectFile);
+                    return gm.getStageJson(false, msg.unSelectFile_cht);
                 else
                     return gm.getStageJson(false, msg.dataError_cht);
             }
@@ -384,7 +384,7 @@ public class WebService : System.Web.Services.WebService
             else
             {
                 if (image.Equals(""))
-                    return gm.getStageJson(false, msg.unSelectFile);
+                    return gm.getStageJson(false, msg.unSelectFile_cht);
                 else
                     return gm.getStageJson(false, msg.dataError_cht);
             }
@@ -411,7 +411,7 @@ public class WebService : System.Web.Services.WebService
             else
             {
                 if (file.Equals(""))
-                    return gm.getStageJson(false, msg.unSelectFile);
+                    return gm.getStageJson(false, msg.unSelectFile_cht);
                 else
                     return gm.getStageJson(false, msg.dataError_cht);
             }
@@ -790,6 +790,15 @@ public class WebService : System.Web.Services.WebService
     {
         return main.NewProduct(identify, farmID, ProductName, TypeBig, TypeSmall, Introduction, AdditionalValue, Origin,
                     Price, Amount, PackagingDate, ValidityPeriod, VerificationID, Stage);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProduct2(string identify, string ProductName, string TypeBig, string Price, string PaymentMethod, string ShipmentsMethod, string Location, string Amount, string Specification,
+        string ImageBig, string ImageSmall, string Introduction)
+    {
+        return main.NewProduct2(identify, ProductName, TypeBig, Price, PaymentMethod, ShipmentsMethod, Location, Amount, Specification,
+            ImageBig, ImageSmall, Introduction);
     }
 
     [WebMethod]
