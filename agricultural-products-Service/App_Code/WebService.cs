@@ -370,6 +370,41 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewProduct2Json(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string productName = job["ProductName"].ToString();
+            string typeBig = job["TypeBig"].ToString();
+            string price = job["Price"].ToString();
+            string paymentmethod = job["PaymentMethod"].ToString();
+            string shipmentsmethod = job["ShipmentsMethod"].ToString();
+            string location = job["Location"].ToString();
+            string amount = job["Amount"].ToString();
+            string specification = job["Specification"].ToString();
+            string imageBig = job["ImageBig"].ToString();
+            string imageSmall = job["ImageSmall"].ToString();
+            string introduction = job["Introduction"].ToString();
+
+            if (!identify.Equals("") && !productName.Equals("") && !typeBig.Equals("") && !price.Equals("") && !paymentmethod.Equals("") &&
+                !shipmentsmethod.Equals("") && !location.Equals("") && !amount.Equals("") && !specification.Equals("") && !imageBig.Equals("") &&
+                !imageSmall.Equals("") && !introduction.Equals(""))
+                return main.NewProduct2(identify, productName, typeBig, price, paymentmethod, shipmentsmethod, location, amount, specification,
+            imageBig, imageSmall, introduction);
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.dataError_cht);
+        }
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewProductImageJson(string inputJsonStr)
     {
         job = gm.getJsonResult(inputJsonStr);
