@@ -329,9 +329,9 @@ public class MainMethod
             memberID = jObject["MemberID"].ToString();
             typeSmall = "大漿果";
             packagingDate = gm.getCurrentDate().Split(' ')[0];
-            CCID = "";
-            CID = "";
-            VID = "";
+            CCID = "1";
+            CID = "1";
+            VID = "1";
 
             sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID) values " +
                     "('" + farmID + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + price + "','" + amount +
