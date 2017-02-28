@@ -418,7 +418,7 @@ public class MainMethod
         sql = "select Product.ProductID, ProductName, Price, ProductImage.ImageUrl Image, CertificationClassification.CertificationClassification CC, Farm.FarmName from Product"
             + " INNER JOIN CertificationClassification ON Product.CertificationClassificationID = CertificationClassification.CertificationClassificationID"
             + " INNER JOIN Farm ON Product.FarmID = Farm.FarmID"
-            + " INNER JOIN ProductImage ON Product.ProductID = ProductImage.ProductID and ProductImage.Type = 'Main'";
+            + " INNER JOIN ProductImage ON Product.ProductID = ProductImage.ProductID and ProductImage.Type in ('Main','Small')";
         if (!bigItem.Equals("") || !smallItem.Equals("") || !value.Equals("") || !CCID.Equals(""))
         {
             sql += " where";
