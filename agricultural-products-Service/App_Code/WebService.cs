@@ -763,7 +763,7 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewFarmMember(string Email, string Password, string FirstName, string LastName, string Phone, string Address, string Birthday, string SSNs, string FarmName, string IdentifyID, string FarmArea, string CultivateArea, string ExpectTime, string ExpectVolume)
     {
-        return main.NewFarmMember(MemberID, FarmName, IdentifyID, FarmArea, CultivateArea, ExpectTime, ExpectVolume);
+        return main.NewFarmMember(Email, Password, FirstName, LastName, Phone, Address, Birthday, SSNs, FarmName, IdentifyID, FarmArea, CultivateArea, ExpectTime, ExpectVolume);
     }
 
     [WebMethod]
