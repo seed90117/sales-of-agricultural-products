@@ -126,7 +126,7 @@ public class MainMethod
 
 
     // Member
-    public string NewMember(string email, string password, string firstName, string lastName, string phone, string address, string birthday, string socialsecuritynumbers) // By Wei-Min Zhang //Huan-Chieh Chen
+    public string NewMember(string email, string password, string firstName, string lastName, string phone, string address) // By Wei-Min Zhang //Huan-Chieh Chen
     {
         if (gm.isEmail(email))
         {
@@ -134,29 +134,43 @@ public class MainMethod
             JObject job = gm.getJsonResult(sqlMethod.Select(sql));
             if (job["stage"].ToString().Equals(false.ToString()))
             {
-                sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access, tDateTime";
-                if (birthday.Equals("") && socialsecuritynumbers.Equals(""))
-                {
-                    sql += ") values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '" +
-                      address + "','" + gm.getMemberAccess("C") + "','" + gm.getCurrentDate() + "')";
-                    return sqlMethod.Insert(sql);
-                }
-                else if (!birthday.Equals("") && !socialsecuritynumbers.Equals(""))
-                {
-                    sql += ", Birthday, SocialSecurityNumbers) values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '" +
-                      address + "','" + gm.getMemberAccess("E") + "','" + gm.getCurrentDate() + "','" + birthday + "','" + socialsecuritynumbers + "')";
-                    return sqlMethod.Insert(sql);
-                }
-                else
-                {
-                    return gm.getStageJson(false, msg.dataError_cht);
-                }
+                sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access, tDateTime)" +
+                    " values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '" +
+                    address + "','" + gm.getMemberAccess("C") + "','" + gm.getCurrentDate() + "')";
+                return sqlMethod.Insert(sql);
             }
             else
                 return gm.getStageJson(false, msg.emailRepeat_cht);
         }
         else
             return gm.getStageJson(false, msg.emailError_cht);
+    }
+
+    public string NewFarmMember(string email, string password, string firstName, string lastName, string phone, string address, string birthday, string socialsecuritynumbers
+        , string farmname, string thefarmID, string farmarea, string cultivatearea, string expecttime, string expectvolume) //Huan-Chieh Chen
+    {
+        sql = "select Email from Member where Email = '" + email + "'";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(false.ToString()))
+        {
+            sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access, Birthday, SocialSecurityNumbers, tDateTime)"
+                + " values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '"
+                + address + "','" + gm.getMemberAccess("E") + "','" + birthday + "','" + socialsecuritynumbers + "','" + gm.getCurrentDate() + "');SELECT SCOPE_IDENTITY()";
+            job = gm.getJsonResult(sqlMethod.Select(sql));
+            if (job["stage"].ToString().Equals(true.ToString()))
+            {
+                job = gm.getJsonObjectResult(job["message"].ToString());
+                string memberid = job["Column1"].ToString();
+                sql = "insert into Farm(MemberID, FarmName, IdentifyID, FarmArea, CultivateArea, ExpectTime, ExpectVolume)"
+                + " values('" + memberid + "', '" + farmname + "', '" + thefarmID + "', '" + farmarea + "', '" + cultivatearea + "', '"
+                + expecttime + "','" + expectvolume + "')";
+                return sqlMethod.Insert(sql);
+            }
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        else
+            return gm.getStageJson(false, msg.emailRepeat_cht);
     }
 
     public string NewHeadShot(string identify, string fileName, string image) // By Kevin Yen

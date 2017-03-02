@@ -139,10 +139,8 @@ public class WebService : System.Web.Services.WebService
             string phone = job["Phone"].ToString();
             string email = job["Email"].ToString();
             string address = job["Address"].ToString();
-            string birthday = job["Birthday"].ToString();
-            string socialsecuritynumbers = job["SSNs"].ToString();
             if (!password.Equals("") && !firstName.Equals("") && !lastName.Equals("") && !email.Equals(""))
-                return main.NewMember(email, password, firstName, lastName, phone, address, birthday, socialsecuritynumbers);
+                return main.NewMember(email, password, firstName, lastName, phone, address);
             else
                 return gm.getStageJson(false, msg.dataError_cht);
         }
@@ -756,9 +754,16 @@ public class WebService : System.Web.Services.WebService
     // Member
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string NewMember(string Email, string Password, string FirstName, string LastName, string Phone, string Address, string Birthday, string SSNs)
+    public string NewMember(string Email, string Password, string FirstName, string LastName, string Phone, string Address)
     {
-        return main.NewMember(Email, Password, FirstName, LastName, Phone, Address, Birthday, SSNs);
+        return main.NewMember(Email, Password, FirstName, LastName, Phone, Address);
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string NewFarmMember(string Email, string Password, string FirstName, string LastName, string Phone, string Address, string Birthday, string SSNs, string FarmName, string IdentifyID, string FarmArea, string CultivateArea, string ExpectTime, string ExpectVolume)
+    {
+        return main.NewFarmMember(MemberID, FarmName, IdentifyID, FarmArea, CultivateArea, ExpectTime, ExpectVolume);
     }
 
     [WebMethod]
@@ -903,7 +908,7 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetProductTypeItem();
     }
-
+    
 
     // Record
     [WebMethod]
