@@ -138,7 +138,7 @@ public class MainMethod
                 if (birthday.Equals("") && socialsecuritynumbers.Equals(""))
                 {
                     sql += ") values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '" +
-                      address + "','" + gm.getMemberAccess("C") + "','"+ gm.getCurrentDate() + "')";
+                      address + "','" + gm.getMemberAccess("C") + "','" + gm.getCurrentDate() + "')";
                     return sqlMethod.Insert(sql);
                 }
                 else if (!birthday.Equals("") && !socialsecuritynumbers.Equals(""))
