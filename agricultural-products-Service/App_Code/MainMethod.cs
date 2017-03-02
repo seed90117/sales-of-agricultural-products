@@ -126,7 +126,7 @@ public class MainMethod
 
 
     // Member
-    public string NewMember(string email, string password, string firstName, string lastName, string phone, string address) // By Wei-Min Zhang
+    public string NewMember(string email, string password, string firstName, string lastName, string phone, string address, string birthday, string socialsecuritynumbers) // By Wei-Min Zhang //Huan-Chieh Chen
     {
         if (gm.isEmail(email))
         {
@@ -134,10 +134,23 @@ public class MainMethod
             JObject job = gm.getJsonResult(sqlMethod.Select(sql));
             if (job["stage"].ToString().Equals(false.ToString()))
             {
-                sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access) " +
-                      "values('" + email + "','" + password + "','" + firstName + "','" + lastName + "','" + phone + "','" +
-                      address + "','" + gm.getMemberAccess("C") + "')";
-                return sqlMethod.Insert(sql);
+                sql = "insert into Member(Email, Password, FirstName, LastName, Phone, Address, Access, tDateTime";
+                if (birthday.Equals("") && socialsecuritynumbers.Equals(""))
+                {
+                    sql += ") values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '" +
+                      address + "','" + gm.getMemberAccess("C") + "','"+ gm.getCurrentDate() + "')";
+                    return sqlMethod.Insert(sql);
+                }
+                else if (!birthday.Equals("") && !socialsecuritynumbers.Equals(""))
+                {
+                    sql += ", Birthday, SocialSecurityNumbers) values('" + email + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + phone + "', '" +
+                      address + "','" + gm.getMemberAccess("E") + "','" + gm.getCurrentDate() + "','" + birthday + "','" + socialsecuritynumbers + "')";
+                    return sqlMethod.Insert(sql);
+                }
+                else
+                {
+                    return gm.getStageJson(false, msg.dataError_cht);
+                }
             }
             else
                 return gm.getStageJson(false, msg.emailRepeat_cht);
@@ -315,7 +328,7 @@ public class MainMethod
     public string NewProduct2(string identify, string productName, string typeBig, string price, string paymentmethod, string shipmentsmethod, string location, string amount, string specification,
         string imageBig, string imageSmall, string introduction) //Huan-Chieh Chen
     {
-        string farmID="",memberID = "";
+        string farmID = "", memberID = "";
         string typeSmall, packagingDate, CCID, CID, VID;//暫時
         sql = "select TOP (1) SignLog.MemberID, Farm.FarmID from SignLog"
             + " INNER JOIN Farm ON Farm.MemberID=SignLog.MemberID"
@@ -336,7 +349,7 @@ public class MainMethod
             sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID) values " +
                     "('" + farmID + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + price + "','" + amount +
                     "','" + packagingDate + "','" + CCID + "','" + CID + "','" + VID + "','" + paymentmethod + "','" +
-                    shipmentsmethod + "','" + location + "','" + specification + "','"+ memberID + "');SELECT SCOPE_IDENTITY()";
+                    shipmentsmethod + "','" + location + "','" + specification + "','" + memberID + "');SELECT SCOPE_IDENTITY()";
             jObject = gm.getJsonResult(sqlMethod.Select(sql));
             if (jObject["stage"].ToString().Equals(true.ToString()))
             {
@@ -350,7 +363,7 @@ public class MainMethod
                     jObject = gm.getJsonResult(sqlMethod.Insert(sql));
                     if (jObject["stage"].ToString().Equals(true.ToString()))
                     {
-                        sql = "insert into ProductIntroduce(ProductID,Introduction,DateTime) values('" + newproductid + "','"+ introduction + "','" + gm.getCurrentDate() + "')";
+                        sql = "insert into ProductIntroduce(ProductID,Introduction,DateTime) values('" + newproductid + "','" + introduction + "','" + gm.getCurrentDate() + "')";
                         return sqlMethod.Insert(sql);
                     }
                     else
@@ -468,7 +481,7 @@ public class MainMethod
         }
         else
             sql += " order by ProductID";
-        
+
         job = gm.getJsonResult(sqlMethod.Select(sql));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
@@ -975,9 +988,9 @@ public class MainMethod
     }
 
     //E-mail
-    public string EMailResetPassword(string Identify,string NewPassword)//Huan-Chieh Chen
+    public string EMailResetPassword(string Identify, string NewPassword)//Huan-Chieh Chen
     {
-        if (!Identify.Equals("")&&!NewPassword.Equals(""))
+        if (!Identify.Equals("") && !NewPassword.Equals(""))
         {
             System.DateTime time;
             sql = "select ForgetPassID,MemberID,Time from ForgetPassword where Identify = '" + Identify + "'";
@@ -994,7 +1007,8 @@ public class MainMethod
                     sqlMethod.Update(sql);
                     sql = "update ForgetPassword set Identify = '' where ForgetPassID = " + forgetpassid;
                     return sqlMethod.Update(sql);
-                }else
+                }
+                else
                 {
                     return gm.getStageJson(false, msg.EMailResetPasswordFail_cht);
                 }
