@@ -195,7 +195,7 @@ public class WebService : System.Web.Services.WebService
                 return main.NewVideo(identify, name, fileName, video);
             else
             {
-                if(video.Equals(""))
+                if (video.Equals(""))
                     return gm.getStageJson(false, msg.unSelectFile_cht);
                 else
                     return gm.getStageJson(false, msg.dataError_cht);
@@ -358,8 +358,8 @@ public class WebService : System.Web.Services.WebService
             if (!identify.Equals("") && !farmID.Equals("") && !productName.Equals("") && !typeBig.Equals("") && !typeSmall.Equals("") &&
                 !introduction.Equals("") && !additionalValue.Equals("") && !origin.Equals("") && !price.Equals("") && !amount.Equals("") &&
                 !packagingDate.Equals("") && !validityPeriod.Equals("") && !verificationID.Equals(""))
-                return main.NewProduct(identify, farmID, productName, typeBig, typeSmall, introduction, additionalValue, origin, 
-                    price, amount,packagingDate, validityPeriod, verificationID, stage);
+                return main.NewProduct(identify, farmID, productName, typeBig, typeSmall, introduction, additionalValue, origin,
+                    price, amount, packagingDate, validityPeriod, verificationID, stage);
             else
                 return gm.getStageJson(false, msg.dataError_cht);
         }
@@ -695,7 +695,7 @@ public class WebService : System.Web.Services.WebService
         {
             string identify = job["Identify"].ToString();
             string newpassword = job["NewPassword"].ToString();
-            if (!identify.Equals("")&&!newpassword.Equals(""))
+            if (!identify.Equals("") && !newpassword.Equals(""))
                 return main.EMailResetPassword(identify, newpassword);
             else
                 return gm.getStageJson(false, msg.dataError_cht);
@@ -823,7 +823,7 @@ public class WebService : System.Web.Services.WebService
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string NewProduct(string identify, string farmID, string ProductName, string TypeBig, string TypeSmall, string Introduction,
                                 string AdditionalValue, string Origin, string Price, string Amount, string PackagingDate,
-                                string ValidityPeriod, string VerificationID,  string Stage)
+                                string ValidityPeriod, string VerificationID, string Stage)
     {
         return main.NewProduct(identify, farmID, ProductName, TypeBig, TypeSmall, Introduction, AdditionalValue, Origin,
                     Price, Amount, PackagingDate, ValidityPeriod, VerificationID, Stage);
