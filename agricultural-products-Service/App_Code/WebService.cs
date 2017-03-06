@@ -378,6 +378,7 @@ public class WebService : System.Web.Services.WebService
             string identify = job["Identify"].ToString();
             string productName = job["ProductName"].ToString();
             string typeBig = job["TypeBig"].ToString();
+            string typeSmall = job["TypeSmall"].ToString();
             string price = job["Price"].ToString();
             string paymentmethod = job["PaymentMethod"].ToString();
             string shipmentsmethod = job["ShipmentsMethod"].ToString();
@@ -388,10 +389,10 @@ public class WebService : System.Web.Services.WebService
             string imageSmall = job["ImageSmall"].ToString();
             string introduction = job["Introduction"].ToString();
 
-            if (!identify.Equals("") && !productName.Equals("") && !typeBig.Equals("") && !price.Equals("") && !paymentmethod.Equals("") &&
+            if (!identify.Equals("") && !productName.Equals("") && !typeBig.Equals("") && !typeSmall.Equals("") && !price.Equals("") && !paymentmethod.Equals("") &&
                 !shipmentsmethod.Equals("") && !location.Equals("") && !amount.Equals("") && !specification.Equals("") && !imageBig.Equals("") &&
                 !imageSmall.Equals("") && !introduction.Equals(""))
-                return main.NewProduct2(identify, productName, typeBig, price, paymentmethod, shipmentsmethod, location, amount, specification,
+                return main.NewProduct2(identify, productName, typeBig, typeSmall, price, paymentmethod, shipmentsmethod, location, amount, specification,
             imageBig, imageSmall, introduction);
             else
                 return gm.getStageJson(false, msg.dataError_cht);
@@ -836,10 +837,10 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string NewProduct2(string identify, string ProductName, string TypeBig, string Price, string PaymentMethod, string ShipmentsMethod, string Location, string Amount, string Specification,
+    public string NewProduct2(string identify, string ProductName, string TypeBig, string TypeSmall, string Price, string PaymentMethod, string ShipmentsMethod, string Location, string Amount, string Specification,
         string ImageBig, string ImageSmall, string Introduction)
     {
-        return main.NewProduct2(identify, ProductName, TypeBig, Price, PaymentMethod, ShipmentsMethod, Location, Amount, Specification,
+        return main.NewProduct2(identify, ProductName, TypeBig, TypeSmall, Price, PaymentMethod, ShipmentsMethod, Location, Amount, Specification,
             ImageBig, ImageSmall, Introduction);
     }
 
@@ -908,7 +909,7 @@ public class WebService : System.Web.Services.WebService
     {
         return main.GetProductTypeItem();
     }
-    
+
 
     // Record
     [WebMethod]

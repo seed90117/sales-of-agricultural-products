@@ -339,11 +339,11 @@ public class MainMethod
 
     }
 
-    public string NewProduct2(string identify, string productName, string typeBig, string price, string paymentmethod, string shipmentsmethod, string location, string amount, string specification,
+    public string NewProduct2(string identify, string productName, string typeBig, string typeSmall, string price, string paymentmethod, string shipmentsmethod, string location, string amount, string specification,
         string imageBig, string imageSmall, string introduction) //Huan-Chieh Chen
     {
         string farmID = "", memberID = "";
-        string typeSmall, packagingDate, CCID, CID, VID;//暫時
+        string packagingDate, CCID, CID, VID;//暫時
         sql = "select TOP (1) SignLog.MemberID, Farm.FarmID from SignLog"
             + " INNER JOIN Farm ON Farm.MemberID=SignLog.MemberID"
             + " where Identify = '" + identify + "'"
@@ -354,7 +354,6 @@ public class MainMethod
             jObject = gm.getJsonObjectResult(jObject["message"].ToString());
             farmID = jObject["FarmID"].ToString();
             memberID = jObject["MemberID"].ToString();
-            typeSmall = "大漿果";
             packagingDate = gm.getCurrentDate().Split(' ')[0];
             CCID = "1";
             CID = "1";
