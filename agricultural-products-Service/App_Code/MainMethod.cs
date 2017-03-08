@@ -359,10 +359,10 @@ public class MainMethod
             CID = "1";
             VID = "1";
 
-            sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID) values " +
+            sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID,Introduction) values " +
                     "('" + farmID + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + price + "','" + amount +
                     "','" + packagingDate + "','" + CCID + "','" + CID + "','" + VID + "','" + paymentmethod + "','" +
-                    shipmentsmethod + "','" + location + "','" + specification + "','" + memberID + "');SELECT SCOPE_IDENTITY()";
+                    shipmentsmethod + "','" + location + "','" + specification + "','" + memberID + "','" + introduction + "');SELECT SCOPE_IDENTITY()";
             jObject = gm.getJsonResult(sqlMethod.Select(sql));
             if (jObject["stage"].ToString().Equals(true.ToString()))
             {
