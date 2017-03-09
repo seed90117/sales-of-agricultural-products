@@ -358,12 +358,19 @@ public class MainMethod
             CCID = "1";
             CID = "1";
             VID = "1";
-
-            sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID,Introduction) values " +
-                    "('" + farmID + "','" + productName + "','" + typeBig + "','" + typeSmall + "','" + price + "','" + amount +
-                    "','" + packagingDate + "','" + CCID + "','" + CID + "','" + VID + "','" + paymentmethod + "','" +
-                    shipmentsmethod + "','" + location + "','" + specification + "','" + memberID + "','" + introduction + "');SELECT SCOPE_IDENTITY()";
-            jObject = gm.getJsonResult(sqlMethod.Select(sql));
+            string[] parametersname = { "@farmID", "@productName", "@typeBig", "@typeSmall", "@price", "@amount", "@packagingDate", "@CCID", "@CID", "@VID", "@paymentmethod", "@shipmentsmethod", "@location", "@specification", "@memberID", "@introduction" };
+            string[] parametersvalue = { farmID, productName, typeBig, typeSmall, price, amount, packagingDate, CCID, CID, VID, paymentmethod, shipmentsmethod, location, specification, memberID, introduction };
+            sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID,Introduction) values (";
+            for(int i=0;i< parametersname.Length; i++)
+            {
+                if (i != 0)
+                {
+                    sql += ",";
+                }
+                sql += parametersname[i];
+            }
+            sql += ");SELECT SCOPE_IDENTITY()";
+            jObject = gm.getJsonResult(sqlMethod.Select(sql, parametersname, parametersvalue));
             if (jObject["stage"].ToString().Equals(true.ToString()))
             {
                 jObject = gm.getJsonObjectResult(jObject["message"].ToString());
@@ -376,8 +383,19 @@ public class MainMethod
                     jObject = gm.getJsonResult(sqlMethod.Insert(sql));
                     if (jObject["stage"].ToString().Equals(true.ToString()))
                     {
-                        sql = "insert into ProductIntroduce(ProductID,Introduction,DateTime) values('" + newproductid + "','" + introduction + "','" + gm.getCurrentDate() + "')";
-                        return sqlMethod.Insert(sql);
+                        string[] parametersname2 = { "@newproductid" , "@introduction","@thedatetime" };
+                        string[] parametersvalue2 = { newproductid , introduction, gm.getCurrentDate() };
+                        sql = "insert into ProductIntroduce(ProductID,Introduction,DateTime) values(";
+                        for (int i = 0; i < parametersname2.Length; i++)
+                        {
+                            if (i != 0)
+                            {
+                                sql += ",";
+                            }
+                            sql += parametersname2[i];
+                        }
+                        sql += ")";
+                        return sqlMethod.Insert(sql, parametersname2, parametersvalue2);
                     }
                     else
                         return gm.getStageJson(false, msg.newproduct_small_cht);
