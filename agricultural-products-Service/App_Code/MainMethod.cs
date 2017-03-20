@@ -218,8 +218,18 @@ public class MainMethod
 
     public string GetMemberInfo(string identify) //Huan-Chieh Chen
     {
-        sql = "select Email,FirstName,LastName,Phone,Address,Access from Member where Identify = '" + identify + "'";
-        return sqlMethod.Select(sql);
+        string[] parametersname = { "@identify" };
+        string[] parametersvalue = { identify };
+        sql = "select Email,FirstName FN,LastName LN,Phone,Address Ad,Access Ac from Member where Identify = ";
+        for (int i = 0; i < parametersname.Length; i++)
+        {
+            if (i != 0)
+            {
+                sql += ",";
+            }
+            sql += parametersname[i];
+        }
+        return sqlMethod.Select(sql, parametersname, parametersvalue);
     }
 
     public string GetMember(string access) // By Kevin Yen
@@ -361,7 +371,7 @@ public class MainMethod
             string[] parametersname = { "@farmID", "@productName", "@typeBig", "@typeSmall", "@price", "@amount", "@packagingDate", "@CCID", "@CID", "@VID", "@paymentmethod", "@shipmentsmethod", "@location", "@specification", "@memberID", "@introduction" };
             string[] parametersvalue = { farmID, productName, typeBig, typeSmall, price, amount, packagingDate, CCID, CID, VID, paymentmethod, shipmentsmethod, location, specification, memberID, introduction };
             sql = "insert into Product(FarmID,ProductName,TypeBig,TypeSmall,Price,Amount,PackagingDate,CertificationClassificationID,CertificationID,VerificationID,PaymentMethod,ShipmentsMethod,Location,Specification,MemberID,Introduction) values (";
-            for(int i=0;i< parametersname.Length; i++)
+            for (int i = 0; i < parametersname.Length; i++)
             {
                 if (i != 0)
                 {
@@ -383,8 +393,8 @@ public class MainMethod
                     jObject = gm.getJsonResult(sqlMethod.Insert(sql));
                     if (jObject["stage"].ToString().Equals(true.ToString()))
                     {
-                        string[] parametersname2 = { "@newproductid" , "@introduction","@thedatetime" };
-                        string[] parametersvalue2 = { newproductid , introduction, gm.getCurrentDate() };
+                        string[] parametersname2 = { "@newproductid", "@introduction", "@thedatetime" };
+                        string[] parametersvalue2 = { newproductid, introduction, gm.getCurrentDate() };
                         sql = "insert into ProductIntroduce(ProductID,Introduction,DateTime) values(";
                         for (int i = 0; i < parametersname2.Length; i++)
                         {
