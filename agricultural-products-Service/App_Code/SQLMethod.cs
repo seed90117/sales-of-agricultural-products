@@ -155,7 +155,7 @@ public class SQLMethod
                 }
                 else
                 {
-                    return gm.getStageJson(false, "錯誤");
+                    return gm.getStageJson(false, msg.fail);
                 }
                 dr = sqlcmd.ExecuteReader();
                 if (dr.IsClosed == false)
@@ -220,5 +220,43 @@ public class SQLMethod
             return gm.getStageJson(false, msg.fail);
         }
     }
-
+    public string Update(string sql, string[] parametersname, string[] parametersvalue)
+    {
+        if (!sql.Equals(""))
+        {
+            try
+            {
+                objcon.Open();
+                sqlcmd = new SqlCommand(sql, objcon);
+                if (parametersname.Length == parametersvalue.Length)
+                {
+                    for (int i = 0; i < parametersname.Length; i++)
+                    {
+                        sqlcmd.Parameters.AddWithValue(parametersname[i], parametersvalue[i]);
+                    }
+                }
+                else
+                {
+                    return gm.getStageJson(false, msg.fail);
+                }
+                if (sqlcmd.ExecuteNonQuery() == 1)
+                    return gm.getStageJson(true, msg.success);
+                else
+                    return gm.getStageJson(false, msg.fail);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return gm.getStageJson(false, msg.fail);
+            }
+            finally
+            {
+                objcon.Close();
+            }
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.fail);
+        }
+    }
 }

@@ -251,35 +251,52 @@ public class MainMethod
         return sqlMethod.Select(sql);
     }
 
-    public string UpdateMemberInfo(string identify, string column, string value) //Huan-Chieh Chen
+    public string UpdateMemberInfo(string identify, string column, string value, string oldpassword) //Huan-Chieh Chen
     {
-        string[] columnArray = column.Split(';');
-        string[] valueArray = value.Split(';');
-        if (columnArray.Length > 0 && valueArray.Length > 0 && columnArray.Length == valueArray.Length)
+        sql = "select Password from Member where Identify = '" + identify + "'";
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql));
+        if (job["stage"].ToString().Equals(true.ToString()))
         {
-            if (!identify.Equals(""))
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            if (job["Password"].ToString().Equals(oldpassword))
             {
-                sql = "update Member set ";
-                for (int i = 0; i < columnArray.Length; i++)
+                string[] columnArray = column.Split(',');
+                job = gm.getJsonResult(value);
+                if (columnArray.Length > 0 && job.Count > 0 && columnArray.Length == job.Count)
                 {
-                    sql += columnArray[i] + " = '" + valueArray[i] + "'";
-                    if (i < columnArray.Length - 1)
+                    if (!identify.Equals(""))
                     {
-                        sql += " , ";
+                        string[] parametersname = new string[job.Count];
+                        string[] parametersvalue = new string[job.Count];
+                        sql = "update Member set ";
+                        for (int i = 0; i < columnArray.Length; i++)
+                        {
+                            parametersname[i] = "@value" + i;
+                            parametersvalue[i] = job["value" + i].ToString();
+                            sql += columnArray[i] + " = " + parametersname[i];
+                            if (i < columnArray.Length - 1)
+                            {
+                                sql += " , ";
+                            }
+                        }
+                        sql += " where Identify = '" + identify + "'";
+                        return sqlMethod.Update(sql, parametersname, parametersvalue);
+                    }
+                    else
+                    {
+                        return gm.getStageJson(false, msg.dataError_cht);
                     }
                 }
-                sql += " where Identify = '" + identify + "'";
-                return sqlMethod.Update(sql);
+                else
+                {
+                    return gm.getStageJson(false, msg.dataError_cht);
+                }
             }
             else
-            {
-                return gm.getStageJson(false, msg.dataError_cht);
-            }
+                return gm.getStageJson(false, msg.passwordError_cht);
         }
         else
-        {
-            return gm.getStageJson(false, msg.dataError_cht);
-        }
+            return gm.getStageJson(false, msg.noData_cht);
     }
 
     public string ResetPassword(string identify, string oldPassword, string newPassword) // By Kevin Yen

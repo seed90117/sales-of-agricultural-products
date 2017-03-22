@@ -276,8 +276,9 @@ public class WebService : System.Web.Services.WebService
             string idnetify = job["Identify"].ToString();
             string column = job["Column"].ToString();
             string value = job["Value"].ToString();
+            string password = job["Password"].ToString();
             if (!column.Equals("") && !value.Equals(""))
-                return main.UpdateMemberInfo(idnetify, column, value);
+                return main.UpdateMemberInfo(idnetify, column, value, password);
             else
                 return gm.getStageJson(false, msg.dataError_cht);
         }
@@ -804,9 +805,9 @@ public class WebService : System.Web.Services.WebService
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    public string UpdateMemberInfo(string Identify, string Column, string Value)
+    public string UpdateMemberInfo(string Identify, string Column, string Value, string Password)
     {
-        return main.UpdateMemberInfo(Identify, Column, Value);
+        return main.UpdateMemberInfo(Identify, Column, Value, Password);
     }
 
     [WebMethod]
