@@ -1198,4 +1198,34 @@ public class MainMethod
             return gm.getStageJson(false, msg.EmailFail_cht);
         }
     }
+
+    //聯絡客服－新增問題
+    public string newContactCustomerserviceQA(string identify, string number, string qtype, string qdescription) //Huan-Chieh Chen
+    {
+        sql = "select TOP (1) MemberID from SignLog"
+            + " where Identify = '" + identify + "'"
+            + " order by SignLogID desc";
+        JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
+        if (jObject["stage"].ToString().Equals(true.ToString()) && !number.Equals("") && !qtype.Equals("") && !qdescription.Equals(""))
+        {
+            string memberID = "";
+            jObject = gm.getJsonObjectResult(jObject["message"].ToString());
+            memberID = jObject["MemberID"].ToString();
+            string[] parametersname = { "@memberID", "@ordernumber", "@problemspecies", "@problemdescription", "@tdatetime" };
+            string[] parametersvalue = { memberID, number, qtype, qdescription, gm.getCurrentDate() };
+            sql = "insert into Contact_CustomerServiceQA(MemberID,OrderNumber,ProblemSpecies,ProblemDescription,tDateTime) values (";
+            for (int i = 0; i < parametersname.Length; i++)
+            {
+                if (i != 0)
+                {
+                    sql += ",";
+                }
+                sql += parametersname[i];
+            }
+            sql += ")";
+            return sqlMethod.Insert(sql, parametersname, parametersvalue);
+        }
+        else
+            return gm.getStageJson(false, msg.dataError_cht);
+    }
 }

@@ -1022,4 +1022,12 @@ public class WebService : System.Web.Services.WebService
     {
         return main.ForgetPasswordEMail(MailTo);
     }
+    
+    //聯絡客服－新增問題
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string newContactCustomerserviceQA(string Identify, string Number, string Qtype, string Qdescription)
+    {
+        return main.newContactCustomerserviceQA(Identify, Number, Qtype, Qdescription);
+    }
 }
