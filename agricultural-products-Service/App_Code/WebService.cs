@@ -1022,7 +1022,28 @@ public class WebService : System.Web.Services.WebService
     {
         return main.ForgetPasswordEMail(MailTo);
     }
-    
+
+    //聯絡客服－我的問題清單
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetContactCustomerserviceQAJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            if (!identify.Equals(""))
+                return main.GetContactCustomerserviceQA(identify);
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.noData_cht);
+        }
+    }
+
     //聯絡客服－新增問題
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

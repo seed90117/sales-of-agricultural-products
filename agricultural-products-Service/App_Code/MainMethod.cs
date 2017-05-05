@@ -1199,6 +1199,35 @@ public class MainMethod
         }
     }
 
+    //聯絡客服－我的問題清單
+    public string GetContactCustomerserviceQA(string identify) //Huan-Chieh Chen
+    {
+        string memberID = "";
+        string[] parametersname = { "@identify" };
+        string[] parametersvalue = { identify };
+        sql = "select MemberID from Member where Identify = ";
+        for (int i = 0; i < parametersname.Length; i++)
+        {
+            if (i != 0)
+            {
+                sql += ",";
+            }
+            sql += parametersname[i];
+        }
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql, parametersname, parametersvalue));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            memberID = job["MemberID"].ToString();
+            sql = "select CCSID nIN,OrderNumber nON,ProblemSpecies nPS,Status nSS,tDateTime nDT from Contact_CustomerServiceQA where MemberID = " + memberID;
+            return sqlMethod.Select(sql);
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.EmailFail_cht);
+        }
+    }
+
     //聯絡客服－新增問題
     public string newContactCustomerserviceQA(string identify, string number, string qtype, string qdescription) //Huan-Chieh Chen
     {
@@ -1211,9 +1240,9 @@ public class MainMethod
             string memberID = "";
             jObject = gm.getJsonObjectResult(jObject["message"].ToString());
             memberID = jObject["MemberID"].ToString();
-            string[] parametersname = { "@memberID", "@ordernumber", "@problemspecies", "@problemdescription", "@tdatetime" };
-            string[] parametersvalue = { memberID, number, qtype, qdescription, gm.getCurrentDate() };
-            sql = "insert into Contact_CustomerServiceQA(MemberID,OrderNumber,ProblemSpecies,ProblemDescription,tDateTime) values (";
+            string[] parametersname = { "@memberID", "@ordernumber", "@problemspecies", "@problemdescription", "@status", "@tdatetime" };
+            string[] parametersvalue = { memberID, number, qtype, qdescription, "0", gm.getCurrentDate() };
+            sql = "insert into Contact_CustomerServiceQA(MemberID,OrderNumber,ProblemSpecies,ProblemDescription,Status,tDateTime) values (";
             for (int i = 0; i < parametersname.Length; i++)
             {
                 if (i != 0)
