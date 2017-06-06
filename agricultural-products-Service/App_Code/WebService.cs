@@ -1044,6 +1044,28 @@ public class WebService : System.Web.Services.WebService
         }
     }
 
+    //聯絡客服－我的問題詳細
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string GetContact_CustomerQAContentJson(string inputJsonStr)
+    {
+        job = gm.getJsonResult(inputJsonStr);
+        try
+        {
+            string identify = job["Identify"].ToString();
+            string CCSID = job["NuID"].ToString();
+            if (!identify.Equals("") && !CCSID.Equals(""))
+                return main.GetContact_CustomerQAContent(identify, CCSID);
+            else
+                return gm.getStageJson(false, msg.dataError_cht);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return gm.getStageJson(false, msg.noData_cht);
+        }
+    }
+
     //聯絡客服－新增問題
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]

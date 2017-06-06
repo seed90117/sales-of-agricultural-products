@@ -220,15 +220,7 @@ public class MainMethod
     {
         string[] parametersname = { "@identify" };
         string[] parametersvalue = { identify };
-        sql = "select Email,FirstName FN,LastName LN,Phone,Address Ad,Access Ac from Member where Identify = ";
-        for (int i = 0; i < parametersname.Length; i++)
-        {
-            if (i != 0)
-            {
-                sql += ",";
-            }
-            sql += parametersname[i];
-        }
+        sql = "select Email,FirstName FN,LastName LN,Phone,Address Ad,Access Ac from Member where Identify = " + parametersname[0];
         return sqlMethod.Select(sql, parametersname, parametersvalue);
     }
 
@@ -372,7 +364,7 @@ public class MainMethod
         string farmID = "", memberID = "";
         string packagingDate, CCID, CID, VID;//暫時
         sql = "select TOP (1) SignLog.MemberID, Farm.FarmID from SignLog"
-            + " INNER JOIN Farm ON Farm.MemberID=SignLog.MemberID"
+            + " INNER JOIN Farm ON Farm.MemberID = SignLog.MemberID"
             + " where Identify = '" + identify + "'"
             + " order by SignLogID desc";
         JObject jObject = gm.getJsonResult(sqlMethod.Select(sql));
@@ -1205,26 +1197,42 @@ public class MainMethod
         string memberID = "";
         string[] parametersname = { "@identify" };
         string[] parametersvalue = { identify };
-        sql = "select MemberID from Member where Identify = ";
-        for (int i = 0; i < parametersname.Length; i++)
-        {
-            if (i != 0)
-            {
-                sql += ",";
-            }
-            sql += parametersname[i];
-        }
+        sql = "select MemberID from Member where Identify = " + parametersname[0];
         JObject job = gm.getJsonResult(sqlMethod.Select(sql, parametersname, parametersvalue));
         if (job["stage"].ToString().Equals(true.ToString()))
         {
             job = gm.getJsonObjectResult(job["message"].ToString());
             memberID = job["MemberID"].ToString();
-            sql = "select CCSID nIN,OrderNumber nON,ProblemSpecies nPS,Status nSS,tDateTime nDT from Contact_CustomerServiceQA where MemberID = " + memberID;
+            sql = "select CCSID nIN,OrderNumber nON,ProblemSpecies nPS,Status nSS,tDateTime nDT from Contact_CustomerServiceQA where MemberID = " + memberID + " order by nDT desc";
             return sqlMethod.Select(sql);
         }
         else
         {
-            return gm.getStageJson(false, msg.EmailFail_cht);
+            return gm.getStageJson(false, msg.fail);
+        }
+    }
+
+    //聯絡客服－我的問題詳細
+    public string GetContact_CustomerQAContent(string identify, string CCSID) //Huan-Chieh Chen
+    {
+        string memberID = "";
+        string[] parametersname = { "@identify" };
+        string[] parametersvalue = { identify };
+        sql = "select MemberID from Member where Identify = " + parametersname[0];
+        JObject job = gm.getJsonResult(sqlMethod.Select(sql, parametersname, parametersvalue));
+        if (job["stage"].ToString().Equals(true.ToString()))
+        {
+            job = gm.getJsonObjectResult(job["message"].ToString());
+            memberID = job["MemberID"].ToString();
+            parametersvalue[0] = CCSID;
+            sql = "select CCS.CCSID nIN, OrderNumber nON, ProblemSpecies nPS, ProblemDescription nPD, Status nSS, CCS.tDateTime nDT, isMana nIM, ContentDescription nCS, CCC.tDateTime nDT2 FROM Contact_CustomerQAContent CCC"
+                + " inner join Contact_CustomerServiceQA CCS on CCC.CCSID = CCS.CCSID"
+                + " where CCS.MemberID = " + memberID + " AND CCC.CCSID = " + parametersname[0];
+            return sqlMethod.Select(sql, parametersname, parametersvalue);
+        }
+        else
+        {
+            return gm.getStageJson(false, msg.fail);
         }
     }
 
